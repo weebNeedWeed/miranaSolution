@@ -1,0 +1,18 @@
+@import url("https://fonts.googleapis.com/css2?family=Source+Sans+Pro:ital,wght@0,200;0,300;0,400;0,600;0,700;1,200;1,300;1,400;1,600;1,700&display=swap");
+
+@import-normalize;
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+	/* Defines css variables here */
+	:root {
+		--color-white-chocolate: 236, 233, 217;
+		--color-dark-vanilla: 205, 185, 158;
+		--color-old-rose: 186, 136, 128;
+		--color-deep-koamaru: 48, 54, 89;
+		--color-powder-blue: 180, 219, 222;
+	}
+}
