@@ -5,6 +5,7 @@ import { RouteObject } from "react-router/dist/lib/context";
 
 import { Home } from "./pages";
 import { AppLayout } from "./AppLayout";
+import { Test } from "./pages/Test";
 
 const routes: RouteObject[] = [
 	{
@@ -14,6 +15,10 @@ const routes: RouteObject[] = [
 				path: "/",
 				element: <Home />,
 				index: true,
+			},
+			{
+				path: "/test",
+				element: <Test />,
 			},
 		],
 	},

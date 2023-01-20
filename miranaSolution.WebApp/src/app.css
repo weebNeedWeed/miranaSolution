@@ -2,6 +2,9 @@
 
 @layer base {
 	body {
-		background: rgb(var(--color-white-chocolate));
+		background: var(--bg-gratient);
+		overflow-x: hidden;
+		box-sizing: border-box;
+		font-family: "Source Sans Pro", sans-serif;
 	}
 }

@@ -1,7 +1,7 @@
 import React from "react";
 
 const Home = (): JSX.Element => {
-	return <div>this is home</div>;
+	return <div>home</div>;
 };
 
 export { Home };

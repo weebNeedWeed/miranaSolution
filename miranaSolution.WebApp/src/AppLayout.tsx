@@ -1,5 +1,5 @@
 import React from "react";
-import { Navbar } from "./layouts/index";
+import { Navbar, Header } from "./layouts/index";
 import { Outlet } from "react-router-dom";
 
 /**
@@ -12,6 +12,7 @@ const AppLayout = (): JSX.Element => {
 		<div>
 			<div>
 				<Navbar />
+				<Header />
 			</div>
 
 			<div>

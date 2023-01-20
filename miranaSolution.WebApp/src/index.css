@@ -14,5 +14,29 @@
 		--color-old-rose: 186, 136, 128;
 		--color-deep-koamaru: 48, 54, 89;
 		--color-powder-blue: 180, 219, 222;
+
+		--bg-gratient: radial-gradient(
+			circle at 4% 25%,
+			rgba(236, 233, 217, 1) 0%,
+			rgba(205, 185, 158, 1) 100%
+		);
+	}
+
+	body {
+		background: var(--bg-gratient);
+		overflow-x: hidden;
+		box-sizing: border-box;
+		font-family: "Source Sans Pro", sans-serif;
+	}
+
+	.gradient-text {
+		background: linear-gradient(
+			90deg,
+			rgba(128, 32, 0, 1) 0%,
+			rgba(238, 130, 238, 1) 100%
+		);
+		-webkit-text-fill-color: transparent;
+		-webkit-background-clip: text;
+		background-clip: text;
 	}
 }
