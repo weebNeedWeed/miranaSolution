@@ -19,7 +19,7 @@ const Menu = ({ className }: MenuProps): JSX.Element => {
 				<NavLink to="/">Trang chủ</NavLink>
 			</p>
 			<p className={pClass}>
-				<NavLink to="/">Tìm kiếm</NavLink>
+				<NavLink to="/test">Tìm kiếm</NavLink>
 			</p>
 			<p className={pClass}>
 				<NavLink to="/">Thể loại</NavLink>

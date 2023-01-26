@@ -1,5 +1,6 @@
 import React from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import { useSystemContext } from "../contexts/SystemContext";
 
 const data = [
 	{
@@ -18,6 +19,7 @@ const data = [
 
 const Test = (): JSX.Element => {
 	const [index, setIndex] = React.useState(1);
+	const { state, dispatch } = useSystemContext();
 
 	const renderData = data.find((elm) => elm.id === index);
 

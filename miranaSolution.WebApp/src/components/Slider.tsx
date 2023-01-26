@@ -1,16 +1,18 @@
 import React, { useState } from "react";
 
-import { Navigation, Pagination, A11y, Autoplay } from "swiper";
+import { A11y, Autoplay } from "swiper";
 import { Swiper, SwiperSlide } from "swiper/react";
-import { EffectFade } from "swiper";
+import { EffectFade, EffectCube } from "swiper";
 import SwiperClass from "swiper/types/swiper-class";
 
 import "swiper/css";
-import "swiper/css/navigation";
-import "swiper/css/pagination";
+import "swiper/css/effect-cube";
 import "swiper/css/effect-fade";
 
-type SliderProps = {};
+type SliderProps = {
+	images: Array<string>;
+	setSlideIndex: (index: number) => void;
+};
 type SwiperChildSlideProps = {
 	image: string;
 };
@@ -20,6 +22,7 @@ const SwiperSlideChild = ({ image }: SwiperChildSlideProps): JSX.Element => {
 		<div
 			className={`w-[215px] h-[322px] bg-cover bg-center`}
 			style={{
+				boxShadow: "rgba(0, 0, 0, 0.35) 0px 5px 15px",
 				backgroundImage: `url('${image}')`,
 			}}
 		></div>
@@ -28,29 +31,30 @@ const SwiperSlideChild = ({ image }: SwiperChildSlideProps): JSX.Element => {
 
 const Slider = (props: SliderProps): JSX.Element => {
 	const handleOnSlideChange = (swiper: SwiperClass) => {
-		console.log(swiper);
+		props.setSlideIndex(swiper.activeIndex);
 	};
 
 	return (
 		<div className="w-full">
 			<Swiper
-				modules={[Navigation, Autoplay, Pagination, A11y, EffectFade]}
+				modules={[Autoplay, A11y, EffectFade, EffectCube]}
 				slidesPerView={1}
-				navigation
-				pagination={{ clickable: true }}
 				onSlideChange={handleOnSlideChange}
-				effect={"fade"}
+				effect={"cube"}
+				allowTouchMove={false}
 				autoplay={{
-					delay: 10000,
+					delay: 5000,
 					disableOnInteraction: false,
 				}}
 			>
-				<SwiperSlide className="flex flex-row items-center justify-center">
-					<SwiperSlideChild image="https://static.cdnno.com/poster/can-cu-so-7/300.jpg?1650802893" />
-				</SwiperSlide>
-				<SwiperSlide className="flex flex-row items-center justify-center">
-					<SwiperSlideChild image="https://static.cdnno.com/poster/can-cu-so-7/300.jpg?1650802893" />
-				</SwiperSlide>
+				{props.images.map((elm, index) => (
+					<SwiperSlide
+						key={index}
+						className="flex flex-row items-center justify-center"
+					>
+						<SwiperSlideChild image={elm} />
+					</SwiperSlide>
+				))}
 			</Swiper>
 		</div>
 	);
