@@ -1,4 +1,4 @@
-﻿namespace miranaSolution.Utilities
+﻿namespace miranaSolution.Utilities.Constants
 {
     public class SystemConstants
     {

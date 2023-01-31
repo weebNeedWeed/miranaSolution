@@ -18,11 +18,7 @@ const Header = (): JSX.Element => {
 		new SlideApiHelper().getAll(),
 	);
 
-	if (isLoading) {
-		return <></>;
-	}
-
-	if (data === null) {
+	if (isLoading || error || !data) {
 		return <></>;
 	}
 
@@ -33,7 +29,7 @@ const Header = (): JSX.Element => {
 	));
 
 	return (
-		<div className="px-4 lg:px-16 py-4 bg-gradient flex items-center">
+		<div className="px-4 pb-4 lg:px-16 md:py-4 bg-gradient flex items-center">
 			<div className="w-full flex flex-col-reverse md:flex-row justify-start items-center min-h-[70vh]">
 				<AnimatePresence mode="wait">
 					<motion.div
@@ -65,7 +61,7 @@ const Header = (): JSX.Element => {
 					</motion.div>
 				</AnimatePresence>
 
-				<div className="w-full mb-4 p-2 md:w-1/3 flex flex-row items-center justify-end">
+				<div className="w-full sm:w-1/2 mb-4 p-2 md:w-1/3 flex flex-row items-center justify-end">
 					<Slider
 						images={data!.map((elm) => elm.image)}
 						setSlideIndex={setSlideIndex}

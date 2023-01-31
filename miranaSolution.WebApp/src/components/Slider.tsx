@@ -2,7 +2,7 @@ import React, { useState } from "react";
 
 import { A11y, Autoplay } from "swiper";
 import { Swiper, SwiperSlide } from "swiper/react";
-import { EffectFade, EffectCube } from "swiper";
+import { EffectCube } from "swiper";
 import SwiperClass from "swiper/types/swiper-class";
 
 import "swiper/css";
@@ -20,7 +20,7 @@ type SwiperChildSlideProps = {
 const SwiperSlideChild = ({ image }: SwiperChildSlideProps): JSX.Element => {
 	return (
 		<div
-			className={`w-[215px] h-[322px] bg-cover bg-center`}
+			className={`w-[150px] h-[224px] md:w-[215px] md:h-[322px] bg-cover bg-center`}
 			style={{
 				boxShadow: "rgba(0, 0, 0, 0.35) 0px 5px 15px",
 				backgroundImage: `url('${image}')`,
@@ -37,7 +37,7 @@ const Slider = (props: SliderProps): JSX.Element => {
 	return (
 		<div className="w-full">
 			<Swiper
-				modules={[Autoplay, A11y, EffectFade, EffectCube]}
+				modules={[Autoplay, A11y, EffectCube]}
 				slidesPerView={1}
 				onSlideChange={handleOnSlideChange}
 				effect={"cube"}

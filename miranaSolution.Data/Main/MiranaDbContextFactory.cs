@@ -1,7 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Design;
 using Microsoft.Extensions.Configuration;
-using miranaSolution.Utilities;
+using miranaSolution.Utilities.Constants;
 
 namespace miranaSolution.Data.Main
 {
