@@ -1,7 +1,7 @@
 import { BaseApiHelper } from "./BaseApiHelper";
 import { Slide } from "./../../types/Slide";
 
-export class SlideApiHelper extends BaseApiHelper {
+class SlideApiHelper extends BaseApiHelper {
 	readonly GET_ALL = "/slides";
 
 	constructor() {
@@ -18,3 +18,5 @@ export class SlideApiHelper extends BaseApiHelper {
 		}
 	}
 }
+
+export const slideApiHelper = new SlideApiHelper;

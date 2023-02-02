@@ -1,4 +1,4 @@
-import React, { useState, MouseEvent, useEffect } from "react";
+import { useState, MouseEvent, useEffect } from "react";
 import { Link, NavLink } from "react-router-dom";
 import logo from "./../assets/logo.svg";
 import { CgMenuRight, CgClose } from "react-icons/cg";
@@ -9,7 +9,7 @@ type MenuProps = {
 };
 const Menu = ({ className }: MenuProps): JSX.Element => {
 	const pClass = clsx(
-		"font-sansPro text-deepKoamaru font-semibold ",
+		"font-sansPro text-deepKoamaru font-semibold",
 		className && className,
 	);
 

@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import { useEffect } from "react";
 import { HashLoader } from "react-spinners";
 import { motion, AnimatePresence } from "framer-motion";
 
@@ -22,7 +22,7 @@ const Loading = ({ show }: LoadingProps): JSX.Element => {
 			{show && (
 				<motion.div
 					initial={{
-						opacity: 0,
+						opacity: 0.5,
 					}}
 					animate={{ opacity: 1 }}
 					exit={{ opacity: 0 }}

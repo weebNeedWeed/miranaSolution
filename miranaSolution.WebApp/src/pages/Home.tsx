@@ -1,11 +1,15 @@
-import React from "react";
-import { Header } from "../layouts";
+import { Divider } from "../components";
+import { EditorRecommendationWithCurrentlyReading, Header } from "../layouts";
 
 const Home = (): JSX.Element => {
 	return (
-		<div>
+		<>
 			<Header />
-		</div>
+
+			<Divider />
+
+			<EditorRecommendationWithCurrentlyReading />
+		</>
 	);
 };
 

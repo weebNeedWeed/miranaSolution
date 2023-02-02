@@ -1,9 +1,9 @@
-import React, { useLayoutEffect } from "react";
-import { Loading } from "./../components";
+import { useLayoutEffect } from "react";
+import { Loading } from "../components";
 import { useSystemContext } from "../contexts/SystemContext";
 import { useLocation } from "react-router-dom";
 
-const LoadingContainer = (): JSX.Element => {
+const LoadingScreen = (): JSX.Element => {
 	const { state, dispatch } = useSystemContext();
 	const location = useLocation();
 
@@ -24,4 +24,4 @@ const LoadingContainer = (): JSX.Element => {
 	return <Loading show={state.showLoading} />;
 };
 
-export { LoadingContainer };
+export { LoadingScreen };

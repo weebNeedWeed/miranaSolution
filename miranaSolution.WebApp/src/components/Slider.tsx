@@ -1,5 +1,3 @@
-import React, { useState } from "react";
-
 import { A11y, Autoplay } from "swiper";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { EffectCube } from "swiper";
@@ -20,7 +18,7 @@ type SwiperChildSlideProps = {
 const SwiperSlideChild = ({ image }: SwiperChildSlideProps): JSX.Element => {
 	return (
 		<div
-			className={`w-[150px] h-[224px] md:w-[215px] md:h-[322px] bg-cover bg-center`}
+			className={`w-[150px] h-[224px] sm:w-[215px] sm:h-[322px] bg-cover bg-center`}
 			style={{
 				boxShadow: "rgba(0, 0, 0, 0.35) 0px 5px 15px",
 				backgroundImage: `url('${image}')`,

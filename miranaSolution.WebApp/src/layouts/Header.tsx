@@ -1,9 +1,9 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { GenreTag, Slider } from "../components";
 import { BsBoxArrowInRight } from "react-icons/bs";
 import { AnimatePresence, motion } from "framer-motion";
 import { useQuery } from "react-query";
-import { SlideApiHelper } from "../helpers/apis/SlideApiHelper";
+import { slideApiHelper } from "../helpers/apis/SlideApiHelper";
 
 const motionVariants = {
 	initial: { opacity: 0, y: 100 },
@@ -15,7 +15,7 @@ const Header = (): JSX.Element => {
 	const [slideIndex, setSlideIndex] = useState<number>(0);
 
 	const { isLoading, error, data } = useQuery("slides", () =>
-		new SlideApiHelper().getAll(),
+		slideApiHelper.getAll(),
 	);
 
 	if (isLoading || error || !data) {
@@ -30,7 +30,7 @@ const Header = (): JSX.Element => {
 
 	return (
 		<div className="px-4 pb-4 lg:px-16 md:py-4 bg-gradient flex items-center">
-			<div className="w-full flex flex-col-reverse md:flex-row justify-start items-center min-h-[70vh]">
+			<div className="w-full flex flex-col-reverse md:flex-row justify-start items-center md:min-h-[70vh]">
 				<AnimatePresence mode="wait">
 					<motion.div
 						key={currentSlide!.id}

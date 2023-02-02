@@ -1,7 +1,6 @@
-import React from "react";
 import { Navbar } from "./layouts";
 import { Outlet } from "react-router-dom";
-import { LoadingContainer } from "./containers";
+import { LoadingScreen } from "./containers";
 
 /**
  * @description Create app layout and add this as a route in routeList to that Link component can be used with data api
@@ -19,7 +18,7 @@ const AppLayout = (): JSX.Element => {
 				<Outlet />
 			</div>
 
-			<LoadingContainer />
+			<LoadingScreen />
 		</div>
 	);
 };
