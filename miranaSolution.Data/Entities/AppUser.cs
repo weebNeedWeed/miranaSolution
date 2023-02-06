@@ -8,5 +8,7 @@ namespace miranaSolution.Data.Entities
         public string LastName { get; set; }
 
         public List<Book> Books { get; set; }
+
+        public List<Rating> Ratings { get; set; }
     }
 }

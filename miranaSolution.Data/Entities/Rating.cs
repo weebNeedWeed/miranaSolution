@@ -7,5 +7,11 @@
         public int? ParentId { get; set; }
         public int ReactionCount { get; set; }
         public DateTime CreatedAt { get; set; }
+
+        public Guid? UserId { get; set; }
+        public AppUser AppUser { get; set; }
+
+        public int BookId { get; set; }
+        public Book Book { get; set; }
     }
 }
