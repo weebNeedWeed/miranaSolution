@@ -7,7 +7,16 @@
         public string ShortDescription { get; set; }
         public string LongDescription { get; set; }
         public DateTime CreatedAt { get; set; }
+        public DateTime UpdatedAt{ get; set; }
         public string ThumbnailImage { get; set; }
         public string Slug { get; set; }
+
+        public int AuthorId { get; set;}
+        public Author Author { get; set; }
+
+        public Guid UserId { get; set;}
+        public AppUser AppUser { get; set; }
+
+        public List<Chapter> Chapters { get; set; }
     }
 }

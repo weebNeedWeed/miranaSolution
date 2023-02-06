@@ -4,5 +4,7 @@
     {
         public int Id { get; set; }
         public int Name { get; set; }
+
+        public List<Book> Books {get; set;}
     }
 }
