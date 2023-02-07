@@ -23,6 +23,7 @@ namespace miranaSolution.Data.Main
             builder.ApplyConfiguration(new BookGenreConfiguration());
             builder.ApplyConfiguration(new ChapterConfiguration());
             builder.ApplyConfiguration(new RatingConfiguration());
+            builder.ApplyConfiguration(new SlideConfiguration());
 
             builder.Entity<IdentityRoleClaim<Guid>>().ToTable("AppRoleClaims");
             builder.Entity<IdentityUserClaim<Guid>>().ToTable("AppUserClaims");
@@ -37,5 +38,6 @@ namespace miranaSolution.Data.Main
         public DbSet<BookGenre> BookGenres { get; set; }
         public DbSet<Chapter> Chapters { get; set; }
         public DbSet<Rating> Ratings { get; set; }
+        public DbSet<Slide> Slides { get; set; }
     }
 }
