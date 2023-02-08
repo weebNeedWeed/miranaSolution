@@ -1,7 +1,8 @@
 export interface Slide {
 	name: string;
-	description: string;
-	image: string;
-	genres: Array<string>;
-	id: string;
+	shortDescription: string;
+	thumbnailImage: string;
+	genres: string;
+	id: number;
+	sortOrder: number;
 }

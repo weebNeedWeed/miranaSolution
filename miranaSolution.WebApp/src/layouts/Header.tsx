@@ -24,7 +24,9 @@ const Header = (): JSX.Element => {
 
 	const currentSlide = data![slideIndex];
 
-	const tags = currentSlide.genres.map((elm, index) => (
+	const genres = currentSlide.genres.split(",").map((elm) => elm.trim());
+
+	const tags = genres.map((elm, index) => (
 		<GenreTag genre={elm} key={index} className="mr-2" />
 	));
 
@@ -46,11 +48,11 @@ const Header = (): JSX.Element => {
 						>
 							{currentSlide.name}
 						</motion.h2>
-						<div className="flex flex-row w-full mb-3 justify-start items-center">
+						<div className="flex flex-row w-full justify-start items-center flex-wrap">
 							{tags}
 						</div>
 						<p className="text-base text-deepKoamaru mb-4">
-							{currentSlide.description}
+							{currentSlide.shortDescription}
 						</p>
 						<button className="group flex flex-row justify-center items-center outline-none rounded-md border-2 border-solid border-deepKoamaru px-3 py-1 text-lg font-semibold font-sansPro text-deepKoamaru bg-[rgba(var(--color-old-rose),0.6)] transition-all hover:bg-[rgba(var(--color-old-rose),0.4)]">
 							<p className="mr-1 group-hover:mr-2 transition-all">Đọc ngay</p>
@@ -63,7 +65,7 @@ const Header = (): JSX.Element => {
 
 				<div className="w-full sm:w-1/2 mb-4 p-2 md:w-1/3 flex flex-row items-center justify-end">
 					<Slider
-						images={data!.map((elm) => elm.image)}
+						images={data!.map((elm) => elm.thumbnailImage)}
 						setSlideIndex={setSlideIndex}
 					/>
 				</div>

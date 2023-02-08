@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using miranaSolution.Data.Configurations;
 using miranaSolution.Data.Entities;
+using miranaSolution.Data.Extensions;
 
 namespace miranaSolution.Data.Main
 {
@@ -30,6 +31,8 @@ namespace miranaSolution.Data.Main
             builder.Entity<IdentityUserLogin<Guid>>().ToTable("AppUserLogins");
             builder.Entity<IdentityUserRole<Guid>>().ToTable("AppUserRoles");
             builder.Entity<IdentityUserToken<Guid>>().ToTable("AppUserTokens");
+
+            builder.Seed();
         }
 
         public DbSet<Author> Authors { get; set; }

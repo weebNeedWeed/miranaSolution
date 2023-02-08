@@ -7,7 +7,11 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "miranaSolution.Data", "mira
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "miranaSolution.Utilities", "miranaSolution.Utilities\miranaSolution.Utilities.csproj", "{B4355E52-EEF2-4924-A24E-5AB2631AE2E9}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "miranaSolution.Business", "miranaSolution.Repository\miranaSolution.Business.csproj", "{E97A8449-16C3-49D3-8D00-BAA22FDDADFD}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "miranaSolution.BackendApi", "miranaSolution.BackendApi\miranaSolution.BackendApi.csproj", "{11F0F066-2EF8-4A80-B7C9-DF6B28E69F27}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "miranaSolution.Business", "miranaSolution.Business\miranaSolution.Business.csproj", "{204BC5DC-F286-4520-A43E-4A8C6701D50B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "miranaSolution.Dtos", "miranaSolution.Dtos\miranaSolution.Dtos.csproj", "{4DDD7FFF-45C5-49AC-916A-0562EF629243}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -23,10 +27,18 @@ Global
 		{B4355E52-EEF2-4924-A24E-5AB2631AE2E9}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B4355E52-EEF2-4924-A24E-5AB2631AE2E9}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B4355E52-EEF2-4924-A24E-5AB2631AE2E9}.Release|Any CPU.Build.0 = Release|Any CPU
-		{E97A8449-16C3-49D3-8D00-BAA22FDDADFD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{E97A8449-16C3-49D3-8D00-BAA22FDDADFD}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{E97A8449-16C3-49D3-8D00-BAA22FDDADFD}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{E97A8449-16C3-49D3-8D00-BAA22FDDADFD}.Release|Any CPU.Build.0 = Release|Any CPU
+		{11F0F066-2EF8-4A80-B7C9-DF6B28E69F27}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{11F0F066-2EF8-4A80-B7C9-DF6B28E69F27}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{11F0F066-2EF8-4A80-B7C9-DF6B28E69F27}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{11F0F066-2EF8-4A80-B7C9-DF6B28E69F27}.Release|Any CPU.Build.0 = Release|Any CPU
+		{204BC5DC-F286-4520-A43E-4A8C6701D50B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{204BC5DC-F286-4520-A43E-4A8C6701D50B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{204BC5DC-F286-4520-A43E-4A8C6701D50B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{204BC5DC-F286-4520-A43E-4A8C6701D50B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4DDD7FFF-45C5-49AC-916A-0562EF629243}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4DDD7FFF-45C5-49AC-916A-0562EF629243}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4DDD7FFF-45C5-49AC-916A-0562EF629243}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4DDD7FFF-45C5-49AC-916A-0562EF629243}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

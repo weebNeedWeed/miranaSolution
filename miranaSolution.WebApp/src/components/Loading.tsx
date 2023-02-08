@@ -26,7 +26,7 @@ const Loading = ({ show }: LoadingProps): JSX.Element => {
 					}}
 					animate={{ opacity: 1 }}
 					exit={{ opacity: 0 }}
-					className="absolute top-0 left-0 w-full h-full bg-whiteChocolate z-[10000] flex items-center justify-center"
+					className="fixed top-0 left-0 w-full h-full bg-whiteChocolate z-[10000] flex items-center justify-center"
 				>
 					<HashLoader color="#BA8880" size={100} />
 				</motion.div>
