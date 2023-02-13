@@ -1,16 +1,14 @@
 import { Divider } from "../components";
-import { EditorRecommendationWithCurrentlyReading, Header } from "../layouts";
+import { Header } from "../layouts";
 
 const Home = (): JSX.Element => {
-	return (
-		<>
-			<Header />
+  return (
+    <>
+      <Header />
 
-			<Divider />
-
-			<EditorRecommendationWithCurrentlyReading />
-		</>
-	);
+      <Divider />
+    </>
+  );
 };
 
 export { Home };
