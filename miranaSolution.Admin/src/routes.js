@@ -9,7 +9,7 @@ import LoginPage from './pages/LoginPage';
 import Page404 from './pages/Page404';
 import ProductsPage from './pages/ProductsPage';
 import DashboardAppPage from './pages/DashboardAppPage';
-import SlidesPage  from './pages/SlidesPage';
+import SlidesPage from './pages/SlidesPage';
 
 // ----------------------------------------------------------------------
 
@@ -24,7 +24,7 @@ export default function Router() {
         { path: 'user', element: <UserPage /> },
         { path: 'products', element: <ProductsPage /> },
         { path: 'blog', element: <BlogPage /> },
-        {path: "slides", element: <SlidesPage />}
+        { path: 'slides', element: <SlidesPage /> },
       ],
     },
     {
