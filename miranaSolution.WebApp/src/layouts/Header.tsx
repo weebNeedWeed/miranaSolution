@@ -6,72 +6,72 @@ import { useQuery } from "react-query";
 import { slideApiHelper } from "../helpers/apis/SlideApiHelper";
 
 const motionVariants = {
-	initial: { opacity: 0, y: 100 },
-	animate: { opacity: 1, y: 0 },
-	exit: { opacity: 0, y: -100 },
+  initial: { opacity: 0, y: 50 },
+  animate: { opacity: 1, y: 0 },
+  exit: { opacity: 0, y: -50 },
 };
 
 const Header = (): JSX.Element => {
-	const [slideIndex, setSlideIndex] = useState<number>(0);
+  const [slideIndex, setSlideIndex] = useState<number>(0);
 
-	const { isLoading, error, data } = useQuery("slides", () =>
-		slideApiHelper.getAll(),
-	);
+  const { isLoading, error, data } = useQuery("slides", () =>
+    slideApiHelper.getAll()
+  );
 
-	if (isLoading || error || !data) {
-		return <></>;
-	}
+  if (isLoading || error || !data) {
+    return <></>;
+  }
 
-	const currentSlide = data![slideIndex];
+  const currentSlide = data![slideIndex];
 
-	const genres = currentSlide.genres.split(",").map((elm) => elm.trim());
+  const genres = currentSlide.genres.split(",").map((elm) => elm.trim());
 
-	const tags = genres.map((elm, index) => (
-		<GenreTag genre={elm} key={index} className="mr-2" />
-	));
+  const tags = genres.map((elm, index) => (
+    <GenreTag genre={elm} key={index} className="mr-2" />
+  ));
 
-	return (
-		<div className="px-4 pb-4 lg:px-16 md:py-4 bg-gradient flex items-center">
-			<div className="w-full flex flex-col-reverse md:flex-row justify-start items-center md:min-h-[70vh]">
-				<AnimatePresence mode="wait">
-					<motion.div
-						key={currentSlide!.id}
-						variants={motionVariants}
-						initial="initial"
-						animate="animate"
-						exit="exit"
-						className="w-full md:w-2/3 h-full flex flex-col justify-center items-start px-0 lg:px-20"
-					>
-						<motion.h2
-							variants={motionVariants}
-							className="uppercase font-bold text-3xl md:text-4xl lg:text-6xl mb-4 gradient-text"
-						>
-							{currentSlide.name}
-						</motion.h2>
-						<div className="flex flex-row w-full justify-start items-center flex-wrap">
-							{tags}
-						</div>
-						<p className="text-base text-deepKoamaru mb-4">
-							{currentSlide.shortDescription}
-						</p>
-						<button className="group flex flex-row justify-center items-center outline-none rounded-md border-2 border-solid border-deepKoamaru px-3 py-1 text-lg font-semibold font-sansPro text-deepKoamaru bg-[rgba(var(--color-old-rose),0.6)] transition-all hover:bg-[rgba(var(--color-old-rose),0.4)]">
-							<p className="mr-1 group-hover:mr-2 transition-all">Đọc ngay</p>
-							<span>
-								<BsBoxArrowInRight />
-							</span>
-						</button>
-					</motion.div>
-				</AnimatePresence>
+  return (
+    <div className="px-4 pb-4 lg:px-16 md:py-4 bg-gradient flex items-center">
+      <div className="w-full flex flex-col-reverse md:flex-row justify-start items-center md:min-h-[70vh]">
+        <AnimatePresence mode="wait">
+          <motion.div
+            key={currentSlide!.id}
+            variants={motionVariants}
+            initial="initial"
+            animate="animate"
+            exit="exit"
+            className="w-full md:w-2/3 h-full flex flex-col justify-center items-start px-0 lg:px-20"
+          >
+            <motion.h2
+              variants={motionVariants}
+              className="uppercase font-bold text-3xl md:text-4xl lg:text-6xl mb-4 gradient-text"
+            >
+              {currentSlide.name}
+            </motion.h2>
+            <div className="flex flex-row w-full justify-start items-center flex-wrap">
+              {tags}
+            </div>
+            <p className="text-base text-deepKoamaru mb-4">
+              {currentSlide.shortDescription}
+            </p>
+            <button className="group flex flex-row justify-center items-center outline-none rounded-md border-2 border-solid border-deepKoamaru px-3 py-1 text-lg font-semibold font-sansPro text-deepKoamaru bg-[rgba(var(--color-old-rose),0.6)] transition-all hover:bg-[rgba(var(--color-old-rose),0.4)]">
+              <p className="mr-1 group-hover:mr-2 transition-all">Đọc ngay</p>
+              <span>
+                <BsBoxArrowInRight />
+              </span>
+            </button>
+          </motion.div>
+        </AnimatePresence>
 
-				<div className="w-full sm:w-1/2 mb-4 p-2 md:w-1/3 flex flex-row items-center justify-end">
-					<Slider
-						images={data!.map((elm) => elm.thumbnailImage)}
-						setSlideIndex={setSlideIndex}
-					/>
-				</div>
-			</div>
-		</div>
-	);
+        <div className="w-full sm:w-1/2 mb-4 p-2 md:w-1/3 flex flex-row items-center justify-end">
+          <Slider
+            images={data!.map((elm) => elm.thumbnailImage)}
+            setSlideIndex={setSlideIndex}
+          />
+        </div>
+      </div>
+    </div>
+  );
 };
 
 export { Header };
