@@ -8,6 +8,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\miranaSolution.Data\miranaSolution.Data.csproj" />
+    <ProjectReference Include="..\miranaSolution.Dtos\miranaSolution.Dtos.csproj" />
     <ProjectReference Include="..\miranaSolution.Utilities\miranaSolution.Utilities.csproj" />
   </ItemGroup>
 

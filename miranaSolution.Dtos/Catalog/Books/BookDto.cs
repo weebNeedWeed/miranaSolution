@@ -1,6 +1,6 @@
-﻿namespace miranaSolution.Data.Entities
+﻿namespace miranaSolution.Dtos.Catalog.Books
 {
-    public class Book
+    public class BookDto
     {
         public int Id { get; set; }
         public string Name { get; set; }
@@ -11,17 +11,5 @@
         public string ThumbnailImage { get; set; }
         public bool IsRecommended { get; set; }
         public string Slug { get; set; }
-
-        public int AuthorId { get; set; }
-        public Author Author { get; set; }
-
-        public Guid UserId { get; set; }
-        public AppUser AppUser { get; set; }
-
-        public List<Chapter> Chapters { get; set; }
-
-        public List<BookGenre> BookGenres { get; set; }
-
-        public List<Rating> Ratings { get; set; }
     }
 }

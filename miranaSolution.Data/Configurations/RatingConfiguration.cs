@@ -22,7 +22,7 @@ namespace miranaSolution.Data.Configurations
             builder.HasOne(x => x.AppUser)
                 .WithMany(x => x.Ratings)
                 .HasForeignKey(x => x.UserId)
-                .OnDelete(DeleteBehavior.ClientNoAction);
+                .OnDelete(DeleteBehavior.ClientSetNull);
         }
     }
 }

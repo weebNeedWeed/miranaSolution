@@ -6,12 +6,11 @@
         public string Content { get; set; }
         public int? ParentId { get; set; }
         public DateTime CreatedAt { get; set; }
-        public DateTime UpdatedAt { get; set; }
-
-        public string CommentTypeId { get; set; }
-        public CommentType CommentType { get; set; }
 
         public Guid UserId { get; set; }
         public AppUser AppUser { get; set; }
+
+        public int BookId { get; set; }
+        public Book Book { get; set; }
     }
 }
