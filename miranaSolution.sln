@@ -11,7 +11,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "miranaSolution.BackendApi",
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "miranaSolution.Business", "miranaSolution.Business\miranaSolution.Business.csproj", "{204BC5DC-F286-4520-A43E-4A8C6701D50B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "miranaSolution.Dtos", "miranaSolution.Dtos\miranaSolution.Dtos.csproj", "{4DDD7FFF-45C5-49AC-916A-0562EF629243}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "miranaSolution.Dtos", "miranaSolution.Dtos\miranaSolution.Dtos.csproj", "{4DDD7FFF-45C5-49AC-916A-0562EF629243}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

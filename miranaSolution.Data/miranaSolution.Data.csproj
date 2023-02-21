@@ -29,8 +29,4 @@
     <ProjectReference Include="..\miranaSolution.Utilities\miranaSolution.Utilities.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Enums\" />
-  </ItemGroup>
-
 </Project>
