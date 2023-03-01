@@ -4,8 +4,7 @@ namespace miranaSolution.Data.Entities
 {
     public class Reaction
     {
-        public int CommentId { get; set; }
-        public Comment Comment { get; set; }
+        public int ReactableId { get; set; }
 
         public Guid UserId { get; set; }
         public AppUser AppUser { get; set; }

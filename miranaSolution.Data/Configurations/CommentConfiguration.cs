@@ -4,11 +4,11 @@ using miranaSolution.Data.Entities;
 
 namespace miranaSolution.Data.Configurations
 {
-    public class ChapterConfiguration : IEntityTypeConfiguration<Chapter>
+    public class CommentConfiguration : IEntityTypeConfiguration<Comment>
     {
-        public void Configure(EntityTypeBuilder<Chapter> builder)
+        public void Configure(EntityTypeBuilder<Comment> builder)
         {
-            builder.ToTable("Chapters");
+            builder.ToTable("Comments");
 
             builder.HasKey(x => x.Id);
 
@@ -19,8 +19,12 @@ namespace miranaSolution.Data.Configurations
             builder.Property(x => x.UpdatedAt)
                 .IsRequired().HasDefaultValue(DateTime.Now);
 
+            builder.HasOne(x => x.AppUser)
+                .WithMany(x => x.Comments)
+                .HasForeignKey(x => x.UserId);
+
             builder.HasOne(x => x.Book)
-                .WithMany(x => x.Chapters)
+                .WithMany(x => x.Comments)
                 .HasForeignKey(x => x.BookId);
         }
     }

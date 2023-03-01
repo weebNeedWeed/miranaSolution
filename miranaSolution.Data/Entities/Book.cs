@@ -12,10 +12,10 @@
         public bool IsRecommended { get; set; }
         public string Slug { get; set; }
 
-        public int AuthorId { get; set; }
+        public int? AuthorId { get; set; }
         public Author Author { get; set; }
 
-        public Guid UserId { get; set; }
+        public Guid? UserId { get; set; }
         public AppUser AppUser { get; set; }
 
         public List<Chapter> Chapters { get; set; }
@@ -23,5 +23,7 @@
         public List<BookGenre> BookGenres { get; set; }
 
         public List<Rating> Ratings { get; set; }
+
+        public List<Comment> Comments { get; set; }
     }
 }

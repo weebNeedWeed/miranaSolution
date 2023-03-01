@@ -6,6 +6,7 @@
         public string Name { get; set; }
         public int SortOrder { get; set; }
         public string ShortDescription { get; set; }
+        public string Slug { get; set; }
 
         public List<BookGenre> BookGenres { get; set; }
     }

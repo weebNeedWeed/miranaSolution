@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Microsoft.OpenApi.Models;
+using miranaSolution.Business.Catalog.Books;
 using miranaSolution.Business.Common;
 using miranaSolution.Data.Entities;
 using miranaSolution.Data.Main;
@@ -33,6 +34,7 @@ builder.Services.AddSwaggerGen(options =>
 
 // Register application's services
 builder.Services.AddTransient<IGenericRepository<Slide>, GenericRepository<Slide>>();
+builder.Services.AddTransient<IBookRepository, BookRepository>();
 
 builder.Services.AddCors(options =>
 {

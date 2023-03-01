@@ -4,11 +4,11 @@ using miranaSolution.Data.Entities;
 
 namespace miranaSolution.Data.Configurations
 {
-    public class GenreConfiguration : IEntityTypeConfiguration<Genre>
+    public class AuthorConfiguration : IEntityTypeConfiguration<Author>
     {
-        public void Configure(EntityTypeBuilder<Genre> builder)
+        public void Configure(EntityTypeBuilder<Author> builder)
         {
-            builder.ToTable("Genres");
+            builder.ToTable("Authors");
 
             builder.HasKey(x => x.Id);
 

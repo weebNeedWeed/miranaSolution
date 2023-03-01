@@ -14,13 +14,24 @@ namespace miranaSolution.Data.Configurations
 
             builder.Property(x => x.Id).UseIdentityColumn();
 
+            builder.Property(x => x.CreatedAt)
+                .IsRequired().HasDefaultValue(DateTime.Now);
+            builder.Property(x => x.UpdatedAt)
+                .IsRequired().HasDefaultValue(DateTime.Now);
+            builder.Property(x => x.IsRecommended)
+                .IsRequired().HasDefaultValue(false);
+
+            builder.HasIndex(x => x.Slug).IsUnique();
+
             builder.HasOne(x => x.AppUser)
                 .WithMany(x => x.Books)
-                .HasForeignKey(x => x.UserId);
+                .HasForeignKey(x => x.UserId)
+                .OnDelete(DeleteBehavior.ClientSetNull);
 
             builder.HasOne(x => x.Author)
                 .WithMany(x => x.Books)
-                .HasForeignKey(x => x.AuthorId);
+                .HasForeignKey(x => x.AuthorId)
+                .OnDelete(DeleteBehavior.ClientSetNull);
         }
     }
 }
