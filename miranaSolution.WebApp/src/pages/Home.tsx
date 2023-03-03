@@ -17,11 +17,13 @@ const Home = (): JSX.Element => {
 
       <Section>
         <div className="flex flex-col md:flex-row ml-[-20px]">
-          <div className="w-[calc(calc(2*calc(100%/3))-20px)] ml-[20px]">
+          <div className="w-[calc(calc(2*calc(100%/3))-20px)] ml-[20px] min-h-[600px]">
             <EditorRecommendation />
           </div>
 
-          <div className="w-[calc(calc(100%/3)-20px)] ml-[20px]"></div>
+          <div className="w-[calc(calc(100%/3)-20px)] ml-[20px] min-h-[600px]">
+            <CurrentlyReading />
+          </div>
         </div>
       </Section>
     </>

@@ -9,47 +9,47 @@ type SystemContextType = { state: State; dispatch: Dispatch };
 const SystemContext = createContext<SystemContextType>({} as SystemContextType);
 
 const SystemReducer = (state: State, action: Action): State => {
-	switch (action.type) {
-		case "startLoading": {
-			return { ...state, showLoading: true };
-		}
+  switch (action.type) {
+    case "startLoading": {
+      return { ...state, showLoading: true };
+    }
 
-		case "endLoading": {
-			return { ...state, showLoading: false };
-		}
+    case "endLoading": {
+      return { ...state, showLoading: false };
+    }
 
-		default: {
-			return state;
-		}
-	}
+    default: {
+      return state;
+    }
+  }
 };
 
 const initialState: State = {
-	showLoading: false,
+  showLoading: false,
 };
 
 export const SystemContextProvider = ({
-	children,
+  children,
 }: {
-	children: React.ReactNode;
+  children: React.ReactNode;
 }): JSX.Element => {
-	const [state, dispatch] = useReducer(SystemReducer, initialState);
+  const [state, dispatch] = useReducer(SystemReducer, initialState);
 
-	return (
-		<SystemContext.Provider value={{ state, dispatch }}>
-			{children}
-		</SystemContext.Provider>
-	);
+  return (
+    <SystemContext.Provider value={{ state, dispatch }}>
+      {children}
+    </SystemContext.Provider>
+  );
 };
 
 export const useSystemContext = (): SystemContextType => {
-	const systemContext = useContext(SystemContext);
+  const systemContext = useContext(SystemContext);
 
-	if (SystemContext === undefined) {
-		throw new Error(
-			"useSystemContext must be use within SystemContextProvider",
-		);
-	}
+  if (SystemContext === undefined) {
+    throw new Error(
+      "useSystemContext must be used within SystemContextProvider"
+    );
+  }
 
-	return systemContext;
+  return systemContext;
 };

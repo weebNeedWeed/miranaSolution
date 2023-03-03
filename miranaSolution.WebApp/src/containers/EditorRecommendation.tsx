@@ -5,7 +5,7 @@ const EditorRecommendation = (): JSX.Element => {
     "https://lh3.googleusercontent.com/oPhItNgqVzlAb0H_j8i2W0F3yIgmWCsrOv3nnH5yKCeiOdUjIXZwabzld9U8iWIE3DoeoFa5oRMYqssk8g=w215-h322-rw-no";
 
   return (
-    <div className="w-full bg-white rounded p-4 shadow-sm shadow-slate-500">
+    <div className="w-full bg-white rounded p-4 shadow-sm shadow-slate-500 h-full">
       <h2 className="text-xl gradient-text font-bold mb-4">Đề cử</h2>
 
       <div className="flex flex-row flex-wrap mr-[-20px]">
