@@ -34,7 +34,7 @@ builder.Services.AddSwaggerGen(options =>
 
 // Register application's services
 builder.Services.AddTransient<IGenericRepository<Slide>, GenericRepository<Slide>>();
-builder.Services.AddTransient<IBookRepository, BookRepository>();
+builder.Services.AddTransient<IBookService, BookService>();
 
 builder.Services.AddCors(options =>
 {

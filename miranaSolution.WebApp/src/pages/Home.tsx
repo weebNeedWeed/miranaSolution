@@ -14,18 +14,18 @@ const Home = (): JSX.Element => {
           <Divider />
         </>
       )}
-
-      <Section>
-        <div className="flex flex-col md:flex-row ml-[-20px]">
-          <div className="w-[calc(calc(2*calc(100%/3))-20px)] ml-[20px] min-h-[600px]">
+      <Section className="pt-0 md:pt-8">
+        <div className="flex flex-col md:flex-row md:ml-[-20px]">
+          <div className="w-full md:w-[calc(calc(2*calc(100%/3))-20px)] md:ml-[20px] mb-4 md:mb-0 md:min-h-[600px]">
             <EditorRecommendation />
           </div>
 
-          <div className="w-[calc(calc(100%/3)-20px)] ml-[20px] min-h-[600px]">
+          <div className="w-full md:w-[calc(calc(100%/3)-20px)] md:ml-[20px] md:min-h-[600px]">
             <CurrentlyReading />
           </div>
         </div>
       </Section>
+      <Divider />a
     </>
   );
 };

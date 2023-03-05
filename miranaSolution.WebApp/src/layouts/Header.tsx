@@ -14,8 +14,12 @@ const motionVariants = {
 const Header = (): JSX.Element => {
   const [slideIndex, setSlideIndex] = useState<number>(0);
 
-  const { isLoading, error, data } = useQuery("slides", () =>
-    slideApiHelper.getAll()
+  const { isLoading, error, data } = useQuery(
+    "slides",
+    () => slideApiHelper.getAll(),
+    {
+      staleTime: Infinity,
+    }
   );
 
   if (isLoading || error || !data) {

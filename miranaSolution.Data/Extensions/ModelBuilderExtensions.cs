@@ -50,6 +50,22 @@ namespace miranaSolution.Data.Extensions
                     Slug = "phat-tien-hien-hoa"
                 });
 
+            builder.Entity<Genre>().HasData(
+                new Genre
+                {
+                    Id = 1,
+                    Name = "Khoa Huyễn",
+                    Slug = "khoa-huyen",
+                    ShortDescription = ""
+                },
+                new Genre
+                {
+                    Id = 2,
+                    Name = "Võng Du",
+                    Slug = "vong-du",
+                    ShortDescription = ""
+                });
+
             builder.Entity<Book>().HasData(
                 new Book
                 {
@@ -58,7 +74,7 @@ namespace miranaSolution.Data.Extensions
                     ShortDescription = "Đại Khư Tàn Lão Thôn, một đứa bé được những người già nhặt được ở bờ sống, đặt tên Tần Mục, tân tân khổ khổ nuôi hắn trưởng thành. Một ngày kia bóng đem buông xuống, bóng tối bao trùm Đại Khư, Tần Mục bước ra khỏi nhà...",
                     LongDescription = "Đại Khư Tàn Lão Thôn, một đứa bé được những người già nhặt được ở bờ sống, đặt tên Tần Mục, tân tân khổ khổ nuôi hắn trưởng thành. Một ngày kia bóng đem buông xuống, bóng tối bao trùm Đại Khư, Tần Mục bước ra khỏi nhà...",
                     ThumbnailImage = "https://static.8cache.com/cover/eJzLyTDWr0r0d4svDfJwdUsMTSrKNfUzSYwqDLUsNHV0snT1zy7wcXT28PBJ9gp2MU93TC3JDwjJzC60LDZ29M-PcCtI8wwJMk2q8nXy88kqDSx3zQtKCTSwLTcyNNXNMDYyAgAc-B9d/muc-than-ky.jpg",
-                    IsRecommended = false,
+                    IsRecommended = true,
                     Slug = "muc-than-ky",
                     CreatedAt = DateTime.Now,
                     UpdatedAt = DateTime.Now,
@@ -71,12 +87,17 @@ namespace miranaSolution.Data.Extensions
                     ShortDescription = "Ngũ trọc ác thế,Địa ngục đã không,ác quỷ sống lại,nhân gian như ngục.Thế giới này quỷ xuất hiện. . .Như vậy thần lại ở đâu ? Cầu thần cứu thế,có thể trên đời đã mất thần,chỉ có quỷ.",
                     LongDescription = "Ngũ trọc ác thế,Địa ngục đã không,ác quỷ sống lại,nhân gian như ngục.Thế giới này quỷ xuất hiện. . .Như vậy thần lại ở đâu ? Cầu thần cứu thế,có thể trên đời đã mất thần,chỉ có quỷ.",
                     ThumbnailImage = "https://static.cdnno.com/poster/khung-bo-song-lai/300.jpg?1585205957",
-                    IsRecommended = false,
+                    IsRecommended = true,
                     Slug = "khung-bo-song-lai",
                     CreatedAt = DateTime.Now,
                     UpdatedAt = DateTime.Now,
                     AuthorId = 2
                 });
+
+            builder.Entity<BookGenre>().HasData(
+                new BookGenre { BookId = 1, GenreId = 1 },
+                new BookGenre { BookId = 2, GenreId = 2 },
+                new BookGenre { BookId = 2, GenreId = 1 });
         }
     }
 }

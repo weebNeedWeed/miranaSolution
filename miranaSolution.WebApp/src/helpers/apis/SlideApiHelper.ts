@@ -1,17 +1,15 @@
 import { BaseApiHelper } from "./BaseApiHelper";
-import { Slide } from "./../../types/Slide";
-import { ApiResult } from "../../types/ApiResult";
+import { Slide } from "../../models/Slide";
+import { ApiResult } from "../../models/ApiResult";
 
 class SlideApiHelper extends BaseApiHelper {
-	readonly GET_ALL = "/slides";
-
 	constructor() {
 		super();
 	}
 
 	async getAll(): Promise<Array<Slide> | null> {
 		try {
-			const response = await this.axiosInstance.get<ApiResult<Array<Slide>>>(this.GET_ALL);
+			const response = await this.axiosInstance.get<ApiResult<Array<Slide>>>("/slides");
 
 			if(response.data.isSucceed === false) {
 				throw new Error();
