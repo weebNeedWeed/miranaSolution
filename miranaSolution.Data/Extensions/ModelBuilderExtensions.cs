@@ -1,5 +1,7 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using miranaSolution.Data.Entities;
+using System.Xml.Linq;
 
 namespace miranaSolution.Data.Extensions
 {
@@ -98,6 +100,40 @@ namespace miranaSolution.Data.Extensions
                 new BookGenre { BookId = 1, GenreId = 1 },
                 new BookGenre { BookId = 2, GenreId = 2 },
                 new BookGenre { BookId = 2, GenreId = 1 });
+
+            var adminRoleId = Guid.NewGuid();
+            var userRoleId = Guid.NewGuid();
+
+            var adminUserId = Guid.NewGuid();
+
+            builder.Entity<AppRole>().HasData(new AppRole
+            {
+                Id = adminRoleId,
+                Name = "Administrator",
+                Description = "Administrator"
+            },
+            new AppRole
+            {
+                Id = userRoleId,
+                Name = "User",
+                Description = "User"
+            });
+
+            builder.Entity<AppUser>().HasData(new AppUser
+            {
+                Id = adminUserId,
+                FirstName = "Admin",
+                LastName = "Admin",
+                UserName = "admin",
+                PasswordHash = new PasswordHasher<AppUser>().HashPassword(null, "admin123"),
+                Email = "admin@admin.com",
+            });
+
+            builder.Entity<IdentityUserRole<Guid>>().HasData(new IdentityUserRole<Guid>
+            {
+                RoleId = adminRoleId,
+                UserId = adminUserId
+            });
         }
     }
 }
