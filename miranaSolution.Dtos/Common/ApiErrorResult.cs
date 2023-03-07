@@ -1,16 +1,16 @@
 ﻿namespace miranaSolution.Dtos.Common
 {
-  public class ApiErrorResult<TData> : ApiResult<TData>
-  {
-    public ApiErrorResult()
+    public class ApiErrorResult : ApiResult<string>
     {
-      IsSucceed = false;
-    }
+        public ApiErrorResult()
+        {
+            Status = "error";
+        }
 
-    public ApiErrorResult(string msg)
-    {
-      IsSucceed = false;
-      Message = msg;
+        public ApiErrorResult(string errorMsg)
+        {
+            Status = "error";
+            Message = errorMsg;
+        }
     }
-  }
 }

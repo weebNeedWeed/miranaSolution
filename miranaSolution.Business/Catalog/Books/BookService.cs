@@ -36,11 +36,6 @@ namespace miranaSolution.Business.Catalog.Books
                 if (item.IsChecked)
                 {
                     var genre = await _context.Genres.FirstOrDefaultAsync(x => x.Id == item.Id && x.Name == item.Label);
-                    if (genre is null)
-                    {
-                        throw new MiranaBusinessException($"Error cannot found genre with id {item.Id}.");
-                    }
-
                     var bookGenre = new BookGenre
                     {
                         Genre = genre
@@ -50,16 +45,8 @@ namespace miranaSolution.Business.Catalog.Books
                 }
             }
 
-            try
-            {
-                await _context.Books.AddAsync(newBook);
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateException ex)
-            when (ex.InnerException is SqlException sqlException && (sqlException.Number == 2627 || sqlException.Number == 2601))
-            {
-                throw new MiranaBusinessException("Error duplicated slug.");
-            }
+            await _context.Books.AddAsync(newBook);
+            await _context.SaveChangesAsync();
 
             var bookDto = _bookDtoMapper.Map<BookDto>(newBook);
 
@@ -74,12 +61,14 @@ namespace miranaSolution.Business.Catalog.Books
         public async Task<BookDto> GetById(int id)
         {
             var book = await _context.Books.FindAsync(id);
+            var returnData = _bookDtoMapper.Map<BookDto>(book);
 
-            if (book is null)
-            {
-                throw new MiranaBusinessException($"Book with id {id} does not exists.");
-            }
+            return returnData;
+        }
 
+        public async Task<BookDto> GetBySlug(string slug)
+        {
+            var book = await _context.Books.FirstOrDefaultAsync(x => x.Slug == slug);
             var returnData = _bookDtoMapper.Map<BookDto>(book);
 
             return returnData;

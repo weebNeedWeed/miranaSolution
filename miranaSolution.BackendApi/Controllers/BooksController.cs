@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using miranaSolution.Business.Catalog.Books;
 using miranaSolution.Dtos.Catalog.Books;
+using miranaSolution.Dtos.Common;
 using miranaSolution.Utilities.Exceptions;
 
 namespace miranaSolution.BackendApi.Controllers
@@ -22,22 +23,22 @@ namespace miranaSolution.BackendApi.Controllers
         {
             var books = await _bookService.GetPaging(request);
 
-            return Ok(books);
+            return Ok(new ApiSuccessResult<PagedResult<BookDto>>(books));
         }
 
         [HttpPost]
         public async Task<IActionResult> Create([FromForm] BookCreateRequest request)
         {
-            BookDto book;
+            var errors = new Dictionary<string, List<string>>();
 
-            try
+            var isBookWithSlugExisted = (await _bookService.GetBySlug(request.Slug)) is not null;
+            if (isBookWithSlugExisted)
             {
-                book = await _bookService.Create(request);
+                errors.Add(nameof(request.Slug), new List<string> { "Duplicated slug." });
+                return Ok(new ApiFailResult(errors));
             }
-            catch (MiranaBusinessException ex)
-            {
-                return BadRequest(ex.Message);
-            }
+
+            var book = await _bookService.Create(request);
 
             return CreatedAtAction(nameof(GetById), new { id = book.Id }, book);
         }

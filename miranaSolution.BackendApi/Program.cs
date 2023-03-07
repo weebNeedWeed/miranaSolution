@@ -1,9 +1,11 @@
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using miranaSolution.BackendApi.Filters;
 using miranaSolution.Business.Auth.Users;
 using miranaSolution.Business.Catalog.Books;
 using miranaSolution.Business.Common;
@@ -14,7 +16,12 @@ using System.Text;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-builder.Services.AddControllersWithViews();
+builder.Services.AddControllersWithViews(x => x.Filters.Add<HandleModelStateFilter>());
+
+builder.Services.Configure<ApiBehaviorOptions>(x =>
+{
+    x.SuppressModelStateInvalidFilter = true;
+});
 
 builder.Services.AddDbContext<MiranaDbContext>(options =>
 {

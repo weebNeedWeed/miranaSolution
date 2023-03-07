@@ -16,5 +16,7 @@ namespace miranaSolution.Business.Catalog.Books
         Task<BookDto> Create(BookCreateRequest request);
 
         Task<BookDto> GetById(int id);
+
+        Task<BookDto> GetBySlug(string slug);
     }
 }

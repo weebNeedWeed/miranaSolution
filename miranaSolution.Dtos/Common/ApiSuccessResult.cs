@@ -4,12 +4,12 @@
     {
         public ApiSuccessResult()
         {
-            IsSucceed = true;
+            Status = "success";
         }
 
         public ApiSuccessResult(TData dataObj)
         {
-            IsSucceed = true;
+            Status = "success";
             Data = dataObj;
         }
     }
