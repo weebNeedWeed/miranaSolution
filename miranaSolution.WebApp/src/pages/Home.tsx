@@ -1,5 +1,9 @@
 import { Divider, Section } from "../components";
-import { CurrentlyReading, EditorRecommendation } from "../containers";
+import {
+  CurrentlyReading,
+  EditorRecommendation,
+  NewestChapters,
+} from "../containers";
 import { useMediaQuery } from "../helpers/hooks/useMediaQuery";
 import { Header } from "../layouts";
 
@@ -25,7 +29,12 @@ const Home = (): JSX.Element => {
           </div>
         </div>
       </Section>
-      <Divider />a
+
+      <Divider />
+
+      <Section>
+        <NewestChapters />
+      </Section>
     </>
   );
 };

@@ -1,7 +1,7 @@
 import clsx from "clsx";
 import React from "react";
 
-type SectionProps = { children: React.ReactNode; className: string };
+type SectionProps = { children: React.ReactNode; className?: string };
 
 const Section = ({ children, className }: SectionProps): JSX.Element => {
   return (

@@ -10,11 +10,6 @@ class SlideApiHelper extends BaseApiHelper {
 	async getAll(): Promise<Array<Slide> | null> {
 		try {
 			const response = await this.axiosInstance.get<ApiResult<Array<Slide>>>("/slides");
-
-			if(response.data.isSucceed === false) {
-				throw new Error();
-			}
-
 			return response.data.data;
 		} catch (ex) {
 			return null;

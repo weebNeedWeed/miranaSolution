@@ -46,8 +46,12 @@ const EditorRecommendation = (): JSX.Element => {
   const imgUrl =
     "https://lh3.googleusercontent.com/oPhItNgqVzlAb0H_j8i2W0F3yIgmWCsrOv3nnH5yKCeiOdUjIXZwabzld9U8iWIE3DoeoFa5oRMYqssk8g=w215-h322-rw-no";
 
-  const { isLoading, error, data } = useQuery("recommendedBooks", () =>
-    bookApiHelper.getRecommended()
+  const { isLoading, error, data } = useQuery(
+    "recommendedBooks",
+    () => bookApiHelper.getRecommended(),
+    {
+      staleTime: Infinity,
+    }
   );
 
   return (

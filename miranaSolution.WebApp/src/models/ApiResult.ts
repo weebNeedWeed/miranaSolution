@@ -1,5 +1,5 @@
 export interface ApiResult<TData> {
-  isSucceed: boolean;
+  status: "success" | "fail" | "error";
   data: TData;
   message: string;
 }

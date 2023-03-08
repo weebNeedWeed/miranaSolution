@@ -1,9 +1,8 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using miranaSolution.Business.Catalog.Books;
+using miranaSolution.Data.Entities;
 using miranaSolution.Dtos.Catalog.Books;
 using miranaSolution.Dtos.Common;
-using miranaSolution.Utilities.Exceptions;
 
 namespace miranaSolution.BackendApi.Controllers
 {
@@ -40,24 +39,21 @@ namespace miranaSolution.BackendApi.Controllers
 
             var book = await _bookService.Create(request);
 
-            return CreatedAtAction(nameof(GetById), new { id = book.Id }, book);
+            return Ok(new ApiSuccessResult<BookDto>(book));
         }
 
         [HttpGet("{id}")]
         public async Task<IActionResult> GetById(int id)
         {
-            BookDto book;
-
-            try
+            var book = await _bookService.GetById(id);
+            if (book is null)
             {
-                book = await _bookService.GetById(id);
-            }
-            catch (MiranaBusinessException ex)
-            {
-                return BadRequest(ex.Message);
+                return Ok(new ApiFailResult(new Dictionary<string, List<string>> {
+                        { nameof(book.Id), new List<string> { $"Invalid Id." } }
+                    }));
             }
 
-            return Ok(book);
+            return Ok(new ApiSuccessResult<BookDto>(book));
         }
 
         [HttpGet("recommended")]
@@ -65,7 +61,7 @@ namespace miranaSolution.BackendApi.Controllers
         {
             var books = await _bookService.GetRecommended();
 
-            return Ok(books);
+            return Ok(new ApiSuccessResult<List<BookDto>>(books));
         }
     }
 }

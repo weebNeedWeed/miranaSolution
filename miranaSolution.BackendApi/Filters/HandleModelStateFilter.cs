@@ -6,12 +6,12 @@ namespace miranaSolution.BackendApi.Filters
 {
     public class HandleModelStateFilter : IAsyncActionFilter
     {
-        public Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)
+        public async Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)
         {
-            var errors = new Dictionary<string, List<string>>();
-
             if (!context.ModelState.IsValid)
             {
+                var errors = new Dictionary<string, List<string>>();
+
                 foreach (var key in context.ModelState.Keys)
                 {
                     var errorMessages = context.ModelState[key].Errors
@@ -21,9 +21,11 @@ namespace miranaSolution.BackendApi.Filters
                 }
 
                 context.Result = new JsonResult(new ApiFailResult(errors));
+
+                return;
             }
 
-            return Task.FromResult(0);
+            await next();
         }
     }
 }

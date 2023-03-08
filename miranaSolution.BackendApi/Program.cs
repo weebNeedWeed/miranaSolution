@@ -8,7 +8,7 @@ using Microsoft.OpenApi.Models;
 using miranaSolution.BackendApi.Filters;
 using miranaSolution.Business.Auth.Users;
 using miranaSolution.Business.Catalog.Books;
-using miranaSolution.Business.Common;
+using miranaSolution.Business.Systems.Slides;
 using miranaSolution.Data.Entities;
 using miranaSolution.Data.Main;
 using System.Text;
@@ -76,7 +76,7 @@ builder.Services.AddSwaggerGen(options =>
 });
 
 // Register application's services
-builder.Services.AddTransient<IGenericRepository<Slide>, GenericRepository<Slide>>();
+builder.Services.AddTransient<ISlideService, SlideService>();
 builder.Services.AddTransient<IBookService, BookService>();
 builder.Services.AddTransient<IUserService, UserService>();
 
