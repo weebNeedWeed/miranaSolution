@@ -9,7 +9,7 @@ type CardProps = {
 };
 const Card = (props: CardProps): JSX.Element => {
   return (
-    <div className="md:w-[calc(calc(100%/2)-20px)] md:mr-[20px] mb-3">
+    <div className="md:w-[calc(calc(100%/2)-0.75rem)] md:mr-3 mb-3">
       <Link
         to={"/"}
         className="w-full bg-whiteChocolate p-2 flex cursor-pointer rounded shadow-sm shadow-darkVanilla border-2 border-solid hover:border-darkVanilla transition-all"
@@ -58,7 +58,7 @@ const EditorRecommendation = (): JSX.Element => {
     <div className="w-full bg-white rounded p-4 shadow-sm shadow-slate-500 h-full">
       <h2 className="text-xl gradient-text font-bold mb-4">Đề cử</h2>
 
-      <div className="flex flex-row flex-wrap md:mr-[-20px]">
+      <div className="flex flex-row flex-wrap md:mr-[-0.75rem]">
         {data &&
           data.map((elm, index) => (
             <Card
