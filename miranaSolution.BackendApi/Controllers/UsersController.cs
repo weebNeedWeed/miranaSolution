@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using miranaSolution.Business.Auth.Users;
 using miranaSolution.Dtos.Auth.Users;
+using miranaSolution.Dtos.Common;
 using miranaSolution.Utilities.Exceptions;
 
 namespace miranaSolution.BackendApi.Controllers
@@ -42,11 +43,6 @@ namespace miranaSolution.BackendApi.Controllers
         [HttpPost("authenticate")]
         public async Task<IActionResult> Authenticate([FromBody] UserAuthenticationRequest request)
         {
-            if (!ModelState.IsValid)
-            {
-                return BadRequest(ModelState);
-            }
-
             string token;
 
             try
@@ -55,10 +51,13 @@ namespace miranaSolution.BackendApi.Controllers
             }
             catch (MiranaBusinessException ex)
             {
-                return BadRequest(ex.Message);
+                return Ok(new ApiFailResult(new Dictionary<string, List<string>>
+                {
+                    {nameof(request.UserName), new List<string>{ex.Message} }
+                }));
             }
 
-            return Ok(token);
+            return Ok(new ApiSuccessResult<string>(token));
         }
     }
 }

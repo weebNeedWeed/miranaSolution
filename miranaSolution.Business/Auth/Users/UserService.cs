@@ -31,12 +31,12 @@ namespace miranaSolution.Business.Auth.Users
 
             if (!result.Succeeded)
             {
-                throw new MiranaBusinessException("Cannot authenticate user");
+                throw new MiranaBusinessException("Invalid credentials.");
             }
 
             var user = await _userManager.FindByNameAsync(request.UserName);
 
-            return GenerateToken(user);
+            return await GenerateToken(user);
         }
 
         public async Task<UserDto> Register(UserRegisterRequest request)
@@ -57,26 +57,31 @@ namespace miranaSolution.Business.Auth.Users
                 throw new MiranaBusinessException("Cannot create new User");
             }
 
+            await _userManager.AddToRolesAsync(newUser, new[] { "User" });
+
             var returnData = mapper.Map<UserDto>(newUser);
 
             return returnData;
         }
 
-        private string GenerateToken(AppUser user)
+        private async Task<string> GenerateToken(AppUser user)
         {
             var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:Key"]));
             var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
+
+            var roles = await _userManager.GetRolesAsync(user);
+            var rolesClaim = roles.Select(x => new Claim("roles", x));
 
             var claims = new[] {
                 new Claim(Microsoft.IdentityModel.JsonWebTokens.JwtRegisteredClaimNames.Sub, user.UserName),
                 new Claim(Microsoft.IdentityModel.JsonWebTokens.JwtRegisteredClaimNames.Email, user.Email),
                 new Claim(Microsoft.IdentityModel.JsonWebTokens.JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
-                new Claim(Microsoft.IdentityModel.JsonWebTokens.JwtRegisteredClaimNames.Exp, TimeSpan.FromMinutes(60).ToString())
+                new Claim(Microsoft.IdentityModel.JsonWebTokens.JwtRegisteredClaimNames.Exp, TimeSpan.FromMinutes(60).ToString()),
             };
 
             var token = new JwtSecurityToken(_configuration["Jwt:Issuer"],
                 _configuration["Jwt:Issuer"],
-                claims,
+                claims.Concat(rolesClaim),
                 expires: DateTime.Now.AddMinutes(60),
                 signingCredentials: credentials);
 

@@ -110,13 +110,15 @@ namespace miranaSolution.Data.Extensions
             {
                 Id = adminRoleId,
                 Name = "Administrator",
-                Description = "Administrator"
+                Description = "Administrator",
+                NormalizedName = "ADMINISTRATOR"
             },
             new AppRole
             {
                 Id = userRoleId,
                 Name = "User",
-                Description = "User"
+                Description = "User",
+                NormalizedName = "USER"
             });
 
             builder.Entity<AppUser>().HasData(new AppUser
@@ -124,9 +126,11 @@ namespace miranaSolution.Data.Extensions
                 Id = adminUserId,
                 FirstName = "Admin",
                 LastName = "Admin",
-                UserName = "admin",
-                PasswordHash = new PasswordHasher<AppUser>().HashPassword(null, "admin123"),
+                UserName = "adminadmin",
+				NormalizedUserName = "ADMINADMIN",
+                PasswordHash = new PasswordHasher<AppUser>().HashPassword(null, "Admin123"),
                 Email = "admin@admin.com",
+				SecurityStamp = Guid.NewGuid().ToString()
             });
 
             builder.Entity<IdentityUserRole<Guid>>().HasData(new IdentityUserRole<Guid>
