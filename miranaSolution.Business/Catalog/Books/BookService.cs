@@ -1,11 +1,9 @@
 ﻿using AutoMapper;
-using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using miranaSolution.Data.Entities;
 using miranaSolution.Data.Main;
 using miranaSolution.Dtos.Catalog.Books;
 using miranaSolution.Dtos.Common;
-using miranaSolution.Utilities.Exceptions;
 
 namespace miranaSolution.Business.Catalog.Books
 {

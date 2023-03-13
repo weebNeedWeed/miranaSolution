@@ -2,6 +2,7 @@ import { Divider, Section } from "../components";
 import {
   CurrentlyReading,
   EditorRecommendation,
+  MostReading,
   NewestChapters,
 } from "../containers";
 import { useMediaQuery } from "../helpers/hooks/useMediaQuery";
@@ -34,6 +35,12 @@ const Home = (): JSX.Element => {
 
       <Section>
         <NewestChapters />
+      </Section>
+
+      <Divider />
+
+      <Section>
+        <MostReading />
       </Section>
     </>
   );
