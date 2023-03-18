@@ -2,7 +2,7 @@ import { Router } from "@remix-run/router";
 import { Navigate, createBrowserRouter } from "react-router-dom";
 import { RouteObject } from "react-router/dist/lib/context";
 
-import { Home, Login } from "../../pages";
+import { Home, Login, Register } from "../../pages";
 import { DefaultLayout } from "../../layouts/DefaultLayout";
 import { Test } from "../../pages/Test";
 import { AuthLayout } from "../../layouts/AuthLayout";
@@ -33,6 +33,10 @@ const routes: RouteObject[] = [
       {
         path: "login",
         element: <Login />,
+      },
+      {
+        path: "register",
+        element: <Register />,
       },
     ],
   },

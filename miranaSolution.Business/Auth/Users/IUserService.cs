@@ -7,5 +7,9 @@ namespace miranaSolution.Business.Auth.Users
         Task<string> Authentication(UserAuthenticationRequest request);
 
         Task<UserDto> Register(UserRegisterRequest request);
+
+        Task<UserDto> GetByEmail(string email);
+
+        Task<UserDto> GetByUserName(string userName);
     }
 }

@@ -4,6 +4,7 @@ using miranaSolution.Business.Auth.Users;
 using miranaSolution.Dtos.Auth.Users;
 using miranaSolution.Dtos.Common;
 using miranaSolution.Utilities.Exceptions;
+using Newtonsoft.Json.Linq;
 
 namespace miranaSolution.BackendApi.Controllers
 {
@@ -21,9 +22,20 @@ namespace miranaSolution.BackendApi.Controllers
         [HttpPost]
         public async Task<IActionResult> Register([FromBody] UserRegisterRequest request)
         {
-            if (!ModelState.IsValid)
+            if (await _userService.GetByEmail(request.Email) is not null)
             {
-                return BadRequest(ModelState);
+                return Ok(new ApiFailResult(new Dictionary<string, List<string>>
+                {
+                    {nameof(request.Email), new List<string>{"Duplicated email."} }
+                }));
+            }
+
+            if (await _userService.GetByUserName(request.UserName) is not null)
+            {
+                return Ok(new ApiFailResult(new Dictionary<string, List<string>>
+                {
+                    {nameof(request.UserName), new List<string>{"Duplicated User Name."} }
+                }));
             }
 
             UserDto newUser;
@@ -34,20 +46,23 @@ namespace miranaSolution.BackendApi.Controllers
             }
             catch (MiranaBusinessException ex)
             {
-                return BadRequest(ex.Message);
+                return Ok(new ApiFailResult(new Dictionary<string, List<string>>
+                {
+                    {nameof(request.UserName), new List<string>{ex.Message} }
+                }));
             }
 
-            return Ok(newUser);
+            return Ok(new ApiSuccessResult<UserDto>(newUser));
         }
 
         [HttpPost("authenticate")]
         public async Task<IActionResult> Authenticate([FromBody] UserAuthenticationRequest request)
         {
-            string token;
+            string accessToken;
 
             try
             {
-                token = await _userService.Authentication(request);
+                accessToken = await _userService.Authentication(request);
             }
             catch (MiranaBusinessException ex)
             {
@@ -57,7 +72,7 @@ namespace miranaSolution.BackendApi.Controllers
                 }));
             }
 
-            return Ok(new ApiSuccessResult<string>(token));
+            return Ok(new ApiSuccessResult<object>(new { AccessToken = accessToken }));
         }
     }
 }

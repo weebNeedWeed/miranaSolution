@@ -1,7 +1,6 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
-using Microsoft.IdentityModel.JsonWebTokens;
 using Microsoft.IdentityModel.Tokens;
 using miranaSolution.Data.Entities;
 using miranaSolution.Dtos.Auth.Users;
@@ -37,6 +36,28 @@ namespace miranaSolution.Business.Auth.Users
             var user = await _userManager.FindByNameAsync(request.UserName);
 
             return await GenerateToken(user);
+        }
+
+        public async Task<UserDto> GetByEmail(string email)
+        {
+            var config = new MapperConfiguration(cfg => cfg.CreateMap<AppUser, UserDto>());
+            var mapper = config.CreateMapper();
+
+            var user = await _userManager.FindByEmailAsync(email);
+            var returnData = mapper.Map<UserDto>(user);
+
+            return returnData;
+        }
+
+        public async Task<UserDto> GetByUserName(string userName)
+        {
+            var config = new MapperConfiguration(cfg => cfg.CreateMap<AppUser, UserDto>());
+            var mapper = config.CreateMapper();
+
+            var user = await _userManager.FindByNameAsync(userName);
+            var returnData = mapper.Map<UserDto>(user);
+
+            return returnData;
         }
 
         public async Task<UserDto> Register(UserRegisterRequest request)
