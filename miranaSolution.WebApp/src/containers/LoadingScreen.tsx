@@ -8,20 +8,19 @@ const LoadingScreen = (): JSX.Element => {
 	const location = useLocation();
 
 	useLayoutEffect(() => {
-		if (state.showLoading === false) {
-			dispatch({ type: "startLoading" });
+		dispatch({type: "startLoading"});
 
-			const temp = setTimeout(() => {
-				dispatch({ type: "endLoading" });
-			}, 3000);
+		const temp = setTimeout(() => {
+			dispatch({type: "endLoading"});
+		}, 3000);
 
-			return () => {
+		return () => {
+			if (temp)
 				clearTimeout(temp);
-			};
-		}
+		};
 	}, [location]);
 
-	return <Loading show={state.showLoading} />;
+	return <Loading show={state.showLoading}/>;
 };
 
 export { LoadingScreen };

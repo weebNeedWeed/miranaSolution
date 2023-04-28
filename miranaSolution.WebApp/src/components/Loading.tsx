@@ -8,14 +8,14 @@ type LoadingProps = {
 
 const Loading = ({ show }: LoadingProps): JSX.Element => {
 	useEffect(() => {
-		if (show === true) {
-			document.body.style.overflowY = "hidden";
+    if (show === true) {
+      document.body.style.overflowY = "hidden";
 
-			return () => {
-				document.body.style.overflowY = "scroll";
-			};
-		}
-	}, [show]);
+      return () => {
+        document.body.style.overflowY = "scroll";
+      };
+    }
+  }, [show]);
 
 	return (
 		<AnimatePresence>

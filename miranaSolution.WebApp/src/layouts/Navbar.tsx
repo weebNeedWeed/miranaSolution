@@ -36,7 +36,7 @@ const Navbar = (): JSX.Element => {
   };
 
   useEffect(() => {
-    if (toggleMenu === true) {
+    if (toggleMenu) {
       document.body.style.overflow = "hidden";
       return () => {
         document.body.style.overflow = "scroll";
@@ -52,7 +52,7 @@ const Navbar = (): JSX.Element => {
           <Menu className="flex mb-4" />
           <div className="sm:hidden flex flex-col items-end">
             <p className="font-semibold text-deepKoamaru text-2xl font-sansPro mb-8">
-              <Link to="/">{"Đăng ký"}</Link>
+              <Link to="/auth/register">{"Đăng ký"}</Link>
             </p>
             <Link
               to="/auth/login"
@@ -82,7 +82,7 @@ const Navbar = (): JSX.Element => {
 
       <div className="grow hidden sm:flex flex-row justify-end items-center mt-1">
         <p className="mr-4 font-semibold text-deepKoamaru text-lg font-sansPro">
-          <Link to="/">{"Đăng ký"}</Link>
+          <Link to="/auth/register">{"Đăng ký"}</Link>
         </p>
         <Link
           to="/auth/login"

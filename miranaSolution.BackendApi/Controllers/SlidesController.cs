@@ -1,6 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using miranaSolution.Business.Systems.Slides;
-using miranaSolution.Data.Entities;
 using miranaSolution.Dtos.Common;
 using miranaSolution.Dtos.Systems.Slides;
 

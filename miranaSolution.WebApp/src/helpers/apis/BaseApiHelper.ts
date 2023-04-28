@@ -4,20 +4,29 @@ import {
 	AxiosHeaders,
 	RawAxiosRequestHeaders,
 	HeadersDefaults,
-} from "axios/index";
+} from "axios";
 
 export class BaseApiHelper {
-	_axiosInstance: AxiosInstance;
-
-	get axiosInstance() {
-		return this._axiosInstance;
+	
+	private client: AxiosInstance | null;
+	private token: string;
+	private baseUrl: string;
+	
+	constructor() {
+		this.client = null;
+		this.baseUrl = "";
+		this.token = "";
 	}
-
-	constructor(headers: RawAxiosRequestHeaders = {}) {
-		this._axiosInstance = axios.create({
-			baseURL: import.meta.env.VITE_BASE_ADDRESS,
+	
+	init(headers: RawAxiosRequestHeaders = {}): AxiosInstance {
+		this.baseUrl = import.meta.env.VITE_BASE_ADDRESS;
+		
+		this.client = axios.create({
+			baseURL: this.baseUrl,
 			timeout: 1000,
 			headers,
-		});
+		})
+		
+		return this.client;
 	}
 }

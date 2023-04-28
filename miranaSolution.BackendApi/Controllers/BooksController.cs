@@ -1,6 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using miranaSolution.Business.Catalog.Books;
-using miranaSolution.Data.Entities;
 using miranaSolution.Dtos.Catalog.Books;
 using miranaSolution.Dtos.Common;
 
@@ -60,7 +59,6 @@ namespace miranaSolution.BackendApi.Controllers
         public async Task<IActionResult> GetRecommended()
         {
             var books = await _bookService.GetRecommended();
-
             return Ok(new ApiSuccessResult<List<BookDto>>(books));
         }
     }

@@ -1,10 +1,8 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using miranaSolution.Business.Auth.Users;
 using miranaSolution.Dtos.Auth.Users;
 using miranaSolution.Dtos.Common;
 using miranaSolution.Utilities.Exceptions;
-using Newtonsoft.Json.Linq;
 
 namespace miranaSolution.BackendApi.Controllers
 {

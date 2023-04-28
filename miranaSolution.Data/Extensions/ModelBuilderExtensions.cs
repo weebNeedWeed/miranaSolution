@@ -1,7 +1,6 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using miranaSolution.Data.Entities;
-using System.Xml.Linq;
 
 namespace miranaSolution.Data.Extensions
 {
