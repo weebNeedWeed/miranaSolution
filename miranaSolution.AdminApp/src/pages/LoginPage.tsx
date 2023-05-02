@@ -1,7 +1,8 @@
 import { Container, Box, TextField, Typography, Button } from "@mui/material";
-import { userApiClient } from "../apis/UserApiClient";
-import { useState } from "react";
+import { userApiClient } from "../helpers/apis/UserApiClient";
+import React, { useState } from "react";
 import jwt_decode, { JwtPayload } from "jwt-decode";
+import { useNavigate } from "react-router-dom";
 
 interface MyJwtPayload extends JwtPayload {
   roles: Array<string>;
@@ -15,9 +16,11 @@ const validateIsAdmin = (token: string): boolean => {
 };
 
 const LoginPage = (): JSX.Element => {
-  const [userName, setUserName] = useState("");
-  const [password, setPassword] = useState("");
-  const [error, setError] = useState("");
+  const navigate = useNavigate();
+
+  const [ userName, setUserName ] = useState("");
+  const [ password, setPassword ] = useState("");
+  const [ error, setError ] = useState("");
 
   const handleTypeUserName = (event: React.ChangeEvent<HTMLInputElement>) => {
     setUserName(event.target.value);
@@ -26,21 +29,19 @@ const LoginPage = (): JSX.Element => {
     setPassword(event.target.value);
   };
 
-  const handleSubmitForm = async (event: React.FormEvent<unknown>) => {
+  const handleSubmitForm = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     if (!password.trim() || !userName.trim()) {
       return;
     }
 
-    const token = await userApiClient.authenticate(userName, password);
-    if (!token) {
+    const token = await userApiClient.authenticate({userName, password});
+    if (!token || !validateIsAdmin(token)) {
       setError("Invalid credentials");
       return;
     }
 
-    setError("");
-
-    console.log(validateIsAdmin(token));
+    navigate("/dashboard");
   };
 
   return (
@@ -79,7 +80,7 @@ const LoginPage = (): JSX.Element => {
         />
         <TextField
           value={password}
-          sx={{ marginTop: "20px" }}
+          sx={{marginTop: "20px"}}
           fullWidth
           label="Password"
           onChange={handleTypePassword}
@@ -89,7 +90,7 @@ const LoginPage = (): JSX.Element => {
           variant="contained"
           type="submit"
           fullWidth
-          sx={{ marginTop: "20px" }}
+          sx={{marginTop: "20px"}}
         >
           Login
         </Button>
