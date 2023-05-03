@@ -13,5 +13,7 @@
 
         public int BookId { get; set; }
         public Book Book { get; set; }
+        
+        public List<Bookmark> Bookmarks { get; set; }
     }
 }

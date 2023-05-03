@@ -47,9 +47,10 @@ namespace miranaSolution.BackendApi.Controllers
             var book = await _bookService.GetById(id);
             if (book is null)
             {
-                return Ok(new ApiFailResult(new Dictionary<string, List<string>> {
-                        { nameof(book.Id), new List<string> { $"Invalid Id." } }
-                    }));
+                return Ok(new ApiFailResult(new Dictionary<string, List<string>>
+                {
+                    { nameof(book.Id), new List<string> { $"Invalid Id." } }
+                }));
             }
 
             return Ok(new ApiSuccessResult<BookDto>(book));
@@ -60,6 +61,13 @@ namespace miranaSolution.BackendApi.Controllers
         {
             var books = await _bookService.GetRecommended();
             return Ok(new ApiSuccessResult<List<BookDto>>(books));
+        }
+
+        [HttpGet("chapters/latest/{numOfChapters:int}")]
+        public async Task<IActionResult> GetLatestChapter([FromRoute] int numOfChapters)
+        {
+            var chapters = await _bookService.GetLatestChapters(numOfChapters);
+            return Ok(new ApiSuccessResult<List<ChapterDto>>(chapters));
         }
     }
 }

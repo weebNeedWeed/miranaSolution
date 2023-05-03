@@ -15,9 +15,9 @@ namespace miranaSolution.Data.Configurations
             builder.Property(x => x.Id).UseIdentityColumn();
 
             builder.Property(x => x.CreatedAt)
-                .IsRequired().HasDefaultValue(DateTime.Now);
+                .IsRequired().HasDefaultValueSql("getdate()");;
             builder.Property(x => x.UpdatedAt)
-                .IsRequired().HasDefaultValue(DateTime.Now);
+                .IsRequired().HasDefaultValueSql("getdate()");
 
             builder.HasOne(x => x.Book)
                 .WithMany(x => x.Chapters)

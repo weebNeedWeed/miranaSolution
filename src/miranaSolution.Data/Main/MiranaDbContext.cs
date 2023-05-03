@@ -28,6 +28,7 @@ namespace miranaSolution.Data.Main
             builder.ApplyConfiguration(new ReactionConfiguration());
             builder.ApplyConfiguration(new CommentConfiguration());
             builder.ApplyConfiguration(new AuthorConfiguration());
+            builder.ApplyConfiguration(new BookmarkConfiguration());
 
             builder.Entity<IdentityRoleClaim<Guid>>().ToTable("AppRoleClaims");
             builder.Entity<IdentityUserClaim<Guid>>().ToTable("AppUserClaims");
@@ -47,5 +48,6 @@ namespace miranaSolution.Data.Main
         public DbSet<Slide> Slides { get; set; }
         public DbSet<Reaction> Reactions { get; set; }
         public DbSet<Comment> Comments { get; set; }
+        public DbSet<Bookmark> Bookmarks { get; set; }
     }
 }

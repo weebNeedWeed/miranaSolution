@@ -9,6 +9,8 @@ namespace miranaSolution.Business.Catalog.Books
 
         Task<List<BookDto>> GetRecommended();
 
+        Task<List<ChapterDto>> GetLatestChapters(int numOfChapters);
+
         Task<bool> Delete(int id);
 
         Task<bool> Update(int id, BookUpdateRequest request);
@@ -18,5 +20,15 @@ namespace miranaSolution.Business.Catalog.Books
         Task<BookDto> GetById(int id);
 
         Task<BookDto> GetBySlug(string slug);
+
+        Task<ChapterDto> AddChapter(int id, ChapterCreateRequest request);
+
+        // Task<bool> UpdateChapter();
+        //
+        // Task<bool> DeleteChapter();
+        //
+        // Task<ChapterDto> GetChapterByIndex();
+        //
+        // Task<ChapterDto> GetChapterById();
     }
 }
