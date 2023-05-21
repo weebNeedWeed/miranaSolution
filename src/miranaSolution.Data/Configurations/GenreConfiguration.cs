@@ -14,6 +14,8 @@ namespace miranaSolution.Data.Configurations
 
             builder.Property(x => x.Id).UseIdentityColumn();
 
+            builder.Property(x => x.Slug).IsRequired().IsUnicode();
+
             builder.HasIndex(x => x.Slug).IsUnique();
         }
     }

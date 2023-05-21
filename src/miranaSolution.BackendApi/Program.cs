@@ -14,16 +14,16 @@ using miranaSolution.Data.Entities;
 using miranaSolution.Data.Main;
 using miranaSolution.Dtos.Auth.Users.Validations;
 using System.Text;
+using miranaSolution.Business.Catalog.Authors;
+using miranaSolution.Business.Catalog.Genres;
+using miranaSolution.Business.Systems.Files;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllersWithViews(x => x.Filters.Add<HandleModelStateFilter>());
 
-builder.Services.Configure<ApiBehaviorOptions>(x =>
-{
-    x.SuppressModelStateInvalidFilter = true;
-});
+builder.Services.Configure<ApiBehaviorOptions>(x => { x.SuppressModelStateInvalidFilter = true; });
 
 builder.Services.AddFluentValidationAutoValidation();
 builder.Services.AddValidatorsFromAssemblyContaining<UserAuthenticationRequestValidator>();
@@ -34,8 +34,8 @@ builder.Services.AddDbContext<MiranaDbContext>(options =>
 });
 
 builder.Services.AddIdentity<AppUser, AppRole>()
-            .AddEntityFrameworkStores<MiranaDbContext>()
-            .AddDefaultTokenProviders();
+    .AddEntityFrameworkStores<MiranaDbContext>()
+    .AddDefaultTokenProviders();
 
 builder.Services.Configure<IdentityOptions>(options =>
 {
@@ -85,6 +85,9 @@ builder.Services.AddSwaggerGen(options =>
 builder.Services.AddTransient<ISlideService, SlideService>();
 builder.Services.AddTransient<IBookService, BookService>();
 builder.Services.AddTransient<IUserService, UserService>();
+builder.Services.AddTransient<IFileService, FileService>();
+builder.Services.AddTransient<IAuthorService, AuthorService>();
+builder.Services.AddTransient<IGenreService, GenreService>();
 
 builder.Services.AddCors(options =>
 {

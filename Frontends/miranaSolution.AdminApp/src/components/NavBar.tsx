@@ -9,6 +9,7 @@ import Typography from '@mui/material/Typography';
 import Divider from '@mui/material/Divider';
 import IconButton from '@mui/material/IconButton';
 import MenuIcon from '@mui/icons-material/Menu';
+import BookIcon from '@mui/icons-material/Book';
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 import ListItem from '@mui/material/ListItem';
@@ -26,6 +27,7 @@ const drawerWidth = 240;
 const Main = styled('main', {shouldForwardProp: (prop) => prop !== 'open'})<{
   open?: boolean;
 }>(({theme, open}) => ({
+  width: "100%",
   flexGrow: 1,
   padding: theme.spacing(3),
   transition: theme.transitions.create('margin', {
@@ -42,31 +44,42 @@ const Main = styled('main', {shouldForwardProp: (prop) => prop !== 'open'})<{
   }),
 }));
 
-const MenuItems = (): JSX.Element => {
+const menuItems = [
+  {
+    to: "/dashboard",
+    icon: <HomeIcon/>,
+    name: "Home",
+  },
+  {
+    to: "/dashboard/books",
+    icon: <PersonIcon/>,
+    name: "Users",
+  },
+  {
+    to: "/dashboard/books",
+    icon: <BookIcon/>,
+    name: "Books",
+  }
+];
 
-  return <List>
-    <Link style={{color: 'inherit', textDecoration: 'inherit'}} to="/dashboard">
-      <ListItem disablePadding>
-        <ListItemButton>
-          <ListItemIcon>
-            <HomeIcon/>
-          </ListItemIcon>
-          <ListItemText primary="Home"/>
-        </ListItemButton>
-      </ListItem>
-    </Link>
+type MenuItemProps = {
+  to: string;
+  name: string;
+  icon: React.ReactNode;
+};
+const MenuItem = (props: MenuItemProps): JSX.Element => {
+  const {to, name, icon} = props;
 
-    <Link style={{color: 'inherit', textDecoration: 'inherit'}} to="/dashboard/users">
-      <ListItem disablePadding>
-        <ListItemButton>
-          <ListItemIcon>
-            <PersonIcon/>
-          </ListItemIcon>
-          <ListItemText primary="Users"/>
-        </ListItemButton>
-      </ListItem>
-    </Link>
-  </List>;
+  return <Link style={{color: 'inherit', textDecoration: 'inherit'}} to={to}>
+    <ListItem disablePadding>
+      <ListItemButton>
+        <ListItemIcon>
+          {icon}
+        </ListItemIcon>
+        <ListItemText primary={name}/>
+      </ListItemButton>
+    </ListItem>
+  </Link>;
 };
 
 interface AppBarProps extends MuiAppBarProps {
@@ -154,7 +167,10 @@ export function NavBar() {
           </IconButton>
         </DrawerHeader>
         <Divider/>
-        <MenuItems/>
+        <List>
+          {menuItems.map((elm, index) =>
+            <MenuItem to={elm.to} name={elm.name} icon={elm.icon} key={index}/>)}
+        </List>
       </Drawer>
       <Main open={open}>
         <DrawerHeader/>

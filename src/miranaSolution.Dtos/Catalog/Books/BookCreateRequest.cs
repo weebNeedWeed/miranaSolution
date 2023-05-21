@@ -1,4 +1,5 @@
-﻿using miranaSolution.Dtos.Common;
+﻿using Microsoft.AspNetCore.Http;
+using miranaSolution.Dtos.Common;
 
 namespace miranaSolution.Dtos.Catalog.Books
 {
@@ -10,6 +11,8 @@ namespace miranaSolution.Dtos.Catalog.Books
         public bool IsRecommended { get; set; }
         public string Slug { get; set; }
         public int AuthorId { get; set; }
-        public List<CheckboxItem> Genres { get; set; }
+        public IEnumerable<CheckboxItem> Genres { get; set; }
+
+        public IFormFile ThumnailImage { get; set; }
     }
 }

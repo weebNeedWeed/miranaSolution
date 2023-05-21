@@ -42,7 +42,7 @@ const Login = (): JSX.Element => {
   };
 
   const validatePassword = (password: string) => {
-    var errors: Array<string> = [];
+    let errors: Array<string> = [];
 
     setAbleToSubmit(true);
     const regex = new RegExp(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{8,}$/);
@@ -71,13 +71,20 @@ const Login = (): JSX.Element => {
 
   const handleSubmit = async (event: React.FormEvent<unknown>) => {
     event.preventDefault();
+
+    systemContext.dispatch({
+      type: "addToast", payload: {
+        title: "LOgin"
+      }
+    });
+
     if (!ableToSubmit) {
       validateUserName(userName);
       validatePassword(password);
       return;
     }
 
-    const authData = await userApiHelper.authenticate({ userName, password });
+    const authData = await userApiHelper.authenticate({userName, password});
     if (!authData) {
       setUserNameErrors(["Invalid Credentials."]);
       return;

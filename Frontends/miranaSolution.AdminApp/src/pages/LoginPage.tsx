@@ -1,5 +1,5 @@
 import { Container, Box, TextField, Typography, Button } from "@mui/material";
-import { userApiClient } from "../helpers/apis/UserApiClient";
+import { usersApiClient } from "../helpers/apis/UsersApiClient";
 import React, { useState } from "react";
 import jwt_decode, { JwtPayload } from "jwt-decode";
 import { useNavigate } from "react-router-dom";
@@ -35,7 +35,7 @@ const LoginPage = (): JSX.Element => {
       return;
     }
 
-    const token = await userApiClient.authenticate({userName, password});
+    const token = await usersApiClient.authenticate({userName, password});
     if (!token || !validateIsAdmin(token)) {
       setError("Invalid credentials");
       return;

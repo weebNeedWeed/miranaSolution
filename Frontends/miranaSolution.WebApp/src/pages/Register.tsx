@@ -60,8 +60,9 @@ const Register = (): JSX.Element => {
       return;
     }
 
+
     function isUser(obj: any): obj is User {
-      return obj.password === undefined;
+      return Object.keys(obj).some(x => typeof obj[x] !== "object");
     }
 
     if (!isUser(res)) {

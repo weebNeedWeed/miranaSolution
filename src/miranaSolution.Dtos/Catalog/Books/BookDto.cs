@@ -11,5 +11,7 @@
         public string ThumbnailImage { get; set; }
         public bool IsRecommended { get; set; }
         public string Slug { get; set; }
+        public string AuthorName { get; set; }
+        public List<String> Genres { get; set; }
     }
 }

@@ -1,43 +1,41 @@
 ﻿using AutoMapper;
+using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
+using miranaSolution.Business.Systems.Files;
 using miranaSolution.Data.Entities;
 using miranaSolution.Data.Main;
 using miranaSolution.Dtos.Catalog.Books;
 using miranaSolution.Dtos.Common;
+using miranaSolution.Utilities.Exceptions;
 
 namespace miranaSolution.Business.Catalog.Books
 {
     public class BookService : IBookService
     {
         private readonly MiranaDbContext _context;
-        private readonly IMapper _bookDtoMapper;
+        private readonly IFileService _fileService;
 
-        public BookService(MiranaDbContext context)
+        public BookService(MiranaDbContext context, IFileService fileService)
         {
             _context = context;
-
-            var config = new MapperConfiguration(cfg => cfg.CreateMap<Book, BookDto>());
-            _bookDtoMapper = config.CreateMapper();
+            _fileService = fileService;
         }
 
         public async Task<BookDto> Create(BookCreateRequest request)
         {
-            var config = new MapperConfiguration(cfg => cfg.CreateMap<BookCreateRequest, Book>());
+            var config = new MapperConfiguration(cfg => { cfg.CreateMap<BookCreateRequest, Book>(); });
             var mapper = config.CreateMapper();
 
             var newBook = mapper.Map<Book>(request);
-
             newBook.BookGenres = new List<BookGenre>();
+            newBook.ThumbnailImage = await this.SaveFileAsync(request.ThumnailImage);
 
-            foreach (var item in request.Genres)
+            foreach (var item in request.Genres.Where(x => x.IsChecked))
             {
-                if (!item.IsChecked)
-                    continue;
-
                 var genre = await _context.Genres.FirstOrDefaultAsync(x => x.Id == item.Id && x.Name == item.Label);
                 var bookGenre = new BookGenre
                 {
-                    Genre = genre
+                    GenreId = genre!.Id
                 };
 
                 newBook.BookGenres.Add(bookGenre);
@@ -46,7 +44,7 @@ namespace miranaSolution.Business.Catalog.Books
             await _context.Books.AddAsync(newBook);
             await _context.SaveChangesAsync();
 
-            var bookDto = _bookDtoMapper.Map<BookDto>(newBook);
+            var bookDto = await this.GetById(newBook.Id);
 
             return bookDto;
         }
@@ -55,18 +53,12 @@ namespace miranaSolution.Business.Catalog.Books
         {
             var query = from chapters in _context.Chapters
                 join books in _context.Books on chapters.BookId equals books.Id
-                join authors in _context.Authors on books.AuthorId equals authors.Id
                 orderby chapters.CreatedAt descending
                 select
                     new
                     {
                         chapters,
                         books,
-                        authors,
-                        genres = (from genres in _context.Genres
-                            join bookGenres in _context.BookGenres on genres.Id equals bookGenres.GenreId
-                            where bookGenres.BookId == books.Id
-                            select genres.Name).ToList(),
                     };
 
             var data = await query.Take(numOfChapters).Select(x => new ChapterDto
@@ -79,10 +71,6 @@ namespace miranaSolution.Business.Catalog.Books
                 ReadCount = x.chapters.ReadCount,
                 WordCount = x.chapters.WordCount,
                 Content = x.chapters.Content,
-                BookId = x.books.Id,
-                BookName = x.books.Name,
-                BookAuthor = x.authors.Name,
-                Genre = x.genres[0]
             }).ToListAsync();
 
             return data;
@@ -104,34 +92,94 @@ namespace miranaSolution.Business.Catalog.Books
 
         public async Task<BookDto> GetById(int id)
         {
-            var book = await _context.Books.FindAsync(id);
-            var returnData = _bookDtoMapper.Map<BookDto>(book);
+            var query = from book in _context.Books
+                join book_author in _context.Authors
+                    on book.AuthorId equals book_author.Id
+                where book.Id == id
+                select new
+                {
+                    book,
+                    authorName = book_author.Name,
+                    genres = (
+                        from book_genre in _context.BookGenres
+                        join genre in _context.Genres
+                            on book_genre.GenreId equals genre.Id
+                        where book_genre.BookId == id
+                        select genre.Name).ToList()
+                };
+            var data = await query.FirstAsync();
 
-            return returnData;
+            var config = new MapperConfiguration(cfg => cfg.CreateMap<Book, BookDto>());
+            var mapper = config.CreateMapper();
+
+            var bookDto = mapper.Map<BookDto>(data.book);
+            bookDto.Genres = data.genres;
+            bookDto.AuthorName = data.authorName;
+
+            return bookDto;
         }
 
         public async Task<BookDto> GetBySlug(string slug)
         {
             var book = await _context.Books.FirstOrDefaultAsync(x => x.Slug == slug);
-            var returnData = _bookDtoMapper.Map<BookDto>(book);
+            var config = new MapperConfiguration(cfg => cfg.CreateMap<Book, BookDto>());
+            var mapper = config.CreateMapper();
+
+            var returnData = mapper.Map<BookDto>(book);
 
             return returnData;
         }
 
-        public Task<ChapterDto> AddChapter(int id, ChapterCreateRequest request)
+        public async Task<ChapterDto> AddChapter(int id, ChapterCreateRequest request)
         {
-            throw new NotImplementedException();
+            var isChapterExisted = await _context.Chapters.AnyAsync(x => x.BookId == id && x.Index == request.Index);
+            if (isChapterExisted)
+            {
+                throw new MiranaBusinessException(
+                    $"The book with Id: {id} already has a chapter with Index: {request.Index}");
+            }
+
+            var config = new MapperConfiguration(cfg =>
+            {
+                cfg.CreateMap<Chapter, ChapterDto>();
+                cfg.CreateMap<ChapterCreateRequest, Chapter>();
+            });
+            var mapper = config.CreateMapper();
+
+            var chapter = mapper.Map<Chapter>(request);
+            chapter.ReadCount = 0;
+            chapter.BookId = id;
+
+            await _context.Chapters.AddAsync(chapter);
+            await _context.SaveChangesAsync();
+
+            var chapterDto = mapper.Map<ChapterDto>(chapter);
+
+            return chapterDto;
         }
 
         public async Task<PagedResult<BookDto>> GetPaging(BookGetPagingRequest request)
         {
-            var query = _context.Books.AsQueryable();
+            var query = from book in _context.Books
+                join book_author in _context.Authors
+                    on book.AuthorId equals book_author.Id
+                select new
+                {
+                    book,
+                    authorName = book_author.Name,
+                    genres = (
+                        from book_genre in _context.BookGenres
+                        join genre in _context.Genres
+                            on book_genre.GenreId equals genre.Id
+                        where book_genre.BookId == book.Id
+                        select genre.Name).ToList()
+                };
 
             if (request.Keyword is not null)
             {
                 query = query.Where(x =>
-                    x.Name.Contains(request.Keyword) || x.ShortDescription.Contains(request.Keyword) ||
-                    x.LongDescription.Contains(request.Keyword));
+                    x.book.Name.Contains(request.Keyword) || x.book.ShortDescription.Contains(request.Keyword) ||
+                    x.book.LongDescription.Contains(request.Keyword));
             }
 
             var pageSize = request.PageSize;
@@ -141,15 +189,17 @@ namespace miranaSolution.Business.Catalog.Books
 
             var data = await query.Skip((pageIndex - 1) * pageSize).Take(pageSize).Select(x => new BookDto
             {
-                Id = x.Id,
-                Name = x.Name,
-                ShortDescription = x.ShortDescription,
-                LongDescription = x.LongDescription,
-                CreatedAt = x.CreatedAt,
-                UpdatedAt = x.UpdatedAt,
-                ThumbnailImage = x.ThumbnailImage,
-                IsRecommended = x.IsRecommended,
-                Slug = x.Slug
+                Id = x.book.Id,
+                Name = x.book.Name,
+                ShortDescription = x.book.ShortDescription,
+                LongDescription = x.book.LongDescription,
+                CreatedAt = x.book.CreatedAt,
+                UpdatedAt = x.book.UpdatedAt,
+                ThumbnailImage = x.book.ThumbnailImage,
+                IsRecommended = x.book.IsRecommended,
+                Slug = x.book.Slug,
+                AuthorName = x.authorName,
+                Genres = x.genres
             }).ToListAsync();
 
             var paged = new PagedResult<BookDto>
@@ -165,9 +215,12 @@ namespace miranaSolution.Business.Catalog.Books
 
         public async Task<List<BookDto>> GetRecommended()
         {
+            var config = new MapperConfiguration(cfg => cfg.CreateMap<Book, BookDto>());
+            var mapper = config.CreateMapper();
+
             var data = await _context.Books
                 .Where(x => x.IsRecommended)
-                .Select(x => _bookDtoMapper.Map<BookDto>(x))
+                .Select(x => mapper.Map<BookDto>(x))
                 .ToListAsync();
 
             return data;
@@ -214,6 +267,15 @@ namespace miranaSolution.Business.Catalog.Books
             await _context.SaveChangesAsync();
 
             return true;
+        }
+
+        private async Task<string> SaveFileAsync(IFormFile file)
+        {
+            var extension = Path.GetExtension(file.FileName);
+            var newName = $"{Guid.NewGuid().ToString()}{extension}";
+
+            return await _fileService.SaveFileAsync(
+                file.OpenReadStream(), newName);
         }
     }
 }

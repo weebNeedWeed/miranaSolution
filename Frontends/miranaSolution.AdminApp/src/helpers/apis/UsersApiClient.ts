@@ -7,7 +7,7 @@ type Credentials = {
   password: string;
 }
 
-class UserApiClient extends BaseApiClient {
+class UsersApiClient extends BaseApiClient {
   async authenticate(
     credentials: Credentials
   ): Promise<string | null> {
@@ -27,4 +27,4 @@ class UserApiClient extends BaseApiClient {
   }
 }
 
-export const userApiClient = new UserApiClient();
+export const usersApiClient = new UsersApiClient();

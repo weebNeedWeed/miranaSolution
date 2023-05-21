@@ -1,6 +1,6 @@
 import { Footer, Navbar } from ".";
 import { Outlet } from "react-router-dom";
-import { LoadingScreen } from "../containers";
+import { LoadingScreen, ToastContainer } from "../containers";
 
 /**
  * @description Create app layout and add this as a route in routeList to that Link component can be used with data api
@@ -11,16 +11,18 @@ const DefaultLayout = (): JSX.Element => {
   return (
     <div>
       <div>
-        <Navbar />
+        <Navbar/>
       </div>
 
       <div>
-        <Outlet />
+        <Outlet/>
       </div>
 
-      <Footer />
+      <Footer/>
 
-      <LoadingScreen />
+      <LoadingScreen/>
+
+      <ToastContainer/>
     </div>
   );
 };

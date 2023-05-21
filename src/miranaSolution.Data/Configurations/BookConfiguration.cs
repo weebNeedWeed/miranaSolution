@@ -21,6 +21,8 @@ namespace miranaSolution.Data.Configurations
             builder.Property(x => x.IsRecommended)
                 .IsRequired().HasDefaultValue(false);
 
+            builder.Property(x => x.Slug).IsUnicode().IsRequired();
+
             builder.HasIndex(x => x.Slug).IsUnique();
 
             builder.HasOne(x => x.AppUser)

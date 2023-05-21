@@ -10,8 +10,4 @@ public class ChapterDto
     public int ReadCount { get; set; }
     public int WordCount { get; set; }
     public string Content { get; set; }
-    public int BookId { get; set; }
-    public string BookName { get; set; }
-    public string Genre { get; set; }
-    public string BookAuthor { get; set; }
 }
