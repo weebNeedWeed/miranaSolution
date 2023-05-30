@@ -1,6 +1,6 @@
 ﻿namespace miranaSolution.Utilities.Constants
 {
-    public class SystemConstants
+    public static class SystemConstants
     {
         public class DatabaseSettings
         {
