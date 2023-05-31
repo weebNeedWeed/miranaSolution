@@ -5,11 +5,6 @@ using Refit;
 
 var builder = WebApplication.CreateBuilder(args);
 
-void ConfigureClient(HttpClient client)
-{
-    client.BaseAddress = new Uri(builder!.Configuration["BaseAddress"]);
-}
-
 // Add services to the container.
 builder.Services.AddControllersWithViews();
 
@@ -26,8 +21,13 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
         options.LoginPath = "/Auth/Login";
     });
 
-builder.Services.AddRefitClient<IUsersApiService>().ConfigureHttpClient(ConfigureClient);
-builder.Services.AddRefitClient<IBooksApiService>().ConfigureHttpClient(ConfigureClient);
+var configureClient = (HttpClient client) =>
+{
+    client.BaseAddress = new Uri(builder.Configuration["BaseAddress"]);
+};
+
+builder.Services.AddRefitClient<IUsersApiService>().ConfigureHttpClient(configureClient);
+builder.Services.AddRefitClient<IBooksApiService>().ConfigureHttpClient(configureClient);
 
 var app = builder.Build();
 

@@ -1,0 +1,68 @@
+@using System.Text
+@model miranaSolution.Dtos.Common.PagedResult<miranaSolution.Dtos.Catalog.Books.BookDto>
+
+@{
+    var template = new StringBuilder(Url.Action() + "/?pageIndex={x}");
+    var queries = Context.Request.Query;
+
+    foreach (var query in queries)
+    {
+        if (query.Key.ToLower() == "pageindex")
+        {
+            continue;
+        }
+        
+        if (query.Value.Count > 0)
+        {
+            foreach (var queryValue in query.Value.ToArray())
+            {
+                template.Append($"&{query.Key}={queryValue}");
+            }
+            continue;
+        }
+        
+        template.Append($"&{query.Key}={query.Value}");
+    }
+
+    var start = Math.Max(1, Model.PageIndex - 2);
+    var end = Math.Min(Model.TotalPages, Model.PageIndex + 2);
+}
+
+<nav>
+    <ul class="pagination">
+        @if (Model.PageIndex != 1)
+        {
+            <li class="page-item">
+                <a class="page-link" href="@template.ToString().Replace("{x}", "1")" aria-label="Previous">
+                    <span aria-hidden="true">&laquo;</span>
+                    <span class="sr-only">Previous</span>
+                </a>
+            </li>
+        }
+        
+
+        @for (var i = start; i <= end; ++i)
+        {
+            @if (i == Model.PageIndex)
+            {
+                <li class="page-item active">
+                    <a class="page-link" href="@template.ToString().Replace("{x}", i.ToString())">@i</a>
+                </li>
+                continue;
+            }
+            <li class="page-item">
+                <a class="page-link" href="@template.ToString().Replace("{x}", i.ToString())">@i</a>
+            </li>
+        }
+        
+        @if (Model.PageIndex != Model.TotalPages)
+        {
+            <li class="page-item">
+                <a class="page-link" href="@template.ToString().Replace("{x}", Model.TotalPages.ToString())" aria-label="Next">
+                    <span aria-hidden="true">&raquo;</span>
+                    <span class="sr-only">Next</span>
+                </a>
+            </li>
+        }
+    </ul>
+</nav>
