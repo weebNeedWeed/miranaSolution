@@ -68,6 +68,7 @@
     </ItemGroup>
 
     <ItemGroup>
+      <Folder Include="Models\Books\" />
       <Folder Include="wwwroot\" />
     </ItemGroup>
 

@@ -1,13 +1,16 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using miranaSolution.Business.Catalog.Books;
 using miranaSolution.Business.Systems.Files;
 using miranaSolution.Dtos.Catalog.Books;
 using miranaSolution.Dtos.Common;
+using miranaSolution.Utilities.Constants;
 
 namespace miranaSolution.BackendApi.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize(Roles = RolesConstant.Administrator)]
     public class BooksController : ControllerBase
     {
         private readonly IBookService _bookService;
@@ -18,6 +21,7 @@ namespace miranaSolution.BackendApi.Controllers
         }
 
         [HttpGet]
+        [AllowAnonymous]
         public async Task<IActionResult> GetPaging([FromQuery] BookGetPagingRequest request)
         {
             var books = await _bookService.GetPaging(request);
@@ -31,9 +35,9 @@ namespace miranaSolution.BackendApi.Controllers
         {
             var errors = new Dictionary<string, List<string>>();
 
-            if (!HasValidExtension(request.ThumnailImage.FileName))
+            if (!HasValidExtension(request.ThumbnailImage.FileName))
             {
-                errors.Add(nameof(request.ThumnailImage), new List<string> { "Invalid image extension." });
+                errors.Add(nameof(request.ThumbnailImage), new List<string> { "Invalid image extension." });
                 return Ok(new ApiFailResult(errors));
             }
 
@@ -50,6 +54,7 @@ namespace miranaSolution.BackendApi.Controllers
         }
 
         [HttpGet("{id:int}")]
+        [AllowAnonymous]
         public async Task<IActionResult> GetById(int id)
         {
             var book = await _bookService.GetById(id);
@@ -65,6 +70,7 @@ namespace miranaSolution.BackendApi.Controllers
         }
 
         [HttpGet("recommended")]
+        [AllowAnonymous]
         public async Task<IActionResult> GetRecommended()
         {
             var books = await _bookService.GetRecommended();
@@ -72,6 +78,7 @@ namespace miranaSolution.BackendApi.Controllers
         }
 
         [HttpGet("chapters/latest/{numOfChapters:int}")]
+        [AllowAnonymous]
         public async Task<IActionResult> GetLatestChapter([FromRoute] int numOfChapters)
         {
             var chapters = await _bookService.GetLatestChapters(numOfChapters);

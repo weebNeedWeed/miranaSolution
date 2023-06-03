@@ -1,0 +1,5 @@
+.row-table-action {
+    display: flex;
+    flex-direction: row;
+    gap: 10px;
+}

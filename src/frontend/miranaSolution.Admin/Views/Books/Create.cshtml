@@ -1,9 +1,60 @@
+@using miranaSolution.Dtos.Catalog.Authors
+@using System.Collections
+@model miranaSolution.Dtos.Catalog.Books.BookCreateRequest
+
 <h1 class="mt-4">Create new book</h1>
 <div class="card mb-4">
-<div class="card-header">
-    <a asp-action="Index" class="btn btn-success">Back</a>
-</div>
+    <div class="card-header">
+        <a asp-action="Index" class="btn btn-success">Back</a>
+    </div>
     <div class="card-body">
-        aaa
+        <form enctype="multipart/form-data" asp-action="Create" asp-controller="Books" method="POST">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            
+            <div class="form-group">
+                <label asp-for="Name">Name</label>
+                <input class="form-control" placeholder="Enter name" asp-for="Name">
+                <span asp-validation-for="Name" class="text-danger form-text"></span>
+            </div>
+
+            <div class="form-group mt-4">
+                <label asp-for="ShortDescription">Short description</label>
+                <textarea class="form-control" asp-for="ShortDescription" placeholder="Enter short description" rows="4"></textarea>
+                <span asp-validation-for="ShortDescription" class="text-danger form-text"></span>
+            </div>
+
+            <div class="form-group mt-4">
+                <label asp-for="LongDescription">Long description</label>
+                <textarea class="form-control" asp-for="LongDescription" placeholder="Enter long description" rows="4"></textarea>
+                <span asp-validation-for="LongDescription" class="text-danger form-text"></span>
+            </div>
+
+            <div class="form-check mt-4">
+                <input type="checkbox" class="form-check-input" asp-for="IsRecommended">
+                <label class="form-check-label" asp-for="IsRecommended">Is recommended</label>
+                <span asp-validation-for="IsRecommended" class="text-danger form-text"></span>
+            </div>
+
+            <div class="form-group mt-4">
+                <label asp-for="Slug">Slug</label>
+                <input class="form-control" placeholder="Enter slug" asp-for="Slug">
+                <span asp-validation-for="Slug" class="text-danger form-text"></span>
+            </div>
+
+            <div class="form-group mt-4">
+                <label asp-for="AuthorId">Author</label>
+                <select class="form-control" asp-for="AuthorId"
+                        asp-items="@ViewBag.Authors">
+                </select>
+                <span asp-validation-for="AuthorId" class="text-danger form-text"></span>
+            </div>
+            
+            <div class="input-group mt-4">
+                <input type="file" asp-for="ThumbnailImage">
+                <span asp-validation-for="ThumbnailImage" class="text-danger form-text"></span>
+            </div>
+
+            <button type="submit" class="btn btn-primary mt-4">Submit</button>
+        </form>
     </div>
 </div>

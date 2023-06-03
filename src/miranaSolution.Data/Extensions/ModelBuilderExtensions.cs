@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using miranaSolution.Data.Entities;
+using miranaSolution.Utilities.Constants;
 
 namespace miranaSolution.Data.Extensions
 {
@@ -143,16 +144,16 @@ namespace miranaSolution.Data.Extensions
             builder.Entity<AppRole>().HasData(new AppRole
                 {
                     Id = adminRoleId,
-                    Name = "Administrator",
-                    Description = "Administrator",
-                    NormalizedName = "ADMINISTRATOR"
+                    Name = RolesConstant.Administrator,
+                    Description = RolesConstant.Administrator,
+                    NormalizedName = RolesConstant.Administrator.ToUpper()
                 },
                 new AppRole
                 {
                     Id = userRoleId,
-                    Name = "User",
-                    Description = "User",
-                    NormalizedName = "USER"
+                    Name = RolesConstant.User,
+                    Description = RolesConstant.User,
+                    NormalizedName = RolesConstant.User.ToUpper()
                 });
 
             builder.Entity<AppUser>().HasData(new AppUser

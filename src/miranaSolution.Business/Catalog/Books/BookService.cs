@@ -28,18 +28,18 @@ namespace miranaSolution.Business.Catalog.Books
 
             var newBook = mapper.Map<Book>(request);
             newBook.BookGenres = new List<BookGenre>();
-            newBook.ThumbnailImage = await this.SaveFileAsync(request.ThumnailImage);
+            newBook.ThumbnailImage = await this.SaveFileAsync(request.ThumbnailImage);
 
-            foreach (var item in request.Genres.Where(x => x.IsChecked))
-            {
-                var genre = await _context.Genres.FirstOrDefaultAsync(x => x.Id == item.Id && x.Name == item.Label);
-                var bookGenre = new BookGenre
-                {
-                    GenreId = genre!.Id
-                };
-
-                newBook.BookGenres.Add(bookGenre);
-            }
+            // foreach (var item in request.Genres.Where(x => x.IsChecked))
+            // {
+            //     var genre = await _context.Genres.FirstOrDefaultAsync(x => x.Id == item.Id && x.Name == item.Label);
+            //     var bookGenre = new BookGenre
+            //     {
+            //         GenreId = genre!.Id
+            //     };
+            //
+            //     newBook.BookGenres.Add(bookGenre);
+            // }
 
             await _context.Books.AddAsync(newBook);
             await _context.SaveChangesAsync();

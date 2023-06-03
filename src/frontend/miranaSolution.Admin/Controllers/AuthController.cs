@@ -3,10 +3,10 @@ using System.Security.Claims;
 using System.Text;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
 using miranaSolution.Admin.Models.Auth;
-using miranaSolution.Admin.Services;
 using miranaSolution.Admin.Services.Interfaces;
 using miranaSolution.Dtos.Auth.Users;
 using miranaSolution.Utilities.Constants;
@@ -26,14 +26,19 @@ public class AuthController : Controller
     }
 
     [HttpGet]
-    public  IActionResult Login()
+    [AllowAnonymous]
+    public IActionResult Login([FromQuery] string? returnUrl)
     {
+        ViewBag.ReturnUrl = returnUrl ?? "/";
         return View();
     }
 
     [HttpPost]
-    public async Task<IActionResult> Login([FromForm] LoginViewModel loginViewModel)
+    [AllowAnonymous]
+    public async Task<IActionResult> Login([FromForm] LoginViewModel loginViewModel, [FromQuery] string? returnUrl)
     {
+        ViewBag.ReturnUrl = returnUrl ?? "/";
+        
         if (!ModelState.IsValid)
         {
             return View(loginViewModel);
@@ -71,7 +76,14 @@ public class AuthController : Controller
             new ClaimsPrincipal(claimsIdentity), 
             authProperties);
 
-        return RedirectToAction(controllerName: "Home", actionName: "Index");
+        HttpContext.Session.SetString("accessToken", (string)accessToken);
+        
+        if (Url.IsLocalUrl(returnUrl))
+        {
+            return Redirect(returnUrl);
+        }
+
+        return RedirectToAction(actionName: "Index", controllerName: "Home");
     }
 
     private ClaimsIdentity? GetClaimsIdentity(string accessToken)

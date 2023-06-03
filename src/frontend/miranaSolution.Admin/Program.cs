@@ -1,5 +1,4 @@
 using Microsoft.AspNetCore.Authentication.Cookies;
-using miranaSolution.Admin.Services;
 using miranaSolution.Admin.Services.Interfaces;
 using Refit;
 
@@ -7,6 +6,15 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
+builder.Services.AddHttpContextAccessor();
+builder.Services.AddDistributedMemoryCache();
+
+builder.Services.AddSession(options =>
+{
+    options.IdleTimeout = TimeSpan.FromMinutes(30);
+    options.Cookie.HttpOnly = true;
+    options.Cookie.IsEssential = true;
+});
 
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
     .AddCookie(options =>
@@ -28,6 +36,7 @@ var configureClient = (HttpClient client) =>
 
 builder.Services.AddRefitClient<IUsersApiService>().ConfigureHttpClient(configureClient);
 builder.Services.AddRefitClient<IBooksApiService>().ConfigureHttpClient(configureClient);
+builder.Services.AddRefitClient<IAuthorsApiService>().ConfigureHttpClient(configureClient);
 
 var app = builder.Build();
 
@@ -43,6 +52,7 @@ app.UseHttpsRedirection();
 app.UseStaticFiles();
 
 app.UseRouting();
+app.UseSession();
 
 app.UseAuthentication();
 app.UseAuthorization();

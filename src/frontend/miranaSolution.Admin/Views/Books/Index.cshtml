@@ -1,5 +1,9 @@
 @model miranaSolution.Dtos.Common.PagedResult<miranaSolution.Dtos.Catalog.Books.BookDto>
 
+@section Styles {
+    <link rel="stylesheet" href="~/css/books/index.css">
+}
+
 <h1 class="mt-4">Books</h1>
 <div class="card mb-4">
     <div class="card-header">
@@ -28,18 +32,28 @@
                     <td>
                         @if (book.IsRecommended)
                         {
-                            <div class="text-success">
-                                <i class="fa-solid fa-check"></i>
-                            </div>
+                            <span class="text-success">
+                                @book.IsRecommended
+                            </span>
                         }
                         else
                         {
-                            <div class="text-danger">
-                                <i class="fa-solid fa-xmark"></i>
-                            </div>
+                            <span class="text-danger">
+                                 @book.IsRecommended
+                            </span>
                         }
                     </td>
-                    <td></td>
+                    <td>
+                        <div class="row-table-action">
+                            <a href="#" title="Chapters">
+                                <i class="fa-solid fa-book"></i>
+                            </a>
+                            
+                            <a href="#" title="Edit">
+                                <i class="fa-solid fa-pen-to-square"></i>
+                            </a>
+                        </div>
+                    </td>
                 </tr>
             }
             </tbody>
