@@ -20,6 +20,8 @@ namespace miranaSolution.Data.Configurations
                 .IsRequired().HasDefaultValueSql("getdate()");
             builder.Property(x => x.IsRecommended)
                 .IsRequired().HasDefaultValue(false);
+            builder.Property(x => x.IsDone)
+                .IsRequired().HasDefaultValue(false);
 
             builder.Property(x => x.Slug).IsUnicode().IsRequired();
 

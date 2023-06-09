@@ -68,12 +68,12 @@
     </ItemGroup>
 
     <ItemGroup>
-      <Folder Include="Models\Books\" />
       <Folder Include="wwwroot\" />
     </ItemGroup>
 
     <ItemGroup>
       <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="6.0.16" />
+      <PackageReference Include="Microsoft.Extensions.Caching.SqlServer" Version="6.0.16" />
       <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
       <PackageReference Include="Refit" Version="6.3.2" />
       <PackageReference Include="Refit.HttpClientFactory" Version="6.3.2" />

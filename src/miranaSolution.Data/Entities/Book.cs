@@ -11,6 +11,7 @@
         public string ThumbnailImage { get; set; }
         public bool IsRecommended { get; set; }
         public string Slug { get; set; }
+        public bool IsDone { get; set; }
 
         public int? AuthorId { get; set; }
         public Author Author { get; set; }

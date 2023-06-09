@@ -13,5 +13,6 @@
         public string Slug { get; set; }
         public string AuthorName { get; set; }
         public List<String> Genres { get; set; }
+        public bool IsDone { get; set; }
     }
 }

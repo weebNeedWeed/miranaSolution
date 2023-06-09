@@ -4,6 +4,12 @@
     <link rel="stylesheet" href="~/css/books/index.css">
 }
 
+@section Scripts
+{
+    <script src="https://cdn.jsdelivr.net/npm/simple-datatables@7.1.2/dist/umd/simple-datatables.min.js" crossorigin="anonymous"></script>
+    <script src="~/js/datatables-simple-demo.js"></script>
+}
+
 <h1 class="mt-4">Books</h1>
 <div class="card mb-4">
     <div class="card-header">
@@ -39,13 +45,13 @@
                         else
                         {
                             <span class="text-danger">
-                                 @book.IsRecommended
+                                @book.IsRecommended
                             </span>
                         }
                     </td>
                     <td>
                         <div class="row-table-action">
-                            <a href="#" title="Chapters">
+                            <a asp-action="ShowChapters" asp-route-id="@book.Id" title="Chapters">
                                 <i class="fa-solid fa-book"></i>
                             </a>
                             

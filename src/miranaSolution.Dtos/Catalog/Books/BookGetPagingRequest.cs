@@ -1,9 +1,8 @@
-﻿namespace miranaSolution.Dtos.Catalog.Books
+﻿using miranaSolution.Dtos.Common;
+
+namespace miranaSolution.Dtos.Catalog.Books
 {
-    public class BookGetPagingRequest
+    public class BookGetPagingRequest : PagingRequestBase
     {
-        public int PageIndex { get; set; }
-        public int PageSize { get; set; }
-        public string? Keyword { get; set; }
     }
 }

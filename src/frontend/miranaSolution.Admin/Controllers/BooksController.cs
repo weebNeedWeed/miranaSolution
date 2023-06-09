@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using miranaSolution.Admin.Services.Interfaces;
 using miranaSolution.Dtos.Catalog.Authors;
 using miranaSolution.Dtos.Catalog.Books;
+using miranaSolution.Dtos.Catalog.Books.Chapters;
 using Newtonsoft.Json;
 
 namespace miranaSolution.Admin.Controllers;
@@ -45,6 +46,32 @@ public class BooksController : Controller
         return View();
     }
     
+    // GET /books/{id}/chapters
+    [HttpGet("[controller]/{id:int}/chapters")]
+    public async Task<IActionResult> ShowChapters(
+        [FromRoute] int id, 
+        [FromQuery] int pageIndex = 1, 
+        [FromQuery] int pageSize = 10,
+        [FromQuery] string keyword = "")
+    {
+        var book = await _booksApiService.GetById(id);
+        if (book.Status is null || book.Status == "fail" || book.Status == "error")
+        {
+            return RedirectToAction(actionName: "Index");
+        }
+
+        ViewBag.Book = book.Data;
+
+        var chapters = await _booksApiService.GetChaptersPaging(id, new ChapterGetPagingRequest()
+        {
+            PageSize = pageSize,
+            PageIndex = pageIndex,
+            Keyword = keyword
+        });
+
+        return View(chapters.Data);
+    }
+
     // POST /books/create
     [HttpPost]
     [Consumes("multipart/form-data")]
@@ -96,5 +123,42 @@ public class BooksController : Controller
         }
         
         return RedirectToAction(actionName: "Index");
+    }
+    
+    // GET /books/{id}/chapters/create
+    [HttpGet("[controller]/{id:int}/chapters/create")]
+    public async Task<IActionResult> AddChapter([FromRoute] int id)
+    {
+        var book = await _booksApiService.GetById(id);
+        if (book.Status is null || book.Status == "fail" || book.Status == "error")
+        {
+            return RedirectToAction(actionName: "Index");
+        }
+
+        ViewBag.Book = book.Data;
+        
+        return View();
+    }
+    
+    // POST /books/{id}/chapters/create
+    [HttpPost("[controller]/{id:int}/chapters/create")]
+    public async Task<IActionResult> AddChapter([FromRoute] int id, [FromForm] ChapterCreateRequest request)
+    {
+        var book = await _booksApiService.GetById(id);
+        if (book.Status is null || book.Status == "fail" || book.Status == "error")
+        {
+            return RedirectToAction(actionName: "Index");
+        }
+
+        ViewBag.Book = book.Data;
+        
+        var result = await _booksApiService.AddChapter(id, request);
+        if (result.Status == "fail" || result.Status == "error")
+        {
+            ModelState.AddModelError("" ,!string.IsNullOrEmpty(result.Message) ? result.Message : "Unknown error");
+            return View(request);
+        }
+
+        return RedirectToAction(actionName: "ShowChapters", routeValues: new {id = book.Data.Id});
     }
 }

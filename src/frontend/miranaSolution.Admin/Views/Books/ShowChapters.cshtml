@@ -1,0 +1,59 @@
+@model miranaSolution.Dtos.Common.PagedResult<miranaSolution.Dtos.Catalog.Books.ChapterDto>
+
+@section Scripts
+{
+    <script src="https://cdn.jsdelivr.net/npm/simple-datatables@7.1.2/dist/umd/simple-datatables.min.js" crossorigin="anonymous"></script>
+    <script src="~/js/datatables-simple-demo.js"></script>
+}
+
+<h1 class="mt-4">Chapters of @ViewBag.Book.Name</h1>
+<div class="card mb-4">
+    <div class="card-header">
+        <a
+            asp-action="AddChapter"
+            asp-route-id="@ViewBag.Book.Id"
+            class="btn btn-success">
+            <i class="fa-solid fa-plus"></i> Create new chapter
+        </a>
+        
+        <a
+            asp-action="Index"
+            class="btn btn-danger">
+            Back
+        </a>
+    </div>
+    <div class="card-body">
+        <table id="datatablesSimple">
+            <thead>
+            <tr>
+                <th>Id</th>
+                <th>Name</th>
+                <th>Index</th>
+                <th>Updated At</th>
+                <th>Read Count</th>
+                <th>Word Count</th>
+                <th></th>
+            </tr>
+            </thead>
+            <tbody>
+            @foreach (var book in Model.Items)
+            {
+                <tr>
+                    <td>@book.Id</td>
+                    <td>@book.Name</td>
+                    <td>@book.Index</td>
+                    <td>@book.UpdatedAt</td>
+                    <td>@book.ReadCount</td>
+                    <td>@book.WordCount</td>
+                    <td>
+                    </td>
+                </tr>
+            }
+            </tbody>
+        </table>
+    </div>
+    
+    <div class="card-body">
+        @await Component.InvokeAsync("Pager", Model)
+    </div>
+</div>

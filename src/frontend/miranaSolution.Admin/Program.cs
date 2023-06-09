@@ -7,7 +7,13 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 builder.Services.AddControllersWithViews();
 builder.Services.AddHttpContextAccessor();
-builder.Services.AddDistributedMemoryCache();
+
+builder.Services.AddDistributedSqlServerCache(options =>
+{
+    options.ConnectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+    options.SchemaName = "dbo";  
+    options.TableName = "SQLSessions";  
+});
 
 builder.Services.AddSession(options =>
 {

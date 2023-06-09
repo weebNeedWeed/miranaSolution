@@ -1,4 +1,5 @@
 using miranaSolution.Dtos.Catalog.Books;
+using miranaSolution.Dtos.Catalog.Books.Chapters;
 using miranaSolution.Dtos.Common;
 using Refit;
 
@@ -19,4 +20,13 @@ public interface IBooksApiService
         [AliasAs("AuthorId")] int authorId,
         [AliasAs("ThumbnailImage")] ByteArrayPart thumbnailImage,
         [Header("Authorization")] string authorization);
+
+    [Get("/books/{id}")]
+    Task<ApiResult<BookDto>> GetById([AliasAs("id")] int id);
+
+    [Get("/books/{id}/chapters")]
+    Task<ApiResult<PagedResult<ChapterDto>>> GetChaptersPaging([AliasAs("id")] int id, ChapterGetPagingRequest request);
+
+    [Post("/books/{id}/chapters")]
+    Task<ApiResult<ChapterDto>> AddChapter([AliasAs("id")] int id,[Body] ChapterCreateRequest request);
 }

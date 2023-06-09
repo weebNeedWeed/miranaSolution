@@ -3,8 +3,10 @@ using Microsoft.AspNetCore.Mvc;
 using miranaSolution.Business.Catalog.Books;
 using miranaSolution.Business.Systems.Files;
 using miranaSolution.Dtos.Catalog.Books;
+using miranaSolution.Dtos.Catalog.Books.Chapters;
 using miranaSolution.Dtos.Common;
 using miranaSolution.Utilities.Constants;
+using miranaSolution.Utilities.Exceptions;
 
 namespace miranaSolution.BackendApi.Controllers
 {
@@ -20,6 +22,7 @@ namespace miranaSolution.BackendApi.Controllers
             _bookService = bookService;
         }
 
+        // GET /api/books
         [HttpGet]
         [AllowAnonymous]
         public async Task<IActionResult> GetPaging([FromQuery] BookGetPagingRequest request)
@@ -29,6 +32,7 @@ namespace miranaSolution.BackendApi.Controllers
             return Ok(new ApiSuccessResult<PagedResult<BookDto>>(books));
         }
 
+        // POST /api/books
         [HttpPost]
         [Consumes("multipart/form-data")]
         public async Task<IActionResult> Create([FromForm] BookCreateRequest request)
@@ -48,11 +52,14 @@ namespace miranaSolution.BackendApi.Controllers
                 return Ok(new ApiFailResult(errors));
             }
 
-            var book = await _bookService.Create(request);
+            var userId = User.Claims.First(x => x.Type == "sid").Value;
+
+            var book = await _bookService.Create(userId, request);
 
             return Ok(new ApiSuccessResult<BookDto>(book));
         }
 
+        // GET /api/books/{id}
         [HttpGet("{id:int}")]
         [AllowAnonymous]
         public async Task<IActionResult> GetById(int id)
@@ -69,6 +76,7 @@ namespace miranaSolution.BackendApi.Controllers
             return Ok(new ApiSuccessResult<BookDto>(book));
         }
 
+        // GET /api/books/recommended
         [HttpGet("recommended")]
         [AllowAnonymous]
         public async Task<IActionResult> GetRecommended()
@@ -77,6 +85,7 @@ namespace miranaSolution.BackendApi.Controllers
             return Ok(new ApiSuccessResult<List<BookDto>>(books));
         }
 
+        // GET /api/books/chapters/latest/{numOfChapters}
         [HttpGet("chapters/latest/{numOfChapters:int}")]
         [AllowAnonymous]
         public async Task<IActionResult> GetLatestChapter([FromRoute] int numOfChapters)
@@ -85,10 +94,30 @@ namespace miranaSolution.BackendApi.Controllers
             return Ok(new ApiSuccessResult<List<ChapterDto>>(chapters));
         }
 
+        // POST /api/books/{id}/chapters
         [HttpPost("{id:int}/chapters")]
-        public async Task<IActionResult> AddChapter([FromRoute] int id)
+        [AllowAnonymous]
+        public async Task<IActionResult> AddChapter([FromRoute] int id, [FromBody] ChapterCreateRequest request)
         {
-            return Ok();
+            try
+            {
+                var chapter = await _bookService.AddChapter(id, request);
+
+                return Ok(new ApiSuccessResult<ChapterDto>(chapter));
+            }
+            catch (MiranaBusinessException exception)
+            {
+                return BadRequest(new ApiErrorResult(exception.Message));
+            }
+        }
+
+        // GET /api/books/{id}/chapters
+        [HttpGet("{id:int}/chapters")]
+        [AllowAnonymous]
+        public async Task<IActionResult> GetChaptetsPaging([FromRoute] int id, [FromQuery] ChapterGetPagingRequest request)
+        {
+            var chaptersPaging = await _bookService.GetChaptersPaging(id, request);
+            return Ok(new ApiSuccessResult<PagedResult<ChapterDto>>(chaptersPaging));
         }
 
         private bool HasValidExtension(string fileName)

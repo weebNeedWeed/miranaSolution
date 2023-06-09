@@ -1,0 +1,39 @@
+@model miranaSolution.Dtos.Catalog.Books.Chapters.ChapterCreateRequest
+
+<h1 class="mt-4">Chapters of @ViewBag.Book.Name</h1>
+<div class="card mb-4">
+    <div class="card-header">
+        <a asp-action="ShowChapters" asp-route-id="@ViewBag.Book.Id" class="btn btn-danger">Back</a>
+    </div>
+    <div class="card-body">
+        <form method="POST" asp-action="AddChapter" asp-controller="Books" asp-route-id="@ViewBag.Book.Id">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+        
+            <div class="form-group">
+                <label asp-for="Name">Name</label>
+                <input class="form-control" placeholder="Enter name" asp-for="Name">
+                <span asp-validation-for="Name" class="text-danger form-text"></span>
+            </div>
+            
+            <div class="form-group mt-4">
+                <label>Content</label>
+                <span asp-validation-for="Content" class="text-danger form-text"></span>
+                <textarea asp-for="Content"></textarea>
+            </div>
+            
+            <div class="form-group mt-4">
+                <label asp-for="WordCount">Word count</label>
+                <input class="form-control" placeholder="Enter name" asp-for="WordCount">
+                <span asp-validation-for="WordCount" class="text-danger form-text"></span>
+            </div>
+
+            <button type="submit" class="btn btn-primary mt-4">Submit</button>
+        </form>
+    </div>
+</div>
+
+@section Scripts
+{
+    <script src="https://cdn.ckeditor.com/ckeditor5/38.0.1/classic/ckeditor.js"></script>
+    <script src="~/js/books/showChapters.js"></script>
+}

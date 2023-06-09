@@ -5,6 +5,7 @@ using miranaSolution.Business.Systems.Files;
 using miranaSolution.Data.Entities;
 using miranaSolution.Data.Main;
 using miranaSolution.Dtos.Catalog.Books;
+using miranaSolution.Dtos.Catalog.Books.Chapters;
 using miranaSolution.Dtos.Common;
 using miranaSolution.Utilities.Exceptions;
 
@@ -21,7 +22,7 @@ namespace miranaSolution.Business.Catalog.Books
             _fileService = fileService;
         }
 
-        public async Task<BookDto> Create(BookCreateRequest request)
+        public async Task<BookDto> Create(string userId, BookCreateRequest request)
         {
             var config = new MapperConfiguration(cfg => { cfg.CreateMap<BookCreateRequest, Book>(); });
             var mapper = config.CreateMapper();
@@ -29,6 +30,7 @@ namespace miranaSolution.Business.Catalog.Books
             var newBook = mapper.Map<Book>(request);
             newBook.BookGenres = new List<BookGenre>();
             newBook.ThumbnailImage = await this.SaveFileAsync(request.ThumbnailImage);
+            newBook.UserId = new Guid(userId);
 
             // foreach (var item in request.Genres.Where(x => x.IsChecked))
             // {
@@ -132,11 +134,11 @@ namespace miranaSolution.Business.Catalog.Books
 
         public async Task<ChapterDto> AddChapter(int id, ChapterCreateRequest request)
         {
-            var isChapterExisted = await _context.Chapters.AnyAsync(x => x.BookId == id && x.Index == request.Index);
-            if (isChapterExisted)
+            var book = await _context.Books.FirstOrDefaultAsync(x => x.Id == id);
+            if (book is null)
             {
                 throw new MiranaBusinessException(
-                    $"The book with Id: {id} already has a chapter with Index: {request.Index}");
+                    $"The book with Id: {id} is not found");
             }
 
             var config = new MapperConfiguration(cfg =>
@@ -146,7 +148,15 @@ namespace miranaSolution.Business.Catalog.Books
             });
             var mapper = config.CreateMapper();
 
+            // If there was no chapter added before, then prevIndex is 0 (default of int)
+            var prevIndex = await _context.Chapters
+                .Where(x => x.BookId == id)
+                .OrderByDescending(x => x.Index)
+                .Select(x => x.Index)
+                .FirstOrDefaultAsync();
+
             var chapter = mapper.Map<Chapter>(request);
+            chapter.Index = prevIndex + 1;
             chapter.ReadCount = 0;
             chapter.BookId = id;
 
@@ -156,6 +166,37 @@ namespace miranaSolution.Business.Catalog.Books
             var chapterDto = mapper.Map<ChapterDto>(chapter);
 
             return chapterDto;
+        }
+
+        public async Task<PagedResult<ChapterDto>> GetChaptersPaging(int id, ChapterGetPagingRequest request)
+        {
+            var query = _context.Chapters.Where(x => x.BookId == id);
+
+            if (!string.IsNullOrEmpty(request.Keyword))
+            {
+                query = query.Where(x => x.Name.Contains(request.Keyword));
+            }
+
+            query = query.Skip((request.PageIndex - 1) * request.PageSize)
+                .Take(request.PageSize)
+                .OrderBy(x => x.Index);
+
+            var config = new MapperConfiguration(cfg => cfg.CreateMap<Chapter, ChapterDto>());
+            var mapper = config.CreateMapper();
+
+            var totalRows = await query.CountAsync();
+            
+            var data = await query.Select(x => mapper.Map<ChapterDto>(x)).ToListAsync();
+
+            var result = new PagedResult<ChapterDto>
+            {
+                Items = data,
+                PageIndex = request.PageIndex,
+                PageSize = request.PageSize,
+                TotalRecords = totalRows
+            };
+
+            return result;
         }
 
         public async Task<PagedResult<BookDto>> GetPaging(BookGetPagingRequest request)

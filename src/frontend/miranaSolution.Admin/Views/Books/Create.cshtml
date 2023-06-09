@@ -5,7 +5,7 @@
 <h1 class="mt-4">Create new book</h1>
 <div class="card mb-4">
     <div class="card-header">
-        <a asp-action="Index" class="btn btn-success">Back</a>
+        <a asp-action="Index" class="btn btn-danger">Back</a>
     </div>
     <div class="card-body">
         <form enctype="multipart/form-data" asp-action="Create" asp-controller="Books" method="POST">
@@ -49,7 +49,7 @@
                 <span asp-validation-for="AuthorId" class="text-danger form-text"></span>
             </div>
             
-            <div class="input-group mt-4">
+            <div class="input-group mt-4 d-flex flex-column">
                 <input type="file" asp-for="ThumbnailImage">
                 <span asp-validation-for="ThumbnailImage" class="text-danger form-text"></span>
             </div>

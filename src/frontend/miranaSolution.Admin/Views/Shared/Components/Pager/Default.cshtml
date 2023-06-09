@@ -1,5 +1,5 @@
 @using System.Text
-@model miranaSolution.Dtos.Common.PagedResult<miranaSolution.Dtos.Catalog.Books.BookDto>
+@model miranaSolution.Dtos.Common.PagedResultBase
 
 @{
     var template = new StringBuilder(Url.Action() + "/?pageIndex={x}");
