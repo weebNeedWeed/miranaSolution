@@ -114,7 +114,7 @@ namespace miranaSolution.BackendApi.Controllers
         // GET /api/books/{id}/chapters
         [HttpGet("{id:int}/chapters")]
         [AllowAnonymous]
-        public async Task<IActionResult> GetChaptetsPaging([FromRoute] int id, [FromQuery] ChapterGetPagingRequest request)
+        public async Task<IActionResult> GetChaptersPaging([FromRoute] int id, [FromQuery] ChapterGetPagingRequest request)
         {
             var chaptersPaging = await _bookService.GetChaptersPaging(id, request);
             return Ok(new ApiSuccessResult<PagedResult<ChapterDto>>(chaptersPaging));

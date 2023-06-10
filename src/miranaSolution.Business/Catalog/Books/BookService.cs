@@ -199,6 +199,20 @@ namespace miranaSolution.Business.Catalog.Books
             return result;
         }
 
+        public async Task<ChapterDto> GetChapterByIndex(int id, int index)
+        {
+            var chapter = await _context.Chapters.FirstOrDefaultAsync(x => x.BookId == id && x.Index == index);
+            if (chapter is null)
+            {
+                return null;
+            }
+
+            var config = new MapperConfiguration(cfg => cfg.CreateMap<Chapter, ChapterDto>());
+            var mapper = config.CreateMapper();
+
+            return mapper.Map<ChapterDto>(chapter);
+        }
+
         public async Task<PagedResult<BookDto>> GetPaging(BookGetPagingRequest request)
         {
             var query = from book in _context.Books

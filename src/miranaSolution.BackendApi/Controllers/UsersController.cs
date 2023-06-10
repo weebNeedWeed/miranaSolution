@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using miranaSolution.Business.Auth.Users;
 using miranaSolution.Dtos.Auth.Users;
 using miranaSolution.Dtos.Common;
@@ -18,6 +19,7 @@ namespace miranaSolution.BackendApi.Controllers
         }
 
         [HttpPost]
+        [AllowAnonymous]
         public async Task<IActionResult> Register([FromBody] UserRegisterRequest request)
         {
             if (await _userService.GetByEmail(request.Email) is not null)
@@ -54,6 +56,7 @@ namespace miranaSolution.BackendApi.Controllers
         }
 
         [HttpPost("authenticate")]
+        [AllowAnonymous]
         public async Task<IActionResult> Authenticate([FromBody] UserAuthenticationRequest request)
         {
             string accessToken;

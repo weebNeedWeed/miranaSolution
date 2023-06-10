@@ -1,5 +1,14 @@
 @model miranaSolution.Dtos.Common.PagedResult<miranaSolution.Dtos.Catalog.Books.ChapterDto>
 
+@{
+    ViewData["title"] = "Chapters Of " + ViewBag.Book.Name;
+}
+
+@section LibResources
+{
+    <link href="https://cdn.jsdelivr.net/npm/simple-datatables@7.1.2/dist/style.min.css" rel="stylesheet" />
+}
+
 @section Scripts
 {
     <script src="https://cdn.jsdelivr.net/npm/simple-datatables@7.1.2/dist/umd/simple-datatables.min.js" crossorigin="anonymous"></script>

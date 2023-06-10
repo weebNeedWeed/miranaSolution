@@ -25,12 +25,13 @@ namespace miranaSolution.Business.Catalog.Books
         Task<ChapterDto> AddChapter(int id, ChapterCreateRequest request);
         
         Task<PagedResult<ChapterDto>> GetChaptersPaging(int id, ChapterGetPagingRequest request);
+        
+        Task<ChapterDto> GetChapterByIndex(int id, int index);
 
         // Task<bool> UpdateChapter();
         //
         // Task<bool> DeleteChapter();
         //
-        // Task<ChapterDto> GetChapterByIndex();
         //
         // Task<ChapterDto> GetChapterById();
     }

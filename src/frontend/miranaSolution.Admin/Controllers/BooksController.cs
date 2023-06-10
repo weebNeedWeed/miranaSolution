@@ -75,6 +75,7 @@ public class BooksController : Controller
     // POST /books/create
     [HttpPost]
     [Consumes("multipart/form-data")]
+    [AutoValidateAntiforgeryToken]
     public async Task<IActionResult> Create([FromForm] BookCreateRequest request)
     { 
         var authors = (await _authorsApiService.GetAll()).Data;
@@ -142,6 +143,7 @@ public class BooksController : Controller
     
     // POST /books/{id}/chapters/create
     [HttpPost("[controller]/{id:int}/chapters/create")]
+    [AutoValidateAntiforgeryToken]
     public async Task<IActionResult> AddChapter([FromRoute] int id, [FromForm] ChapterCreateRequest request)
     {
         var book = await _booksApiService.GetById(id);

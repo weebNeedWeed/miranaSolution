@@ -14,6 +14,7 @@ using Newtonsoft.Json;
 
 namespace miranaSolution.Admin.Controllers;
 
+[AllowAnonymous]
 public class AuthController : Controller
 {
     private readonly IUsersApiService _usersApiService;
@@ -35,6 +36,7 @@ public class AuthController : Controller
 
     [HttpPost]
     [AllowAnonymous]
+    [AutoValidateAntiforgeryToken]
     public async Task<IActionResult> Login([FromForm] LoginViewModel loginViewModel, [FromQuery] string? returnUrl)
     {
         ViewBag.ReturnUrl = returnUrl ?? "/";
