@@ -119,6 +119,34 @@ namespace miranaSolution.BackendApi.Controllers
             var chaptersPaging = await _bookService.GetChaptersPaging(id, request);
             return Ok(new ApiSuccessResult<PagedResult<ChapterDto>>(chaptersPaging));
         }
+        
+        // GET /api/books/{id}/chapters
+        [HttpGet("{id:int}/chapters/{index:int}")]
+        [AllowAnonymous]
+        public async Task<IActionResult> GetChapterByIndex([FromRoute] int id, [FromRoute] int index)
+        {
+            var chapter = await _bookService.GetChapterByIndex(id, index);
+            if (chapter is null)
+            {
+                return Ok(new ApiErrorResult("Not found"));
+            }
+            
+            return Ok(new ApiSuccessResult<ChapterDto>(chapter));
+        }
+        
+        // GET /api/books/{slug}
+        [HttpGet("{slug}")]
+        [AllowAnonymous]
+        public async Task<IActionResult> GetBySlug([FromRoute] string slug)
+        {
+            var book = await _bookService.GetBySlug(slug);
+            if (book is null)
+            {
+                return Ok(new ApiErrorResult("Not found"));
+            }
+
+            return Ok(new ApiSuccessResult<BookDto>(book));
+        }
 
         private bool HasValidExtension(string fileName)
         {

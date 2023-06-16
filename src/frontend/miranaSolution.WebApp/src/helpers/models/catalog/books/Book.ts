@@ -1,5 +1,5 @@
 export interface Book {
-  id: string;
+  id: number;
   name: string;
   shortDescription: string;
   longDescription: string;
@@ -8,4 +8,7 @@ export interface Book {
   thumbnailImage: string;
   isRecommended: boolean;
   slug: string;
+  authorName: string;
+  genres: string[];
+  isDone: boolean;
 }

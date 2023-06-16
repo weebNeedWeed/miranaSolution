@@ -1,4 +1,4 @@
-﻿namespace miranaSolution.Dtos.Catalog.Books;
+﻿namespace miranaSolution.Dtos.Catalog.Books.Chapters;
 
 public class ChapterDto
 {

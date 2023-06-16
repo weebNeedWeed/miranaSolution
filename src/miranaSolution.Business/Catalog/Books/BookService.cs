@@ -124,12 +124,14 @@ namespace miranaSolution.Business.Catalog.Books
         public async Task<BookDto> GetBySlug(string slug)
         {
             var book = await _context.Books.FirstOrDefaultAsync(x => x.Slug == slug);
-            var config = new MapperConfiguration(cfg => cfg.CreateMap<Book, BookDto>());
-            var mapper = config.CreateMapper();
+            if (book is null)
+            {
+                return null;
+            }
+            
+            var fullBookInfo = await this.GetById(book.Id);
 
-            var returnData = mapper.Map<BookDto>(book);
-
-            return returnData;
+            return fullBookInfo;
         }
 
         public async Task<ChapterDto> AddChapter(int id, ChapterCreateRequest request)
