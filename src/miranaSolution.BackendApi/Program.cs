@@ -1,6 +1,8 @@
 using Microsoft.AspNetCore.Mvc;
 using miranaSolution.BackendApi.Filters;
 using miranaSolution.BackendApi.Extensions;
+using miranaSolution.Business;
+using miranaSolution.Data;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -9,11 +11,14 @@ builder.Services.AddControllersWithViews(x => x.Filters.Add<HandleModelStateFilt
 builder.Services.Configure<ApiBehaviorOptions>(x => { x.SuppressModelStateInvalidFilter = true; });
 
 builder.Services.AddFluentValidations();
-builder.Services.AddDatabase(builder.Configuration);
-builder.Services.AddAndConfigureAuth(builder.Configuration);
+
+// Add miranaSolution.Data layer
+builder.Services.AddDataLayer(builder.Configuration);
+
+builder.Services.AddAuth(builder.Configuration);
 builder.Services.AddSwagger();
 
-builder.Services.AddBusinessServices();
+builder.Services.AddBusinessLayer();
 
 builder.Services.AddCors(options =>
 {

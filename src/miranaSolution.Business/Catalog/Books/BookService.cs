@@ -209,10 +209,15 @@ namespace miranaSolution.Business.Catalog.Books
                 return null;
             }
 
+            var totalRows = await _context.Chapters.Where(x => x.BookId == id).CountAsync();
+
             var config = new MapperConfiguration(cfg => cfg.CreateMap<Chapter, ChapterDto>());
             var mapper = config.CreateMapper();
 
-            return mapper.Map<ChapterDto>(chapter);
+            var chapterDto = mapper.Map<ChapterDto>(chapter);
+            chapterDto.TotalRecords = totalRows;
+
+            return chapterDto;
         }
 
         public async Task<PagedResult<BookDto>> GetPaging(BookGetPagingRequest request)

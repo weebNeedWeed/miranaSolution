@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import logo from "./../assets/logo.svg";
+import logo from "../assets/logo.svg";
 import { BsFacebook, BsTwitter, BsReddit, BsTelegram } from "react-icons/bs";
 
 const Footer = (): JSX.Element => {
@@ -8,7 +8,7 @@ const Footer = (): JSX.Element => {
       <div className="flex flex-col sm:flex-row w-full gap-y-4 gap-2 justify-between w-full">
         <div className="flex flex-col">
           <Link to={"/"}>
-            <img src={logo} />
+            <img src={logo}/>
             <p className="text-sm text-deepKoamaru">&copy; 2023</p>
           </Link>
         </div>
@@ -49,16 +49,16 @@ const Footer = (): JSX.Element => {
           </p>
           <div className="flex flex-row gap-x-2 text-2xl text-deepKoamaru mt-1">
             <Link to={"/"}>
-              <BsFacebook />
+              <BsFacebook/>
             </Link>
             <Link to={"/"}>
-              <BsTwitter />
+              <BsTwitter/>
             </Link>
             <Link to={"/"}>
-              <BsReddit />
+              <BsReddit/>
             </Link>
             <Link to={"/"}>
-              <BsTelegram />
+              <BsTelegram/>
             </Link>
           </div>
         </div>

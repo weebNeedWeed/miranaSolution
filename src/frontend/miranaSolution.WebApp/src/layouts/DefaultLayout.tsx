@@ -1,4 +1,4 @@
-import { Footer, Navbar } from ".";
+import { Footer, Navbar } from "../components";
 import { Outlet } from "react-router-dom";
 import { LoadingScreen, ToastContainer } from "../containers";
 

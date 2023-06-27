@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { GenreTag, Slider } from "../components";
+import { GenreTag, Slider } from "./index";
 import { BsBoxArrowInRight } from "react-icons/bs";
 import { AnimatePresence, motion } from "framer-motion";
 import { useQuery } from "react-query";
@@ -12,7 +12,7 @@ const motionVariants = {
 };
 
 const Header = (): JSX.Element => {
-  const [slideIndex, setSlideIndex] = useState<number>(0);
+  const [ slideIndex, setSlideIndex ] = useState<number>(0);
 
   const { isLoading, error, data } = useQuery(
     "slides",
@@ -31,7 +31,7 @@ const Header = (): JSX.Element => {
   const genres = currentSlide.genres.split(",").map((elm) => elm.trim());
 
   const tags = genres.map((elm, index) => (
-    <GenreTag genre={elm} key={index} className="mr-2" />
+    <GenreTag genre={elm} key={index} className="mr-2"/>
   ));
 
   return (
@@ -58,10 +58,11 @@ const Header = (): JSX.Element => {
             <p className="text-base text-deepKoamaru mb-4">
               {currentSlide.shortDescription}
             </p>
-            <button className="group flex flex-row justify-center items-center outline-none rounded-md border-2 border-solid border-deepKoamaru px-3 py-1 text-lg font-semibold font-sansPro text-deepKoamaru bg-[rgba(var(--color-old-rose),0.6)] transition-all hover:bg-[rgba(var(--color-old-rose),0.4)]">
+            <button
+              className="group flex flex-row justify-center items-center outline-none rounded-md border-2 border-solid border-deepKoamaru px-3 py-1 text-lg font-semibold font-sansPro text-deepKoamaru bg-[rgba(var(--color-old-rose),0.6)] transition-all hover:bg-[rgba(var(--color-old-rose),0.4)]">
               <p className="mr-1 group-hover:mr-2 transition-all">Đọc ngay</p>
               <span>
-                <BsBoxArrowInRight />
+                <BsBoxArrowInRight/>
               </span>
             </button>
           </motion.div>

@@ -20,19 +20,6 @@ namespace miranaSolution.BackendApi.Extensions;
 
 public static class ServiceCollectionExtensions
 {
-    public static IServiceCollection AddBusinessServices(this IServiceCollection services)
-    {
-        // Register application's services
-        services.AddTransient<ISlideService, SlideService>();
-        services.AddTransient<IBookService, BookService>();
-        services.AddTransient<IUserService, UserService>();
-        services.AddTransient<IFileService, FileService>();
-        services.AddTransient<IAuthorService, AuthorService>();
-        services.AddTransient<IGenreService, GenreService>();
-
-        return services;
-    }
-
     public static IServiceCollection AddFluentValidations(this IServiceCollection services)
     {
         services.AddFluentValidationAutoValidation();
@@ -41,18 +28,9 @@ public static class ServiceCollectionExtensions
         return services;
     }
 
-    public static IServiceCollection AddDatabase(this IServiceCollection services,
-        ConfigurationManager configurationManager)
-    {
-        services.AddDbContext<MiranaDbContext>(options =>
-        {
-            options.UseSqlServer(configurationManager.GetConnectionString("DefaultConnection"));
-        });
+    
 
-        return services;
-    }
-
-    public static IServiceCollection AddAndConfigureAuth(this IServiceCollection services,
+    public static IServiceCollection AddAuth(this IServiceCollection services,
         ConfigurationManager configurationManager)
     {
         services.AddIdentity<AppUser, AppRole>()

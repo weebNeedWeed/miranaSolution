@@ -7,4 +7,5 @@ export interface Chapter {
   readCount: number;
   wordCount: number;
   content: string;
+  totalRecords: number;
 }

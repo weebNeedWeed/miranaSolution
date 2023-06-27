@@ -4,3 +4,6 @@ export { Loading } from "./Loading";
 export { Section } from "./Section";
 export { Divider } from "./Divider";
 export { Toast } from "./Toast";
+export { Header } from "./Header";
+export { Navbar } from "./Navbar";
+export { Footer } from "./Footer";

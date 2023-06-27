@@ -1,6 +1,7 @@
 import { LoaderFunctionArgs } from "react-router-dom";
 import { bookApiHelper } from "../../apis/BookApiHelper";
 import { Chapter } from "../../models/catalog/books/Chapter";
+import { Book } from "../../models/catalog/books/Book";
 
 type BooksInfoLoaderArgs = {
   params: {
@@ -9,7 +10,7 @@ type BooksInfoLoaderArgs = {
   }
 }
 
-export async function booksInfoLoader(args: LoaderFunctionArgs): Promise<Chapter | null> {
+export async function booksInfoLoader(args: LoaderFunctionArgs): Promise<{ chapter: Chapter; book: Book } | null> {
   const { slug, index } = args.params;
   const book = await bookApiHelper.getBookBySlug(slug!);
   if (!book) {
@@ -22,5 +23,5 @@ export async function booksInfoLoader(args: LoaderFunctionArgs): Promise<Chapter
   }
 
 
-  return chapter;
+  return { chapter, book };
 }
