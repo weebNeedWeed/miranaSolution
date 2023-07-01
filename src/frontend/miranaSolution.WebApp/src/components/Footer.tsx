@@ -4,7 +4,7 @@ import { BsFacebook, BsTwitter, BsReddit, BsTelegram } from "react-icons/bs";
 
 const Footer = (): JSX.Element => {
   return (
-    <div className="px-16 lg:px-32 py-20 sm:py-40 bg-gradient bg-oldRose mt-4">
+    <div className="px-8 lg:px-32 py-20 sm:py-40 bg-gradient bg-oldRose mt-4">
       <div className="flex flex-col sm:flex-row w-full gap-y-4 gap-2 justify-between w-full">
         <div className="flex flex-col">
           <Link to={"/"}>

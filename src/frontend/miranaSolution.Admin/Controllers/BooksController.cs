@@ -66,7 +66,7 @@ public class BooksController : Controller
         {
             PageSize = pageSize,
             PageIndex = pageIndex,
-            Keyword = keyword
+            // Keyword = keyword
         });
 
         return View(chapters.Data);

@@ -8,6 +8,7 @@ using miranaSolution.Dtos.Catalog.Books;
 using miranaSolution.Dtos.Catalog.Books.Chapters;
 using miranaSolution.Dtos.Common;
 using miranaSolution.Utilities.Exceptions;
+using System.Linq;
 
 namespace miranaSolution.Business.Catalog.Books
 {
@@ -174,10 +175,10 @@ namespace miranaSolution.Business.Catalog.Books
         {
             var query = _context.Chapters.Where(x => x.BookId == id);
 
-            if (!string.IsNullOrEmpty(request.Keyword))
-            {
-                query = query.Where(x => x.Name.Contains(request.Keyword));
-            }
+            // if (!string.IsNullOrEmpty(request.Keyword))
+            // {
+            //     query = query.Where(x => x.Name.Contains(request.Keyword));
+            // }
 
             query = query.Skip((request.PageIndex - 1) * request.PageSize)
                 .Take(request.PageSize)
@@ -222,26 +223,33 @@ namespace miranaSolution.Business.Catalog.Books
 
         public async Task<PagedResult<BookDto>> GetPaging(BookGetPagingRequest request)
         {
-            var query = from book in _context.Books
-                join book_author in _context.Authors
-                    on book.AuthorId equals book_author.Id
-                select new
-                {
-                    book,
-                    authorName = book_author.Name,
-                    genres = (
-                        from book_genre in _context.BookGenres
-                        join genre in _context.Genres
-                            on book_genre.GenreId equals genre.Id
-                        where book_genre.BookId == book.Id
-                        select genre.Name).ToList()
-                };
+            IQueryable<Book> query = _context.Books.AsQueryable();
 
-            if (request.Keyword is not null)
+            // Apply filter by keyword
+            if (!string.IsNullOrEmpty(request.Keyword))
             {
                 query = query.Where(x =>
-                    x.book.Name.Contains(request.Keyword) || x.book.ShortDescription.Contains(request.Keyword) ||
-                    x.book.LongDescription.Contains(request.Keyword));
+                    x.Name.Contains(request.Keyword)
+                    || x.ShortDescription.Contains(request.Keyword)
+                    || x.LongDescription.Contains(request.Keyword));
+            }
+            
+            // Apply filter by genre
+            if (!string.IsNullOrEmpty(request.GenreIds))
+            {
+                var genreIds = request.GenreIds.Split(",").Select(x => Int32.Parse(x));
+                foreach (var genreId in genreIds)
+                {
+                    query = query
+                        .Include(x => x.BookGenres)
+                        .Where(x => x.BookGenres.Select(_ => _.GenreId).Contains(genreId));
+                }
+            }
+            
+            // Apply filter by status
+            if (request.IsDone is not null)
+            {
+                query = query.Where(x => x.IsDone == request.IsDone);
             }
 
             var pageSize = request.PageSize;
@@ -251,17 +259,17 @@ namespace miranaSolution.Business.Catalog.Books
 
             var data = await query.Skip((pageIndex - 1) * pageSize).Take(pageSize).Select(x => new BookDto
             {
-                Id = x.book.Id,
-                Name = x.book.Name,
-                ShortDescription = x.book.ShortDescription,
-                LongDescription = x.book.LongDescription,
-                CreatedAt = x.book.CreatedAt,
-                UpdatedAt = x.book.UpdatedAt,
-                ThumbnailImage = x.book.ThumbnailImage,
-                IsRecommended = x.book.IsRecommended,
-                Slug = x.book.Slug,
-                AuthorName = x.authorName,
-                Genres = x.genres
+                Id = x.Id,
+                Name = x.Name,
+                ShortDescription = x.ShortDescription,
+                LongDescription = x.LongDescription,
+                CreatedAt = x.CreatedAt,
+                UpdatedAt = x.UpdatedAt,
+                ThumbnailImage = x.ThumbnailImage,
+                IsRecommended = x.IsRecommended,
+                Slug = x.Slug,
+                AuthorName = x.Author.Name,
+                Genres = x.BookGenres.Select(_ => _.Genre).Select(_ => _.Name).ToList()
             }).ToListAsync();
 
             var paged = new PagedResult<BookDto>
