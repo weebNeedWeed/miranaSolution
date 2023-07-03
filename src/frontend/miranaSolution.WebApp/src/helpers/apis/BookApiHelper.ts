@@ -12,17 +12,17 @@ class BookApiHelper extends BaseApiHelper {
         params.append("pageSize", request.pageSize.toString());
 
         if (request.keyword != null) {
-            params.append("keyword", request.keyword);
+            params.append("keyword", request.keyword!);
         }
 
         if (request.genreIds != null) {
-            params.append("genreIds", request.genreIds);
+            params.append("genreIds", request.genreIds!);
         }
 
         if (request.isDone != null) {
             params.append("isDone", request.isDone ? "true" : "false");
         }
-
+        
         try {
             const response = await this.init().get<ApiResult<PagedResult<Book>>>("/books?" + params.toString());
             if (response.data.status === "fail" || response.data.status === "error") {
