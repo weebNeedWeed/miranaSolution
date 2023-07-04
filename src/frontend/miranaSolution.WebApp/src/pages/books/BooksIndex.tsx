@@ -1,4 +1,4 @@
-import {BookCard, Divider, Section} from "../../components";
+import {BookCard, Divider, Pager, Section} from "../../components";
 import {FaSwatchbook} from "react-icons/fa";
 import {AiOutlinePlus, AiFillCheckCircle, AiOutlineClose} from "react-icons/ai";
 import {CgTimelapse} from "react-icons/cg";
@@ -11,6 +11,8 @@ import {BookGetPagingRequest} from "../../helpers/models/catalog/books/BookGetPa
 import {useEffect, useMemo, useState} from "react";
 import {Genre} from "../../helpers/models/catalog/books/Genre";
 import {useMediaQuery} from "../../helpers/hooks/useMediaQuery";
+import {VscArrowSmallLeft, VscArrowSmallRight} from "react-icons/vsc";
+import {PagedResult} from "../../helpers/models/common/PagedResult";
 
 type FilterButtonProps = {
     title: string;
@@ -386,14 +388,18 @@ const BookCardList = (props: BookCardListProps): JSX.Element => {
         () => bookApiHelper.getPaging(request),
         {staleTime: Infinity});
 
-    return <div className="w-full p-5 bg-[rgba(255,255,255,0.8)] h-full min-h-[600px]">
+    return <div className="w-full p-5 bg-[rgba(255,255,255,0.8)] h-full min-h-[600px] flex flex-col">
         <div className="flex flex-row flex-wrap md:mr-[-0.75rem]">
             {(isLoading || error || !data) && <>Loading...</>}
             {data && data.items.map(book => <BookCard key={book.id} name={book.name}
                                                       shortDescription={book.shortDescription}
                                                       thumbnailImage={book.thumbnailImage}/>)}
         </div>
-    </div>
+
+        <div className="mt-auto">
+            {data && <Pager pagedResult={data as PagedResult<any>}/>}
+        </div>
+    </div>;
 }
 
 const BooksIndex = (): JSX.Element => {
