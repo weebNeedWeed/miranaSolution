@@ -1,35 +1,16 @@
+using System.Reflection;
 using System.Text;
-using FluentValidation;
-using FluentValidation.AspNetCore;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
-using miranaSolution.Business.Auth.Users;
-using miranaSolution.Business.Catalog.Authors;
-using miranaSolution.Business.Catalog.Books;
-using miranaSolution.Business.Catalog.Genres;
-using miranaSolution.Business.Systems.Files;
-using miranaSolution.Business.Systems.Slides;
 using miranaSolution.Data.Entities;
 using miranaSolution.Data.Main;
-using miranaSolution.Dtos.Auth.Users.Validations;
 
 namespace miranaSolution.BackendApi.Extensions;
 
 public static class ServiceCollectionExtensions
 {
-    public static IServiceCollection AddFluentValidations(this IServiceCollection services)
-    {
-        services.AddFluentValidationAutoValidation();
-        services.AddValidatorsFromAssemblyContaining<UserAuthenticationRequestValidator>();
-
-        return services;
-    }
-
-    
-
     public static IServiceCollection AddAuth(this IServiceCollection services,
         ConfigurationManager configurationManager)
     {
@@ -87,6 +68,36 @@ public static class ServiceCollectionExtensions
                 Title = "ToDo API",
                 Description = "An ASP.NET Core Web API for managing ToDo items",
                 //TermsOfService = new Uri("https://example.com/terms"),
+            });
+            
+            options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+            {
+                Description = @"JWT Authorization header using the Bearer scheme. \r\n\r\n 
+                      Enter 'Bearer' [space] and then your token in the text input below.
+                      \r\n\r\nExample: 'Bearer 12345abcdef'",
+                Name = "Authorization",
+                In = ParameterLocation.Header,
+                Type = SecuritySchemeType.ApiKey,
+                Scheme = "Bearer"
+            });
+
+            options.AddSecurityRequirement(new OpenApiSecurityRequirement()
+            {
+                {
+                    new OpenApiSecurityScheme
+                    {
+                        Reference = new OpenApiReference
+                        {
+                            Type = ReferenceType.SecurityScheme,
+                            Id = "Bearer"
+                        },
+                        Scheme = "oauth2",
+                        Name = "Bearer",
+                        In = ParameterLocation.Header,
+
+                    },
+                    new List<string>()
+                }
             });
         });
 

@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using miranaSolution.BackendApi.Filters;
 using miranaSolution.BackendApi.Extensions;
+using miranaSolution.BackendApi.HealthChecks;
 using miranaSolution.Business;
 using miranaSolution.Data;
 
@@ -10,15 +11,11 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllersWithViews(x => x.Filters.Add<HandleModelStateFilter>());
 builder.Services.Configure<ApiBehaviorOptions>(x => { x.SuppressModelStateInvalidFilter = true; });
 
-builder.Services.AddFluentValidations();
-
-// Add miranaSolution.Data layer
-builder.Services.AddDataLayer(builder.Configuration);
-
-builder.Services.AddAuth(builder.Configuration);
-builder.Services.AddSwagger();
-
-builder.Services.AddBusinessLayer();
+// Add project's logical layers
+builder.Services.AddDataLayer(builder.Configuration)
+    .AddAuth(builder.Configuration)
+    .AddSwagger()
+    .AddBusinessLayer();
 
 builder.Services.AddCors(options =>
 {
@@ -30,6 +27,9 @@ builder.Services.AddCors(options =>
                 .AllowAnyHeader();
         });
 });
+
+builder.Services.AddHealthChecks()
+    .AddCheck<DatabaseHealthCheck>("Database");
 
 var app = builder.Build(); 
 
@@ -51,6 +51,8 @@ app.UseStaticFiles();
 app.UseAuthentication();
 app.UseRouting();
 app.UseAuthorization();
+
+app.MapHealthChecks("/_health");
 
 app.MapControllers();
 

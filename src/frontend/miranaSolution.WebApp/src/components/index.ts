@@ -9,3 +9,4 @@ export {Navbar} from "./Navbar";
 export {Footer} from "./Footer";
 export {BookCard} from "./BookCard";
 export {Pager} from "./Pager";
+export {Avatar} from "./Avatar";

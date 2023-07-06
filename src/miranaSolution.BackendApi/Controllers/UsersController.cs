@@ -1,8 +1,10 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using System.Security.Claims;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using miranaSolution.Business.Auth.Users;
 using miranaSolution.Dtos.Auth.Users;
 using miranaSolution.Dtos.Common;
+using miranaSolution.Utilities.Constants;
 using miranaSolution.Utilities.Exceptions;
 
 namespace miranaSolution.BackendApi.Controllers
@@ -16,6 +18,23 @@ namespace miranaSolution.BackendApi.Controllers
         public UsersController(IUserService userService)
         {
             _userService = userService;
+        }
+
+        [HttpGet("info")]
+        [Authorize]
+        public async Task<IActionResult> GetUserInfo()
+        {
+            var userName = User
+                .Claims
+                .First(x => x.Type == ClaimTypes.NameIdentifier).Value;
+            var user = await _userService.GetByUserName(userName);
+
+            if (user is null)
+            {
+                return Ok(new ApiErrorResult("User was not found."));
+            }
+
+            return Ok(new ApiSuccessResult<UserDto>(user));
         }
 
         [HttpPost]
