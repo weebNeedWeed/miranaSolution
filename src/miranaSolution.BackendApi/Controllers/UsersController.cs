@@ -94,5 +94,30 @@ namespace miranaSolution.BackendApi.Controllers
 
             return Ok(new ApiSuccessResult<object>(new { AccessToken = accessToken }));
         }
+
+        [HttpPost("info")]
+        [Consumes("multipart/form-data")]
+        [Authorize]
+        public async Task<IActionResult> UpdateInfo([FromForm] UserUpdateInfoRequest request)
+        {
+            var validExts = new string[] { ".jpg", ".png", ".jpeg" };
+            if (request.Avatar is not null && !validExts.Contains(Path.GetExtension(request.Avatar.FileName)))
+            {
+                return Ok(new ApiFailResult( new Dictionary<string, List<string>>()
+                {
+                    {nameof(request.Avatar), new List<string>() {"Invalid image extension"}}
+                }));
+            }
+
+            var userId = User.Claims.First(x => x.Type == "sid").Value;
+            var result = await _userService.UpdateInfo(new Guid(userId), request);
+
+            if (result is null)
+            {
+                return Ok(new ApiErrorResult());
+            }
+
+            return Ok(new ApiSuccessResult<UserDto>(result));
+        }
     }
 }

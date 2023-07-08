@@ -14,5 +14,7 @@ namespace miranaSolution.Data.Entities
         public List<Comment> Comments { get; set; }
         
         public List<Bookmark> Bookmarks { get; set; }
+        
+        public string? Avatar { get; set; }
     }
 }

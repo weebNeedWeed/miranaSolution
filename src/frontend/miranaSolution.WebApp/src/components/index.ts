@@ -10,3 +10,5 @@ export {Footer} from "./Footer";
 export {BookCard} from "./BookCard";
 export {Pager} from "./Pager";
 export {Avatar} from "./Avatar";
+export {Dialog} from "./Dialog";
+export {TextInput} from "./TextInput";

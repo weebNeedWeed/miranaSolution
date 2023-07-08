@@ -8,6 +8,8 @@ using miranaSolution.Utilities.Exceptions;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
+using Microsoft.AspNetCore.Http;
+using miranaSolution.Business.Systems.Files;
 
 namespace miranaSolution.Business.Auth.Users
 {
@@ -16,12 +18,14 @@ namespace miranaSolution.Business.Auth.Users
         private readonly UserManager<AppUser> _userManager;
         private readonly SignInManager<AppUser> _signInManager;
         private readonly IConfiguration _configuration;
+        private readonly IFileService _fileService;
 
-        public UserService(UserManager<AppUser> userManager, SignInManager<AppUser> signInManager, IConfiguration configuration)
+        public UserService(UserManager<AppUser> userManager, SignInManager<AppUser> signInManager, IConfiguration configuration, IFileService fileService)
         {
             _userManager = userManager;
             _signInManager = signInManager;
             _configuration = configuration;
+            _fileService = fileService;
         }
 
         public async Task<string> Authentication(UserAuthenticationRequest request)
@@ -58,6 +62,29 @@ namespace miranaSolution.Business.Auth.Users
             var returnData = mapper.Map<UserDto>(user);
 
             return returnData;
+        }
+
+        public async Task<UserDto> UpdateInfo(Guid id, UserUpdateInfoRequest request)
+        {
+            var user = await _userManager.FindByIdAsync(id.ToString());
+            if (user is null)
+            {
+                return null;
+            }
+
+            user.FirstName = request.FirstName;
+            user.LastName = request.LastName;
+            user.Email = request.Email;
+            
+            if(request.Avatar is not null)
+                user.Avatar = await SaveAvatar(request.Avatar);
+
+            await _userManager.UpdateAsync(user);
+            
+            var config = new MapperConfiguration(cfg => cfg.CreateMap<AppUser, UserDto>());
+            var mapper = config.CreateMapper();
+
+            return mapper.Map<UserDto>(user);
         }
 
         public async Task<UserDto> Register(UserRegisterRequest request)
@@ -108,6 +135,17 @@ namespace miranaSolution.Business.Auth.Users
                 signingCredentials: credentials);
 
             return new JwtSecurityTokenHandler().WriteToken(token);
+        }
+
+        private async Task<string> SaveAvatar(IFormFile avatar)
+        {
+            var extension = Path.GetExtension(avatar.FileName);
+            var newName = $"{Guid.NewGuid().ToString()}{extension}";
+
+            await _fileService.SaveFileAsync(
+                avatar.OpenReadStream(), newName);
+
+            return _fileService.GetPath(newName);
         }
     }
 }

@@ -5,7 +5,7 @@ namespace miranaSolution.Business.Systems.Files;
 public class FileService : IFileService
 {
     private readonly string _root;
-    private readonly string _folder = "users";
+    private readonly string _folder = "uploads";
 
     public FileService(IWebHostEnvironment webHostEnvironment)
     {
@@ -36,8 +36,8 @@ public class FileService : IFileService
         await Task.Run(() => File.Delete(filePath));
     }
 
-    public string GetUrl(string fileName)
+    public string GetPath(string fileName)
     {
-        return Path.Combine(_root, fileName);
+        return _folder + "/" + fileName;
     }
 }

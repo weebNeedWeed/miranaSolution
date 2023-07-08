@@ -2,13 +2,15 @@ import {Router} from "@remix-run/router";
 import {Navigate, createBrowserRouter} from "react-router-dom";
 import {RouteObject} from "react-router/dist/lib/context";
 
-import {Home, Login, Register, UserProfile} from "../../pages";
+import {Home} from "../../pages";
 import {DefaultLayout, UserLayout} from "../../layouts";
 import {Test} from "../../pages/Test";
-import {AuthLayout} from "../../layouts/AuthLayout";
+import {AuthLayout} from "../../layouts";
 import {BooksChapter, BooksIndex, BooksInfo} from "../../pages/books";
 import {booksInfoLoader} from "./loaders/booksLoader";
 import React from "react";
+import {UserProfile} from "../../pages/user";
+import {Login, Register} from "../../pages/auth";
 
 const routes: RouteObject[] = [
     {

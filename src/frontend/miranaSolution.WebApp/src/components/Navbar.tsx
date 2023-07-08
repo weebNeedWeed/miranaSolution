@@ -1,4 +1,4 @@
-import {MouseEvent, useEffect, useState} from "react";
+import React, {MouseEvent, useEffect, useState} from "react";
 import {Link, NavLink, useNavigate} from "react-router-dom";
 import logo from "../assets/logo.svg";
 import {CgClose, CgMenuRight} from "react-icons/cg";
@@ -12,6 +12,7 @@ import {useAccessToken} from "../helpers/hooks/useAccessToken";
 import {useSystemContext} from "../contexts/SystemContext";
 import {ToastVariant} from "./Toast";
 import {Avatar} from "./Avatar";
+import {useBaseUrl} from "../helpers/hooks/useBaseUrl";
 
 type GenresBoxProps = {};
 const GenresBox = (props: GenresBoxProps): JSX.Element => {
@@ -77,6 +78,20 @@ const Menu = ({className}: MenuProps): JSX.Element => {
     );
 };
 
+type AutoUpdatedAvatarProps = {
+    className?: string;
+};
+const AutoUpdatedAvatar = ({className}: AutoUpdatedAvatarProps): JSX.Element => {
+    const {state, dispatch} = useAuthenticationContext();
+    const baseUrl = useBaseUrl();
+
+    return <>
+        {typeof state.user.avatar !== "undefined" ?
+            <Avatar imageUrl={baseUrl + state.user.avatar} className={className}/> :
+            <Avatar className={className}/>}
+    </>
+}
+
 const Navbar = (): JSX.Element => {
     const [toggleMenu, setToggleMenu] = useState<boolean>(false);
     const {state: authenticationState, dispatch: authenticationDispatch} = useAuthenticationContext();
@@ -124,7 +139,7 @@ const Navbar = (): JSX.Element => {
                     {isLoggedIn &&
                         <Link to={"/user/profile"}
                               className="flex flex-col justify-end items-end cursor-pointer relative mb-4">
-                            <Avatar className="w-14 h-14"/>
+                            <AutoUpdatedAvatar className="w-14 h-14"/>
 
                             <span className="text-deepKoamaru text-xl">
                                 Hello, <span
@@ -179,7 +194,7 @@ const Navbar = (): JSX.Element => {
                         className="font-semibold">{authenticationState.user.firstName} {authenticationState.user.lastName}</span>
                     </span>
 
-                    <Avatar className="w-9 h-9"/>
+                    <AutoUpdatedAvatar className="ml-1 w-9 h-9"/>
 
                     {openUserMenu &&
                         <div

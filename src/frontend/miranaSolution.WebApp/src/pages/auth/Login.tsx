@@ -2,9 +2,9 @@ import {useId} from "react";
 import {AiOutlineUser, AiOutlineLock} from "react-icons/ai";
 import {Link, useNavigate} from "react-router-dom";
 import {useState, useEffect} from "react";
-import {userApiHelper} from "../helpers/apis/UserApiHelper";
-import {useSystemContext} from "../contexts/SystemContext";
-import {useAccessToken} from "../helpers/hooks/useAccessToken";
+import {userApiHelper} from "../../helpers/apis/UserApiHelper";
+import {useSystemContext} from "../../contexts/SystemContext";
+import {useAccessToken} from "../../helpers/hooks/useAccessToken";
 
 const Login = (): JSX.Element => {
     const userNameId = useId();

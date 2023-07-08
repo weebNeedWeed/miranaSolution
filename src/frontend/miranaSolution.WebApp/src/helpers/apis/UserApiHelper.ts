@@ -2,6 +2,7 @@ import {ApiResult} from "../models/ApiResult";
 import {BaseApiHelper} from "./BaseApiHelper";
 import {UserRegisterRequest} from "../models/auth/UserRegisterRequest";
 import {User} from "../models/auth/User";
+import {UserUpdateInfoRequest} from "../models/auth/UserUpdateInfoRequest";
 
 type AuthenticationData = {
     accessToken: string;
@@ -55,6 +56,34 @@ class UserApiHelper extends BaseApiHelper {
 
             return response.data.data;
         } catch (err) {
+            return null;
+        }
+    }
+
+    async updateUserInfo(accessToken: string, request: UserUpdateInfoRequest): Promise<User | null> {
+        const headers = {
+            Authorization: `Bearer ${accessToken}`,
+        }
+
+        const formData = new FormData();
+        if (typeof request.avatar !== "undefined") {
+            formData.append("avatar", request.avatar);
+        }
+
+        formData.append("firstName", request.firstName);
+        formData.append("lastName", request.lastName);
+        formData.append("email", request.email);
+
+        try {
+            const response = await this.init(headers).post<ApiResult<User>>("/users/info", formData);
+            if (response.data.status === "fail" || response.data.status === "error") {
+                throw new Error();
+            }
+
+            console.log(response);
+
+            return response.data.data;
+        } catch (ex) {
             return null;
         }
     }

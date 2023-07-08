@@ -17,18 +17,21 @@ namespace miranaSolution.Data.Main
         {
             base.OnModelCreating(builder);
 
-            builder.ApplyConfiguration(new AppUserConfiguration());
-            builder.ApplyConfiguration(new AppRoleConfiguration());
-            builder.ApplyConfiguration(new BookConfiguration());
-            builder.ApplyConfiguration(new GenreConfiguration());
-            builder.ApplyConfiguration(new BookGenreConfiguration());
-            builder.ApplyConfiguration(new ChapterConfiguration());
-            builder.ApplyConfiguration(new RatingConfiguration());
-            builder.ApplyConfiguration(new SlideConfiguration());
-            builder.ApplyConfiguration(new ReactionConfiguration());
-            builder.ApplyConfiguration(new CommentConfiguration());
-            builder.ApplyConfiguration(new AuthorConfiguration());
-            builder.ApplyConfiguration(new BookmarkConfiguration());
+            var assembly = typeof(MiranaDbContext).Assembly;
+            builder.ApplyConfigurationsFromAssembly(assembly);
+            
+            // builder.ApplyConfiguration(new AppUserConfiguration());
+            // builder.ApplyConfiguration(new AppRoleConfiguration());
+            // builder.ApplyConfiguration(new BookConfiguration());
+            // builder.ApplyConfiguration(new GenreConfiguration());
+            // builder.ApplyConfiguration(new BookGenreConfiguration());
+            // builder.ApplyConfiguration(new ChapterConfiguration());
+            // builder.ApplyConfiguration(new RatingConfiguration());
+            // builder.ApplyConfiguration(new SlideConfiguration());
+            // builder.ApplyConfiguration(new ReactionConfiguration());
+            // builder.ApplyConfiguration(new CommentConfiguration());
+            // builder.ApplyConfiguration(new AuthorConfiguration());
+            // builder.ApplyConfiguration(new BookmarkConfiguration());
 
             builder.Entity<IdentityRoleClaim<Guid>>().ToTable("AppRoleClaims");
             builder.Entity<IdentityUserClaim<Guid>>().ToTable("AppUserClaims");

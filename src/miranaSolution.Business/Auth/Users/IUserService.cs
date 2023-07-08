@@ -11,5 +11,7 @@ namespace miranaSolution.Business.Auth.Users
         Task<UserDto> GetByEmail(string email);
 
         Task<UserDto> GetByUserName(string userName);
+
+        Task<UserDto> UpdateInfo(Guid id,UserUpdateInfoRequest request);
     }
 }
