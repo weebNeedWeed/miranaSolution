@@ -9,7 +9,7 @@ import {AuthLayout} from "../../layouts";
 import {BooksChapter, BooksIndex, BooksInfo} from "../../pages/books";
 import {booksInfoLoader} from "./loaders/booksLoader";
 import React from "react";
-import {UserProfile} from "../../pages/user";
+import {UserPassword, UserProfile} from "../../pages/user";
 import {Login, Register} from "../../pages/auth";
 
 const routes: RouteObject[] = [
@@ -62,7 +62,7 @@ const routes: RouteObject[] = [
                     },
                     {
                         path: "password",
-                        element: <p>meomeo</p>
+                        element: <UserPassword/>
                     }
                 ]
             }

@@ -3,6 +3,7 @@ import {BaseApiHelper} from "./BaseApiHelper";
 import {UserRegisterRequest} from "../models/auth/UserRegisterRequest";
 import {User} from "../models/auth/User";
 import {UserUpdateInfoRequest} from "../models/auth/UserUpdateInfoRequest";
+import {UserUpdatePasswordRequest} from "../models/auth/UserUpdatePasswordRequest";
 
 type AuthenticationData = {
     accessToken: string;
@@ -80,7 +81,27 @@ class UserApiHelper extends BaseApiHelper {
                 throw new Error();
             }
 
-            console.log(response);
+            return response.data.data;
+        } catch (ex) {
+            return null;
+        }
+    }
+
+    async updatePassword(accessToken: string, request: UserUpdatePasswordRequest): Promise<User | null> {
+        const headers = {
+            Authorization: `Bearer ${accessToken}`,
+        }
+
+        const formData = new FormData();
+        formData.append("oldPassword", request.oldPassword);
+        formData.append("newPassword", request.newPassword);
+        formData.append("newPasswordConfirmation", request.newPasswordConfirmation);
+
+        try {
+            const response = await this.init(headers).post<ApiResult<User>>("/users/password", formData);
+            if (response.data.status === "fail" || response.data.status === "error") {
+                throw new Error();
+            }
 
             return response.data.data;
         } catch (ex) {

@@ -13,5 +13,6 @@ namespace miranaSolution.Business.Auth.Users
         Task<UserDto> GetByUserName(string userName);
 
         Task<UserDto> UpdateInfo(Guid id,UserUpdateInfoRequest request);
+        Task<UserDto> UpdatePassword(Guid id,UserUpdatePasswordRequest request);
     }
 }

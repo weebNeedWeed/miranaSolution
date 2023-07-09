@@ -119,5 +119,23 @@ namespace miranaSolution.BackendApi.Controllers
 
             return Ok(new ApiSuccessResult<UserDto>(result));
         }
+
+        [HttpPost("password")]
+        [Consumes("multipart/form-data")]
+        [Authorize]
+        public async Task<IActionResult> UpdatePassword([FromForm] UserUpdatePasswordRequest request)
+        {
+            var userId = User.Claims.First(x => x.Type == "sid").Value;
+
+            try
+            {
+                var result = await _userService.UpdatePassword(new Guid(userId), request);
+                return Ok(new ApiSuccessResult<UserDto>(result));
+            }
+            catch (Exception ex)
+            {
+                return Ok(new ApiErrorResult("Something went wrong."));
+            }
+        } 
     }
 }

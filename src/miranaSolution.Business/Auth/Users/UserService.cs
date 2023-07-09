@@ -87,6 +87,32 @@ namespace miranaSolution.Business.Auth.Users
             return mapper.Map<UserDto>(user);
         }
 
+        public async Task<UserDto> UpdatePassword(Guid id, UserUpdatePasswordRequest request)
+        {
+            var user = await _userManager.FindByIdAsync(id.ToString());
+            if (user is null)
+            {
+                throw new Exception("The user with given id does not exists.");
+            }
+
+            if (!(await _userManager.CheckPasswordAsync(user, request.OldPassword)))
+            {
+                throw new Exception("Invalid password.");
+            }
+
+            if (!request.NewPassword.Equals(request.NewPasswordConfirmation))
+            {
+                throw new Exception("The new password confirmation must be equal to the new password.");
+            }
+
+            await _userManager.ChangePasswordAsync(user, request.OldPassword, request.NewPassword);
+
+            var config = new MapperConfiguration(cfg => cfg.CreateMap<AppUser, UserDto>());
+            var mapper = config.CreateMapper();
+
+            return mapper.Map<UserDto>(user);
+        }
+
         public async Task<UserDto> Register(UserRegisterRequest request)
         {
             var config = new MapperConfiguration(cfg =>
