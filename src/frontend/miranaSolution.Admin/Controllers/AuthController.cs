@@ -8,7 +8,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
 using miranaSolution.Admin.Models.Auth;
 using miranaSolution.Admin.Services.Interfaces;
-using miranaSolution.Dtos.Auth.Users;
+using miranaSolution.DTOs.Auth.Users;
 using miranaSolution.Utilities.Constants;
 using Newtonsoft.Json;
 
@@ -40,11 +40,8 @@ public class AuthController : Controller
     public async Task<IActionResult> Login([FromForm] LoginViewModel loginViewModel, [FromQuery] string? returnUrl)
     {
         ViewBag.ReturnUrl = returnUrl ?? "/";
-        
-        if (!ModelState.IsValid)
-        {
-            return View(loginViewModel);
-        }
+
+        if (!ModelState.IsValid) return View(loginViewModel);
 
         var response = await _usersApiService.Authenticate(new UserAuthenticationRequest()
         {
@@ -67,25 +64,22 @@ public class AuthController : Controller
             ModelState.AddModelError("", "Unknown error.");
             return View(loginViewModel);
         }
-        
+
         var authProperties = new AuthenticationProperties
         {
             IsPersistent = false
         };
 
         await HttpContext.SignInAsync(
-            CookieAuthenticationDefaults.AuthenticationScheme, 
-            new ClaimsPrincipal(claimsIdentity), 
+            CookieAuthenticationDefaults.AuthenticationScheme,
+            new ClaimsPrincipal(claimsIdentity),
             authProperties);
 
         HttpContext.Session.SetString("accessToken", (string)accessToken);
-        
-        if (Url.IsLocalUrl(returnUrl))
-        {
-            return Redirect(returnUrl);
-        }
 
-        return RedirectToAction(actionName: "Index", controllerName: "Home");
+        if (Url.IsLocalUrl(returnUrl)) return Redirect(returnUrl);
+
+        return RedirectToAction("Index", "Home");
     }
 
     private ClaimsIdentity? GetClaimsIdentity(string accessToken)
@@ -104,14 +98,11 @@ public class AuthController : Controller
                 ValidateAudience = true,
                 // set clockskew to zero so tokens expire exactly at token expiration time (instead of 5 minutes later)
                 ClockSkew = TimeSpan.Zero
-            }, out SecurityToken validatedToken);
+            }, out var validatedToken);
 
             var jwtToken = (JwtSecurityToken)validatedToken;
-            if (!jwtToken.Claims.First(x => x.Type == "roles").Value.Contains(RolesConstant.Administrator))
-            {
-                return null;
-            }
-            
+            if (!jwtToken.Claims.First(x => x.Type == "roles").Value.Contains(RolesConstant.Administrator)) return null;
+
             var claimsIdentity = new ClaimsIdentity(
                 jwtToken.Claims, CookieAuthenticationDefaults.AuthenticationScheme);
 

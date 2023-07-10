@@ -11,8 +11,8 @@ builder.Services.AddHttpContextAccessor();
 builder.Services.AddDistributedSqlServerCache(options =>
 {
     options.ConnectionString = builder.Configuration.GetConnectionString("DefaultConnection");
-    options.SchemaName = "dbo";  
-    options.TableName = "SQLSessions";  
+    options.SchemaName = "dbo";
+    options.TableName = "SQLSessions";
 });
 
 builder.Services.AddSession(options =>
@@ -35,10 +35,7 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
         options.LoginPath = "/Auth/Login";
     });
 
-var configureClient = (HttpClient client) =>
-{
-    client.BaseAddress = new Uri(builder.Configuration["BaseAddress"]);
-};
+var configureClient = (HttpClient client) => { client.BaseAddress = new Uri(builder.Configuration["BaseAddress"]); };
 
 builder.Services.AddRefitClient<IUsersApiService>().ConfigureHttpClient(configureClient);
 builder.Services.AddRefitClient<IBooksApiService>().ConfigureHttpClient(configureClient);
@@ -64,7 +61,7 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllerRoute(
-    name: "default",
-    pattern: "{controller=Home}/{action=Index}/{id?}");
+    "default",
+    "{controller=Home}/{action=Index}/{id?}");
 
 app.Run();

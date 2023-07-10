@@ -202,10 +202,7 @@ const FilterSection = (props: FIltersSectionProps): JSX.Element => {
     const [searchParams] = useSearchParams();
     const {isLoading, error, data: genresData} = useQuery(
         "genres",
-        () => genreApiHelper.getAll(),
-        {
-            staleTime: Infinity
-        });
+        () => genreApiHelper.getAll());
     if (isLoading || error || !genresData) {
         return <div></div>;
     }
@@ -258,8 +255,8 @@ const FilterSection = (props: FIltersSectionProps): JSX.Element => {
 
             const preStatus = searchParams.get("status");
 
-            // If status is chose, then dont include it to queryString
-            // (dont include the status = "remove" them)
+            // If status is chosen, then don't include it to queryString
+            // (don't include the status = "remove" them)
             if (isStatusActive(status)) {
             } else if (preStatus === null) {
                 queryString.append("status", status ? "true" : "false");
@@ -386,12 +383,12 @@ const BookCardList = (props: BookCardListProps): JSX.Element => {
     const {isLoading, error, data} = useQuery(
         ["books", request.pageIndex, request.pageSize, request.genreIds, request.isDone, request.keyword],
         () => bookApiHelper.getPaging(request),
-        {staleTime: Infinity});
+    );
 
     return <div className="w-full p-5 bg-[rgba(255,255,255,0.8)] h-full min-h-[600px] flex flex-col">
         <div className="flex flex-row flex-wrap md:mr-[-0.75rem]">
             {(isLoading || error || !data) && <>Loading...</>}
-            {data && data.items.map(book => <BookCard key={book.id} name={book.name}
+            {data && data.items.map(book => <BookCard slug={book.slug} key={book.id} name={book.name}
                                                       shortDescription={book.shortDescription}
                                                       thumbnailImage={book.thumbnailImage}/>)}
         </div>
@@ -403,7 +400,7 @@ const BookCardList = (props: BookCardListProps): JSX.Element => {
 }
 
 const BooksIndex = (): JSX.Element => {
-    return <Section className="text-deepKoamaru pt-2">
+    return <Section className="text-deepKoamaru">
         <div className="flex flex-col md:flex-row items-stretch shadow-sm shadow-slate-500">
             <FilterSection/>
 

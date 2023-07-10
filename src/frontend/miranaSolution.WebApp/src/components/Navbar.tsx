@@ -13,6 +13,7 @@ import {useSystemContext} from "../contexts/SystemContext";
 import {ToastVariant} from "./Toast";
 import {Avatar} from "./Avatar";
 import {useBaseUrl} from "../helpers/hooks/useBaseUrl";
+import {Section} from "./Section";
 
 type GenresBoxProps = {};
 const GenresBox = (props: GenresBoxProps): JSX.Element => {
@@ -173,61 +174,63 @@ const Navbar = (): JSX.Element => {
     );
 
     return (
-        <nav className="w-full bg-gradient py-8 lg:px-16 px-8 flex flex-row">
-            <div className="flex flex-row items-center justify-start">
-                <div className="mr-16 h-[48px] flex items-center">
-                    <Link to="/">
-                        <img src={logo} alt="logo" className="h-[20px]"/>
-                    </Link>
+        <Section>
+            <nav className="w-full bg-gradient flex flex-row">
+                <div className="flex flex-row items-center justify-start">
+                    <div className="mr-16 h-[48px] flex items-center">
+                        <Link to="/">
+                            <img src={logo} alt="logo" className="h-[20px]"/>
+                        </Link>
+                    </div>
+
+                    <div className="hidden md:flex flex-row items-center">
+                        <Menu className="mt-1 mr-10 text-lg flex items-center"/>
+                    </div>
                 </div>
 
-                <div className="hidden md:flex flex-row items-center">
-                    <Menu className="mt-1 mr-10 text-lg flex items-center"/>
-                </div>
-            </div>
-
-            <div className="grow hidden sm:flex flex-row justify-end items-center mt-1">
-                {isLoggedIn ? <div className="flex flex-row justify-end items-center cursor-pointer relative"
-                                   onClick={() => setOpenUserMenu(!openUserMenu)}>
+                <div className="grow hidden sm:flex flex-row justify-end items-center mt-1">
+                    {isLoggedIn ? <div className="flex flex-row justify-end items-center cursor-pointer relative"
+                                       onClick={() => setOpenUserMenu(!openUserMenu)}>
                     <span className="text-deepKoamaru text-lg">
                         Hello, <span
                         className="font-semibold">{authenticationState.user.firstName} {authenticationState.user.lastName}</span>
                     </span>
 
-                    <AutoUpdatedAvatar className="ml-1 w-9 h-9"/>
+                        <AutoUpdatedAvatar className="ml-1 w-9 h-9"/>
 
-                    {openUserMenu &&
-                        <div
-                            className="rounded z-10 absolute top-[110%] right-0 w-3/4 p-4 flex flex-col bg-oldRose opacity-80 justify-start items-start">
-                            <Link className="w-full" to={"/user/profile"}>
-                                Hồ sơ
-                            </Link>
-                            <button className="w-full text-left text-red-600 font-semibold"
-                                    onClick={handleLogout}>
-                                Đăng xuất
-                            </button>
-                        </div>}
-                </div> : <>
-                    <p className="mr-4 font-semibold text-deepKoamaru text-lg font-sansPro">
-                        <Link to="/auth/register">{"Đăng ký"}</Link>
-                    </p>
-                    <Link
-                        to="/auth/login"
-                        className="outline-none rounded-md border-2 border-solid border-deepKoamaru p-2 text-lg font-semibold font-sansPro text-deepKoamaru bg-[rgba(var(--color-old-rose),0.6)]"
-                    >
-                        {"Đăng nhập"}
-                    </Link>
-                </>}
-            </div>
+                        {openUserMenu &&
+                            <div
+                                className="rounded z-10 absolute top-[110%] right-0 w-3/4 p-4 flex flex-col bg-oldRose opacity-80 justify-start items-start">
+                                <Link className="w-full" to={"/user/profile"}>
+                                    Hồ sơ
+                                </Link>
+                                <button className="w-full text-left text-red-600 font-semibold"
+                                        onClick={handleLogout}>
+                                    Đăng xuất
+                                </button>
+                            </div>}
+                    </div> : <>
+                        <p className="mr-4 font-semibold text-deepKoamaru text-lg font-sansPro">
+                            <Link to="/auth/register">{"Đăng ký"}</Link>
+                        </p>
+                        <Link
+                            to="/auth/login"
+                            className="outline-none rounded-md border-2 border-solid border-deepKoamaru p-2 text-lg font-semibold font-sansPro text-deepKoamaru bg-[rgba(var(--color-old-rose),0.6)]"
+                        >
+                            {"Đăng nhập"}
+                        </Link>
+                    </>}
+                </div>
 
-            <div className="flex md:hidden grow sm:grow-0 ml-4 items-center justify-end mt-1">
-                <button onClick={handleToggleMenu} className="text-2xl relative z-20">
-                    {toggleMenu ? <CgClose/> : <CgMenuRight/>}
-                </button>
+                <div className="flex md:hidden grow sm:grow-0 ml-4 items-center justify-end mt-1">
+                    <button onClick={handleToggleMenu} className="text-2xl relative z-20">
+                        {toggleMenu ? <CgClose/> : <CgMenuRight/>}
+                    </button>
 
-                {renderMobileMenu}
-            </div>
-        </nav>
+                    {renderMobileMenu}
+                </div>
+            </nav>
+        </Section>
     );
 };
 

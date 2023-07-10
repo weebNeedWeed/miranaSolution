@@ -1,4 +1,4 @@
-@model miranaSolution.Dtos.Common.PagedResult<miranaSolution.Dtos.Catalog.Books.BookDto>
+@model miranaSolution.DTOs.Common.PagedResult<miranaSolution.DTOs.Catalog.Books.BookDto>
 
 @{
     ViewData["title"] = "Books";
@@ -6,7 +6,7 @@
 
 @section LibResources
 {
-    <link href="https://cdn.jsdelivr.net/npm/simple-datatables@7.1.2/dist/style.min.css" rel="stylesheet" />
+    <link href="https://cdn.jsdelivr.net/npm/simple-datatables@7.1.2/dist/style.min.css" rel="stylesheet"/>
 }
 
 @section Styles {
@@ -63,7 +63,7 @@
                             <a asp-action="ShowChapters" asp-route-id="@book.Id" title="Chapters">
                                 <i class="fa-solid fa-book"></i>
                             </a>
-                            
+
                             <a href="#" title="Edit">
                                 <i class="fa-solid fa-pen-to-square"></i>
                             </a>
@@ -74,9 +74,9 @@
             </tbody>
         </table>
     </div>
-    
+
     <div class="card-body">
         @await Component.InvokeAsync("Pager", Model)
     </div>
-    
+
 </div>

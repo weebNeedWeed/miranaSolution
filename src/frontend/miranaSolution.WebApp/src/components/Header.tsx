@@ -1,5 +1,5 @@
 import {useState} from "react";
-import {GenreTag, Slider} from "./index";
+import {GenreTag, Section, Slider} from "./index";
 import {BsBoxArrowInRight} from "react-icons/bs";
 import {AnimatePresence, motion} from "framer-motion";
 import {useQuery} from "react-query";
@@ -32,7 +32,7 @@ const Header = (): JSX.Element => {
     ));
 
     return (
-        <div className="px-4 pb-4 lg:px-16 md:py-4 bg-gradient flex items-center">
+        <Section className="bg-gradient flex items-center">
             <div className="w-full flex flex-col-reverse md:flex-row justify-start items-center md:min-h-[70vh]">
                 <AnimatePresence mode="wait">
                     <motion.div
@@ -41,7 +41,7 @@ const Header = (): JSX.Element => {
                         initial="initial"
                         animate="animate"
                         exit="exit"
-                        className="w-full md:w-2/3 h-full flex flex-col justify-center items-start px-0 lg:px-20"
+                        className="w-full md:w-2/3 h-full flex flex-col justify-center items-start px-0 lg:px-12"
                     >
                         <motion.h2
                             variants={motionVariants}
@@ -72,7 +72,7 @@ const Header = (): JSX.Element => {
                     />
                 </div>
             </div>
-        </div>
+        </Section>
     );
 };
 

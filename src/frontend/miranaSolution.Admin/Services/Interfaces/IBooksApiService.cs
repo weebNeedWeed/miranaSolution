@@ -1,6 +1,6 @@
-using miranaSolution.Dtos.Catalog.Books;
-using miranaSolution.Dtos.Catalog.Books.Chapters;
-using miranaSolution.Dtos.Common;
+using miranaSolution.DTOs.Catalog.Books;
+using miranaSolution.DTOs.Catalog.Books.Chapters;
+using miranaSolution.DTOs.Common;
 using Refit;
 
 namespace miranaSolution.Admin.Services.Interfaces;
@@ -12,7 +12,7 @@ public interface IBooksApiService
 
     [Multipart]
     [Post("/books")]
-    Task<ApiResult<dynamic>> Create([AliasAs("Name")] string name, 
+    Task<ApiResult<dynamic>> Create([AliasAs("Name")] string name,
         [AliasAs("ShortDescription")] string shortDescription,
         [AliasAs("LongDescription")] string longDescription,
         [AliasAs("IsRecommended")] bool isRecommended,
@@ -28,5 +28,5 @@ public interface IBooksApiService
     Task<ApiResult<PagedResult<ChapterDto>>> GetChaptersPaging([AliasAs("id")] int id, ChapterGetPagingRequest request);
 
     [Post("/books/{id}/chapters")]
-    Task<ApiResult<ChapterDto>> AddChapter([AliasAs("id")] int id,[Body] ChapterCreateRequest request);
+    Task<ApiResult<ChapterDto>> AddChapter([AliasAs("id")] int id, [Body] ChapterCreateRequest request);
 }

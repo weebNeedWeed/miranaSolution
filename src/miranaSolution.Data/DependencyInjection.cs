@@ -8,15 +8,14 @@ namespace miranaSolution.Data;
 
 public static class DependencyInjection
 {
-    public static IServiceCollection AddDataLayer(this IServiceCollection services,
-        ConfigurationManager configurationManager)
+    public static IServiceCollection AddDataLayer(this IServiceCollection services)
     {
         services.ConfigureOptions<DatabaseOptionsSetup>();
-        
-        services.AddDbContext<MiranaDbContext>((serviceProvider,options) =>
+
+        services.AddDbContext<MiranaDbContext>((serviceProvider, options) =>
         {
-            var databaseOptions = serviceProvider.GetService<IOptions<DatabaseOptions>>().Value;
-            
+            var databaseOptions = serviceProvider.GetService<IOptions<DatabaseOptions>>()!.Value;
+
             options.UseSqlServer(
                 databaseOptions.ConnectionString,
                 x =>
@@ -25,11 +24,12 @@ public static class DependencyInjection
                     x.EnableRetryOnFailure(databaseOptions.MaxRetryCount);
                     x.CommandTimeout(databaseOptions.CommandTimeout);
                 });
-            
+
             options.EnableDetailedErrors(databaseOptions.EnableDetailedErrors);
             options.EnableSensitiveDataLogging(databaseOptions.EnableSensitiveDataLogging);
-
         });
+        
+        services.AddScoped<DbContext, MiranaDbContext>();
 
         return services;
     }

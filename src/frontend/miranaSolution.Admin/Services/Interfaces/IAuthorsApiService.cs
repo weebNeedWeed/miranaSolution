@@ -1,5 +1,5 @@
-using miranaSolution.Dtos.Catalog.Authors;
-using miranaSolution.Dtos.Common;
+using miranaSolution.DTOs.Catalog.Authors;
+using miranaSolution.DTOs.Common;
 using Refit;
 
 namespace miranaSolution.Admin.Services.Interfaces;

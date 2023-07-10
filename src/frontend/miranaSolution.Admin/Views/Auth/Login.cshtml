@@ -8,13 +8,13 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="utf-8" />
-    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
-    <meta name="description" content="" />
-    <meta name="author" content="" />
+    <meta charset="utf-8"/>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no"/>
+    <meta name="description" content=""/>
+    <meta name="author" content=""/>
     <title>@ViewData["title"]</title>
-    <link href="~/css/styles.css" rel="stylesheet" />
+    <link href="~/css/styles.css" rel="stylesheet"/>
     <script src="https://use.fontawesome.com/releases/v6.3.0/js/all.js" crossorigin="anonymous"></script>
 </head>
 <body class="bg-primary">
@@ -25,7 +25,9 @@
                 <div class="row justify-content-center">
                     <div class="col-lg-5">
                         <div class="card shadow-lg border-0 rounded-lg mt-5">
-                            <div class="card-header"><h3 class="text-center font-weight-light my-4">Login</h3></div>
+                            <div class="card-header">
+                                <h3 class="text-center font-weight-light my-4">Login</h3>
+                            </div>
                             <div class="card-body">
                                 <div asp-validation-summary="ModelOnly" class="text-danger"></div>
                                 <form asp-action="Login" asp-controller="Auth" method="POST" asp-route-returnUrl="@ViewBag.ReturnUrl">
@@ -44,7 +46,9 @@
                                 </form>
                             </div>
                             <div class="card-footer text-center py-3">
-                                <div class="small"><a href="#">Need an account? Sign up!</a></div>
+                                <div class="small">
+                                    <a href="#">Need an account? Sign up!</a>
+                                </div>
                             </div>
                         </div>
                     </div>

@@ -1,7 +1,7 @@
 const editor = ClassicEditor
-    .create( 
-        document.querySelector( '#Content' ),
+    .create(
+        document.querySelector('#Content'),
     )
-    .catch( error => {
-        console.error( error );
-    } );
+    .catch(error => {
+        console.error(error);
+    });

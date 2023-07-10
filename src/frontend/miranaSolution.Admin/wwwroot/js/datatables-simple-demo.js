@@ -7,7 +7,7 @@ window.addEventListener('DOMContentLoaded', event => {
         paging: false,
         footer: false,
     };
-    
+
     const datatablesSimple = document.getElementById('datatablesSimple');
     if (datatablesSimple) {
         new simpleDatatables.DataTable(datatablesSimple, datatableOptions);

@@ -1,5 +1,5 @@
 @using System.Text
-@model miranaSolution.Dtos.Common.PagedResultBase
+@model miranaSolution.DTOs.Common.PagedResultBase
 
 @{
     var template = new StringBuilder(Url.Action() + "/?pageIndex={x}");
@@ -11,7 +11,7 @@
         {
             continue;
         }
-        
+
         if (query.Value.Count > 0)
         {
             foreach (var queryValue in query.Value.ToArray())
@@ -20,7 +20,7 @@
             }
             continue;
         }
-        
+
         template.Append($"&{query.Key}={query.Value}");
     }
 
@@ -39,7 +39,7 @@
                 </a>
             </li>
         }
-        
+
 
         @for (var i = start; i <= end; ++i)
         {
@@ -54,7 +54,7 @@
                 <a class="page-link" href="@template.ToString().Replace("{x}", i.ToString())">@i</a>
             </li>
         }
-        
+
         @if (Model.PageIndex != Model.TotalPages)
         {
             <li class="page-item">

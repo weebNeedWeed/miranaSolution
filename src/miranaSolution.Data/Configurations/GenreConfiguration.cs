@@ -2,21 +2,20 @@
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using miranaSolution.Data.Entities;
 
-namespace miranaSolution.Data.Configurations
+namespace miranaSolution.Data.Configurations;
+
+public class GenreConfiguration : IEntityTypeConfiguration<Genre>
 {
-    public class GenreConfiguration : IEntityTypeConfiguration<Genre>
+    public void Configure(EntityTypeBuilder<Genre> builder)
     {
-        public void Configure(EntityTypeBuilder<Genre> builder)
-        {
-            builder.ToTable("Genres");
+        builder.ToTable("Genres");
 
-            builder.HasKey(x => x.Id);
+        builder.HasKey(x => x.Id);
 
-            builder.Property(x => x.Id).UseIdentityColumn();
+        builder.Property(x => x.Id).UseIdentityColumn();
 
-            builder.Property(x => x.Slug).IsRequired().IsUnicode();
+        builder.Property(x => x.Slug).IsRequired().IsUnicode();
 
-            builder.HasIndex(x => x.Slug).IsUnique();
-        }
+        builder.HasIndex(x => x.Slug).IsUnique();
     }
 }

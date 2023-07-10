@@ -1,30 +1,29 @@
-﻿namespace miranaSolution.Data.Entities
+﻿namespace miranaSolution.Data.Entities;
+
+public class Book
 {
-    public class Book
-    {
-        public int Id { get; set; }
-        public string Name { get; set; }
-        public string ShortDescription { get; set; }
-        public string LongDescription { get; set; }
-        public DateTime CreatedAt { get; set; }
-        public DateTime UpdatedAt { get; set; }
-        public string ThumbnailImage { get; set; }
-        public bool IsRecommended { get; set; }
-        public string Slug { get; set; }
-        public bool IsDone { get; set; }
+    public int Id { get; set; }
+    public string? Name { get; set; }
+    public string? ShortDescription { get; set; }
+    public string? LongDescription { get; set; }
+    public DateTime CreatedAt { get; set; }
+    public DateTime UpdatedAt { get; set; }
+    public string? ThumbnailImage { get; set; }
+    public bool IsRecommended { get; set; }
+    public string? Slug { get; set; }
+    public bool IsDone { get; set; }
 
-        public int? AuthorId { get; set; }
-        public Author Author { get; set; }
+    public int? AuthorId { get; set; }
+    public Author? Author { get; set; }
 
-        public Guid? UserId { get; set; }
-        public AppUser AppUser { get; set; }
+    public Guid? UserId { get; set; }
+    public AppUser? AppUser { get; set; }
 
-        public List<Chapter> Chapters { get; set; }
+    public List<Chapter> Chapters { get; set; } = new();
 
-        public List<BookGenre> BookGenres { get; set; }
+    public List<BookGenre> BookGenres { get; set; } = new();
 
-        public List<Rating> Ratings { get; set; }
+    public List<Rating> Ratings { get; set; } = new();
 
-        public List<Comment> Comments { get; set; }
-    }
+    public List<Comment> Comments { get; set; } = new();
 }

@@ -1,9 +1,8 @@
 ﻿using Microsoft.AspNetCore.Identity;
 
-namespace miranaSolution.Data.Entities
+namespace miranaSolution.Data.Entities;
+
+public class AppRole : IdentityRole<Guid>
 {
-    public class AppRole : IdentityRole<Guid>
-    {
-        public string Description { get; set; }
-    }
+    public string? Description { get; set; }
 }

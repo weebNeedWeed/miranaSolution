@@ -2,21 +2,20 @@
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using miranaSolution.Data.Entities;
 
-namespace miranaSolution.Data.Configurations
+namespace miranaSolution.Data.Configurations;
+
+public class AuthorConfiguration : IEntityTypeConfiguration<Author>
 {
-    public class AuthorConfiguration : IEntityTypeConfiguration<Author>
+    public void Configure(EntityTypeBuilder<Author> builder)
     {
-        public void Configure(EntityTypeBuilder<Author> builder)
-        {
-            builder.ToTable("Authors");
+        builder.ToTable("Authors");
 
-            builder.HasKey(x => x.Id);
+        builder.HasKey(x => x.Id);
 
-            builder.Property(x => x.Id).UseIdentityColumn();
+        builder.Property(x => x.Id).UseIdentityColumn();
 
-            builder.Property(x => x.Slug).IsRequired().IsUnicode();
+        builder.Property(x => x.Slug).IsRequired().IsUnicode();
 
-            builder.HasIndex(x => x.Slug).IsUnique();
-        }
+        builder.HasIndex(x => x.Slug).IsUnique();
     }
 }

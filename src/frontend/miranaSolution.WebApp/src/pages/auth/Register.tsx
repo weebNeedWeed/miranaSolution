@@ -58,7 +58,6 @@ const Register = (): JSX.Element => {
         const res = await userApiHelper.register(userRegisterRequest);
 
         if (res === null) {
-            // TODO: Display message in the alert box
             setFirstNameErrors(["Unknown errors. Please try again later!"]);
             return;
         }

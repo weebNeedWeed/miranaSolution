@@ -2,13 +2,12 @@
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using miranaSolution.Data.Entities;
 
-namespace miranaSolution.Data.Configurations
+namespace miranaSolution.Data.Configurations;
+
+public class AppUserConfiguration : IEntityTypeConfiguration<AppUser>
 {
-    public class AppUserConfiguration : IEntityTypeConfiguration<AppUser>
+    public void Configure(EntityTypeBuilder<AppUser> builder)
     {
-        public void Configure(EntityTypeBuilder<AppUser> builder)
-        {
-            builder.ToTable("AppUsers");
-        }
+        builder.ToTable("AppUsers");
     }
 }

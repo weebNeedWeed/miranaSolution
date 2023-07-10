@@ -9,7 +9,7 @@ public class BookmarkConfiguration : IEntityTypeConfiguration<Bookmark>
     public void Configure(EntityTypeBuilder<Bookmark> builder)
     {
         builder.ToTable("Bookmarks");
-        
+
         builder.HasKey(x => new { x.UserId, x.ChapterId });
 
         builder.HasOne(x => x.Chapter)
