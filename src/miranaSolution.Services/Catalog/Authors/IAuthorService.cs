@@ -4,8 +4,5 @@ namespace miranaSolution.Services.Catalog.Authors;
 
 public interface IAuthorService
 {
-    Task<List<AuthorDto>> GetAll();
-    // Task<AuthorDto> Create();
-    // Task Delete();
-    // Task Update();
+    Task<GetAllAuthorsResponse> GetAllAuthorsAsync();
 }

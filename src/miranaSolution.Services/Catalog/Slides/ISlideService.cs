@@ -4,9 +4,9 @@ namespace miranaSolution.Services.Catalog.Slides;
 
 public interface ISlideService
 {
-    Task<List<SlideDto>> GetAll();
+    Task<GetAllSlidesResponse> GetAllSlidesAsync();
 
-    Task<SlideDto> GetById(int id);
+    Task<GetSlideByIdResponse> GetSlideByIdAsync(GetSlideByIdRequest request);
 
-    Task<SlideDto> Create(SlideCreateRequest request);
+    Task<CreateSlideResponse> CreateSlideAsync(CreateSlideRequest request);
 }

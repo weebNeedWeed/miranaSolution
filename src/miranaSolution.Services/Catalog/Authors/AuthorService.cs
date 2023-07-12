@@ -1,6 +1,4 @@
-using AutoMapper;
 using Microsoft.EntityFrameworkCore;
-using miranaSolution.Data.Entities;
 using miranaSolution.Data.Main;
 using miranaSolution.DTOs.Catalog.Authors;
 
@@ -15,14 +13,17 @@ public class AuthorService : IAuthorService
         _context = context;
     }
 
-    public async Task<List<AuthorDto>> GetAll()
+    public async Task<GetAllAuthorsResponse> GetAllAuthorsAsync()
     {
-        var config = new MapperConfiguration(cfg => cfg.CreateMap<Author, AuthorDto>());
-        var mapper = config.CreateMapper();
+        var authorVms = await _context.Authors
+            .Select(x => new AuthorVm(
+                x.Id,
+                x.Name,
+                x.Slug))
+            .ToListAsync();
 
-        var authorList = await _context.Authors
-            .Select(x => mapper.Map<AuthorDto>(x)).ToListAsync();
+        var response = new GetAllAuthorsResponse(authorVms);
 
-        return authorList;
+        return response;
     }
 }

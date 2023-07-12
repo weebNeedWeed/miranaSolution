@@ -1,11 +1,11 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using miranaSolution.API.ViewModels.Books;
 using miranaSolution.Services.Catalog.Books;
 using miranaSolution.Services.Catalog.Chapters;
-using miranaSolution.Services.Systems.Files;
 using miranaSolution.DTOs.Catalog.Books;
-using miranaSolution.DTOs.Catalog.Books.Chapters;
 using miranaSolution.DTOs.Common;
+using miranaSolution.Services.Exceptions;
 using miranaSolution.Utilities.Constants;
 using miranaSolution.Utilities.Exceptions;
 
@@ -28,38 +28,65 @@ public class BooksController : ControllerBase
     // GET /api/books
     [HttpGet]
     [AllowAnonymous]
-    public async Task<IActionResult> GetPaging([FromQuery] BookGetPagingRequest request)
+    public async Task<IActionResult> GetAllBooks([FromQuery] ApiGetAllBooksRequest request)
     {
-        var books = await _bookService.GetPaging(request);
+        var pagerRequest = new PagerRequest(
+            request.PageIndex,
+            request.PageSize);
+        
+        var getAllBooksResponse = await _bookService.GetAllBooksAsync(
+            new GetAllBooksRequest(
+                request.Keyword,
+                request.GenreIds,
+                request.IsDone,
+                pagerRequest));
 
-        return Ok(new ApiSuccessResult<PagedResult<BookDto>>(books));
+        var apiGetAllBooksResponse = new ApiGetAllBooksResponse(
+            getAllBooksResponse.BookVms,
+            getAllBooksResponse.PagerResponse.PageIndex,
+            getAllBooksResponse.PagerResponse.PageSize,
+            getAllBooksResponse.PagerResponse.TotalPages);
+        
+        return Ok(new ApiSuccessResult<ApiGetAllBooksResponse>(apiGetAllBooksResponse));
     }
 
     // POST /api/books
     [HttpPost]
     [Consumes("multipart/form-data")]
-    public async Task<IActionResult> Create([FromForm] BookCreateRequest request)
+    public async Task<IActionResult> Create([FromForm] ApiCreateBookRequest request)
     {
         var errors = new Dictionary<string, List<string>>();
+        var thumbnailImageExt = Path.GetExtension(request.ThumbnailImage.FileName);
 
-        if (!HasValidExtension(request.ThumbnailImage.FileName))
+        try
         {
-            errors.Add(nameof(request.ThumbnailImage), new List<string> { "Invalid image extension." });
+            var userId = User.Claims.First(x => x.Type == "sid").Value;
+            var createBookRequest = new CreateBookRequest(
+                new Guid(userId),
+                request.Name,
+                request.ShortDescription,
+                request.LongDescription,
+                request.IsRecommended,
+                request.IsDone,
+                request.Slug,
+                request.AuthorId,
+                request.ThumbnailImage.OpenReadStream(),
+                thumbnailImageExt);
+
+            var createBookResponse = await _bookService.CreateBookAsync(createBookRequest);
+
+            return Ok(new ApiSuccessResult<BookVm>(createBookResponse.BookVm));
+        }
+        catch (BookAlreadyExistsException ex)
+        {
+            errors.Add(nameof(request.Slug), new List<string> { ex.Message });
             return Ok(new ApiFailResult(errors));
         }
-
-        var isBookWithSlugExisted = await _bookService.GetBySlug(request.Slug) is not null;
-        if (isBookWithSlugExisted)
+        catch (InvalidImageExtensionException ex)
         {
-            errors.Add(nameof(request.Slug), new List<string> { "Duplicated slug." });
+            errors.Add(nameof(request.Slug), new List<string> { ex.Message });
             return Ok(new ApiFailResult(errors));
         }
-
-        var userId = User.Claims.First(x => x.Type == "sid").Value;
-
-        var book = await _bookService.Create(userId, request);
-
-        return Ok(new ApiSuccessResult<BookDto>(book));
     }
 
     // GET /api/books/{id}
@@ -143,9 +170,5 @@ public class BooksController : ControllerBase
         return Ok(new ApiSuccessResult<BookDto>(book));
     }
 
-    private bool HasValidExtension(string fileName)
-    {
-        var allowedExt = new List<string>() { ".jpg", ".jpeg", ".png" };
-        return allowedExt.Contains(Path.GetExtension(fileName));
-    }
+    
 }

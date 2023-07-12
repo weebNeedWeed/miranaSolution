@@ -1,13 +1,10 @@
-﻿using AutoMapper;
-using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using miranaSolution.Data.Entities;
 using miranaSolution.Data.Main;
 using miranaSolution.DTOs.Catalog.Books;
-using miranaSolution.DTOs.Catalog.Books.Chapters;
 using miranaSolution.DTOs.Common;
-using miranaSolution.Utilities.Exceptions;
-using System.Linq;
+using miranaSolution.Services.Exceptions;
 using miranaSolution.Services.Systems.Files;
 
 namespace miranaSolution.Services.Catalog.Books;
@@ -16,205 +13,183 @@ public class BookService : IBookService
 {
     private readonly MiranaDbContext _context;
     private readonly IFileService _fileService;
-
+    //
     public BookService(MiranaDbContext context, IFileService fileService)
     {
         _context = context;
         _fileService = fileService;
     }
 
-    public async Task<BookDto> Create(string userId, BookCreateRequest request)
+    private async Task<string> SaveFileAsync(Stream stream, string fileExtension)
     {
-        var config = new MapperConfiguration(cfg => { cfg.CreateMap<BookCreateRequest, Book>(); });
-        var mapper = config.CreateMapper();
+        var newName = $"{Guid.NewGuid().ToString()}{fileExtension}";
+        await _fileService.SaveFileAsync(
+            stream, newName);
 
-        var newBook = mapper.Map<Book>(request);
-        newBook.BookGenres = new List<BookGenre>();
-        newBook.ThumbnailImage = await SaveFileAsync(request.ThumbnailImage);
-        newBook.UserId = new Guid(userId);
-
-        // foreach (var item in request.Genres.Where(x => x.IsChecked))
-        // {
-        //     var genre = await _context.Genres.FirstOrDefaultAsync(x => x.Id == item.Id && x.Name == item.Label);
-        //     var bookGenre = new BookGenre
-        //     {
-        //         GenreId = genre!.Id
-        //     };
-        //
-        //     newBook.BookGenres.Add(bookGenre);
-        // }
-
-        await _context.Books.AddAsync(newBook);
-        await _context.SaveChangesAsync();
-
-        var bookDto = await GetById(newBook.Id);
-
-        return bookDto;
+        return _fileService.GetPath(newName);
+    }
+    
+    private bool IsValidExtension(string fileExtension)
+    {
+        var allowedExt = new List<string>() { ".jpg", ".jpeg", ".png" };
+        return allowedExt.Contains(Path.GetExtension(fileExtension));
     }
 
-    public async Task<List<ChapterDto>> GetLatestChapters(int numOfChapters)
+    public async Task<GetBookByIdResponse> GetBookByIdAsync(GetBookByIdRequest request)
     {
-        var query = from chapters in _context.Chapters
-            join books in _context.Books on chapters.BookId equals books.Id
-            orderby chapters.CreatedAt descending
-            select
-                new
-                {
-                    chapters,
-                    books
-                };
-
-        var data = await query.Take(numOfChapters).Select(x => new ChapterDto
+        var book = await _context.Books.FindAsync(request.BookId);
+        if (book is null)
         {
-            Id = x.chapters.Id,
-            Index = x.chapters.Index,
-            Name = x.chapters.Name,
-            CreatedAt = x.chapters.CreatedAt,
-            UpdatedAt = x.chapters.UpdatedAt,
-            ReadCount = x.chapters.ReadCount,
-            WordCount = x.chapters.WordCount,
-            Content = x.chapters.Content
-        }).ToListAsync();
-
-        return data;
-    }
-
-    public async Task<bool> Delete(int id)
-    {
-        var book = await _context.Books.FindAsync(id);
-        if (book is null) return false;
-
-        _context.Books.Remove(book);
-        await _context.SaveChangesAsync();
-
-        return true;
-    }
-
-    public async Task<BookDto> GetById(int id)
-    {
-        var query = from book in _context.Books
-            join book_author in _context.Authors
-                on book.AuthorId equals book_author.Id
-            where book.Id == id
-            select new
-            {
-                book,
-                authorName = book_author.Name,
-                genres = (
-                    from book_genre in _context.BookGenres
-                    join genre in _context.Genres
-                        on book_genre.GenreId equals genre.Id
-                    where book_genre.BookId == id
-                    select genre.Name).ToList()
-            };
-        var data = await query.FirstAsync();
-
-        var config = new MapperConfiguration(cfg => cfg.CreateMap<Book, BookDto>());
-        var mapper = config.CreateMapper();
-
-        var bookDto = mapper.Map<BookDto>(data.book);
-        bookDto.Genres = data.genres;
-        bookDto.AuthorName = data.authorName;
-
-        return bookDto;
-    }
-
-    public async Task<BookDto> GetBySlug(string slug)
-    {
-        var book = await _context.Books.FirstOrDefaultAsync(x => x.Slug == slug);
-        if (book is null) return null;
-
-        var fullBookInfo = await GetById(book.Id);
-
-        return fullBookInfo;
-    }
-
-    public async Task<PagedResult<BookDto>> GetPaging(BookGetPagingRequest request)
-    {
-        IQueryable<Book> query = _context.Books.AsQueryable();
-
-        // Apply filter by keyword
-        if (!string.IsNullOrEmpty(request.Keyword))
-            query = query.Where(x =>
-                x.Name.Contains(request.Keyword)
-                || x.ShortDescription.Contains(request.Keyword)
-                || x.LongDescription.Contains(request.Keyword));
-
-        // Apply filter by genre
-        if (!string.IsNullOrEmpty(request.GenreIds))
-        {
-            var genreIds = request.GenreIds.Split(",").Select(x => int.Parse(x));
-            foreach (var genreId in genreIds)
-                query = query
-                    .Include(x => x.BookGenres)
-                    .Where(x => x.BookGenres.Select(_ => _.GenreId).Contains(genreId));
+            return new GetBookByIdResponse(null);
         }
 
-        // Apply filter by status
-        if (request.IsDone is not null) query = query.Where(x => x.IsDone == request.IsDone);
+        var authorName = book.Author.Name;
 
-        var pageSize = request.PageSize;
-        var pageIndex = request.PageIndex;
+        var genres = book.BookGenres
+            .Select(x => x.Genre.Name).ToList();
 
-        var totalRecords = await query.CountAsync();
+        var bookVm = new BookVm(
+            book.Id,
+            book.Name,
+            book.ShortDescription,
+            book.LongDescription,
+            book.CreatedAt,
+            book.UpdatedAt,
+            book.ThumbnailImage,
+            book.IsRecommended,
+            book.Slug,
+            authorName,
+            genres,
+            book.IsDone);
 
-        var data = await query.Skip((pageIndex - 1) * pageSize).Take(pageSize).Select(x => new BookDto
+        var response = new GetBookByIdResponse(bookVm);
+        
+        return response;
+    }
+
+    public async Task<GetBookBySlugResponse> GetBookBySlugAsync(GetBookBySlugRequest request)
+    {
+        var book = await _context.Books.FirstOrDefaultAsync(x => x.Slug == request.Slug);
+        if (book is null)
         {
-            Id = x.Id,
-            Name = x.Name,
-            ShortDescription = x.ShortDescription,
-            LongDescription = x.LongDescription,
-            CreatedAt = x.CreatedAt,
-            UpdatedAt = x.UpdatedAt,
-            ThumbnailImage = x.ThumbnailImage,
-            IsRecommended = x.IsRecommended,
-            Slug = x.Slug,
-            AuthorName = x.Author.Name,
-            Genres = x.BookGenres.Select(_ => _.Genre).Select(_ => _.Name).ToList()
-        }).ToListAsync();
+            return new GetBookBySlugResponse(null);
+        }
 
-        var paged = new PagedResult<BookDto>
+        var authorName = book.Author.Name;
+
+        var genres = book.BookGenres
+            .Select(x => x.Genre.Name).ToList();
+
+        var bookVm = new BookVm(
+            book.Id,
+            book.Name,
+            book.ShortDescription,
+            book.LongDescription,
+            book.CreatedAt,
+            book.UpdatedAt,
+            book.ThumbnailImage,
+            book.IsRecommended,
+            book.Slug,
+            authorName,
+            genres,
+            book.IsDone);
+
+        var response = new GetBookBySlugResponse(bookVm);
+        
+        return response;
+    }
+    
+    /// <exception cref="BookAlreadyExistsException">
+    /// Thrown when the book with given Slug already exists
+    /// </exception>
+    /// <exception cref="InvalidImageExtensionException">
+    /// Thrown when the extension of thumbnail image is not allowed
+    /// </exception>
+    public async Task<CreateBookResponse> CreateBookAsync(CreateBookRequest request)
+    {
+        // TODO: Use FindUserById here
+
+        var book = await _context.Books.FirstOrDefaultAsync(x => x.Slug.Equals(request.Slug));
+        if (book is not null)
         {
-            TotalRecords = totalRecords,
-            PageIndex = pageIndex,
-            PageSize = pageSize,
-            Items = data
+            throw new BookAlreadyExistsException("The book with given Slug already exists.");
+        }
+
+        if (IsValidExtension(request.ThumbnailImageExtension))
+        {
+            throw new InvalidImageExtensionException(
+                "Invalid thumbnail image's extension. Only allow .jpg, .png and .jpeg.");
+        }
+        
+        book = new Book
+        {
+            Name = request.Name,
+            ShortDescription = request.ShortDescription,
+            LongDescription = request.LongDescription,
+            IsRecommended = request.IsRecommended,
+            Slug = request.Slug,
+            IsDone = request.IsDone,
+            ThumbnailImage = 
+                await SaveFileAsync(request.ThumbnailImage, request.ThumbnailImageExtension),
+            UserId = request.UserId,
+            AuthorId = request.AuthorId
         };
 
-        return paged;
+        await _context.Books.AddAsync(book);
+        await _context.SaveChangesAsync();
+        
+        var authorName = book.Author.Name;
+
+        var genres = book.BookGenres
+            .Select(x => x.Genre.Name).ToList();
+
+        var bookVm = new BookVm(
+            book.Id,
+            book.Name,
+            book.ShortDescription,
+            book.LongDescription,
+            book.CreatedAt,
+            book.UpdatedAt,
+            book.ThumbnailImage,
+            book.IsRecommended,
+            book.Slug,
+            authorName,
+            genres,
+            book.IsDone);
+        
+        var response = new CreateBookResponse(bookVm);
+
+        return response;
     }
-
-    public async Task<List<BookDto>> GetRecommended()
+    
+    /// <exception cref="BookNotFoundException">
+    /// Thrown when the book with given Id is not found
+    /// </exception>
+    public async Task<UpdateBookResponse> UpdateBookAsync(UpdateBookRequest request)
     {
-        var config = new MapperConfiguration(cfg => cfg.CreateMap<Book, BookDto>());
-        var mapper = config.CreateMapper();
-
-        var data = await _context.Books
-            .Where(x => x.IsRecommended)
-            .Select(x => mapper.Map<BookDto>(x))
-            .ToListAsync();
-
-        return data;
-    }
-
-    public async Task<bool> Update(int id, BookUpdateRequest request)
-    {
-        var book = await _context.Books.FindAsync(id);
-        if (book is null) return false;
-
+        var book = await _context.Books.FindAsync(request.BookId);
+        if (book is null)
+        {
+            throw new BookNotFoundException("The book with given Id does not exists.");
+        }
+        
         book.Name = request.Name;
         book.ShortDescription = request.ShortDescription;
         book.LongDescription = request.LongDescription;
         book.IsRecommended = request.IsRecommended;
         book.Slug = request.Slug;
         book.AuthorId = request.AuthorId;
-
-        foreach (var item in request.Genres)
+        book.IsDone = request.IsDone;
+        
+        foreach (var item in request.GenreCheckboxItems)
             if (!item.IsChecked)
             {
                 var bookGenre = await _context.BookGenres
                     .FirstOrDefaultAsync(x => x.BookId == book.Id && x.GenreId == item.Id);
-                if (bookGenre is not null) _context.BookGenres.Remove(bookGenre);
+                if (bookGenre is not null)
+                {
+                    _context.BookGenres.Remove(bookGenre);
+                }
             }
             else
             {
@@ -223,21 +198,155 @@ public class BookService : IBookService
                     BookId = book.Id,
                     GenreId = item.Id
                 };
-
+        
                 await _context.BookGenres.AddAsync(bookGenre);
             }
-
+        
         await _context.SaveChangesAsync();
+        
+        var authorName = book.Author.Name;
+        var genres = book.BookGenres
+            .Select(x => x.Genre.Name).ToList();
 
-        return true;
+        var bookVm = new BookVm(
+            book.Id,
+            book.Name,
+            book.ShortDescription,
+            book.LongDescription,
+            book.CreatedAt,
+            book.UpdatedAt,
+            book.ThumbnailImage,
+            book.IsRecommended,
+            book.Slug,
+            authorName,
+            genres,
+            book.IsDone);
+        
+        var response = new UpdateBookResponse(bookVm);
+
+        return response;
     }
 
-    private async Task<string> SaveFileAsync(IFormFile file)
+    /// <exception cref="BookNotFoundException">
+    /// Thrown when the book with given Id is not found
+    /// </exception>
+    public async Task DeleteBookAsync(DeleteBookRequest request)
     {
-        var extension = Path.GetExtension(file.FileName);
-        var newName = $"{Guid.NewGuid().ToString()}{extension}";
+        var book = await _context.Books.FindAsync(request.BookId);
+        if (book is null)
+        {
+            throw new BookNotFoundException("The book with given Id does not exist.");
+        }
+        
+        _context.Books.Remove(book);
+        await _context.SaveChangesAsync();
+    }
 
-        return await _fileService.SaveFileAsync(
-            file.OpenReadStream(), newName);
+    public async Task<GetRecommendedBooksResponse> GetRecommendedBooksAsync()
+    {
+        var books = await _context.Books
+            .Where(x => x.IsRecommended)
+            .ToListAsync();
+
+        var bookVms = books.Select(book =>
+        {
+            var authorName = book.Author.Name;
+            var genres = book.BookGenres
+                .Select(x => x.Genre.Name).ToList();
+
+            var bookVm = new BookVm(
+                book.Id,
+                book.Name,
+                book.ShortDescription,
+                book.LongDescription,
+                book.CreatedAt,
+                book.UpdatedAt,
+                book.ThumbnailImage,
+                book.IsRecommended,
+                book.Slug,
+                authorName,
+                genres,
+                book.IsDone);
+
+            return bookVm;
+        }).ToList();
+        
+        return new GetRecommendedBooksResponse(bookVms);
+    }
+
+    public async Task<GetAllBooksResponse> GetAllBooksAsync(GetAllBooksRequest request)
+    {
+        var query = _context.Books.AsQueryable();
+        
+        // Apply books filter by keyword
+        if (!string.IsNullOrEmpty(request.Keyword))
+        {
+            query = query.Where(x =>
+                x.Name.Contains(request.Keyword)
+                || x.ShortDescription.Contains(request.Keyword)
+                || x.LongDescription.Contains(request.Keyword));
+        }
+
+        // Apply books filter by genre
+        if (!string.IsNullOrEmpty(request.GenreIds))
+        {
+            var genreIds = request.GenreIds.Split(",").Select(int.Parse);
+            foreach (var genreId in genreIds)
+            {
+                query = query
+                    .Include(x => x.BookGenres)
+                    .Where(x => x.BookGenres.Select(_ => _.GenreId).Contains(genreId));
+            }
+        }
+        
+        // Apply books filter by status
+        if (request.IsDone.HasValue)
+        {
+            query = query.Where(x => x.IsDone == request.IsDone);
+        }
+        
+        var pageSize = request.PagerRequest.PageSize;
+        var pageIndex = request.PagerRequest.PageIndex;
+        
+        var totalBooks = await query.CountAsync();
+        
+        var books = await query
+            .Skip((pageIndex - 1) * pageSize)
+            .Take(pageSize)
+            .ToListAsync();
+        
+        var bookVms = books.Select(book =>
+        {
+            var authorName = book.Author.Name;
+            var genres = book.BookGenres
+                .Select(x => x.Genre.Name).ToList();
+
+            var bookVm = new BookVm(
+                book.Id,
+                book.Name,
+                book.ShortDescription,
+                book.LongDescription,
+                book.CreatedAt,
+                book.UpdatedAt,
+                book.ThumbnailImage,
+                book.IsRecommended,
+                book.Slug,
+                authorName,
+                genres,
+                book.IsDone);
+
+            return bookVm;
+        }).ToList();
+
+        var pagerResponse = new PagerResponse(
+            request.PagerRequest.PageIndex,
+            request.PagerRequest.PageSize,
+            totalBooks);
+
+        var response = new GetAllBooksResponse(
+            bookVms,
+            pagerResponse);
+        
+        return response;
     }
 }

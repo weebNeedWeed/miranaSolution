@@ -1,6 +1,4 @@
-﻿using AutoMapper;
-using Microsoft.EntityFrameworkCore;
-using miranaSolution.Data.Entities;
+﻿using Microsoft.EntityFrameworkCore;
 using miranaSolution.Data.Main;
 using miranaSolution.DTOs.Catalog.Genres;
 
@@ -14,19 +12,33 @@ public class GenreService : IGenreService
     {
         _context = context;
     }
-
-    public async Task<List<GenreDto>> GetAll()
+    
+    public async Task<GetAllGenresResponse> GetAllGenresAsync()
     {
-        var config = new MapperConfiguration(cfg => cfg.CreateMap<Genre, GenreDto>());
-        var mapper = config.CreateMapper();
+        var genres = await _context.Genres
+            .Select(x => new GenreVm(x.Id, x.Name, x.ShortDescription, x.Slug))
+            .ToListAsync();
 
-        var data = await _context.Genres.Select(x => mapper.Map<GenreDto>(x)).ToListAsync();
+        var response = new GetAllGenresResponse(genres);
 
-        return data;
+        return response;
     }
 
-    public Task<GenreDto> GetById(int id)
+    public async Task<GetGenreByIdResponse> GetGenreByIdAsync(GetGenreByIdRequest request)
     {
-        throw new NotImplementedException();
+        var genre = await _context.Genres.FindAsync(request.GenreId);
+        if (genre is null)
+        {
+            return new GetGenreByIdResponse(null);
+        }
+
+        var response = new GetGenreByIdResponse(
+            new GenreVm(
+                genre.Id,
+                genre.Name,
+                genre.ShortDescription,
+                genre.Slug));
+
+        return response;
     }
 }

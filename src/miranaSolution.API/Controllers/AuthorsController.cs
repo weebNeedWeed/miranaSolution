@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using miranaSolution.Services.Catalog.Authors;
 using miranaSolution.DTOs.Catalog.Authors;
+using miranaSolution.Services.Catalog.Authors;
 using miranaSolution.DTOs.Common;
 using miranaSolution.Utilities.Constants;
 
@@ -21,9 +21,9 @@ public class AuthorsController : ControllerBase
 
     [HttpGet]
     [AllowAnonymous]
-    public async Task<IActionResult> GetAll()
+    public async Task<IActionResult> GetAllAuthors()
     {
-        var authorList = await _authorService.GetAll();
-        return Ok(new ApiSuccessResult<List<AuthorDto>>(authorList));
+        var getAllAuthorsResponse = await _authorService.GetAllAuthorsAsync();
+        return Ok(new ApiSuccessResult<List<AuthorVm>>(getAllAuthorsResponse.AuthorVms));
     }
 }

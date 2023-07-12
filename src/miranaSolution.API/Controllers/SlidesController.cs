@@ -21,30 +21,29 @@ public class SlidesController : ControllerBase
 
     [HttpGet]
     [AllowAnonymous]
-    public async Task<IActionResult> GetAll()
+    public async Task<IActionResult> GetAllSlides()
     {
-        var slides = await _slideService.GetAll();
-        return Ok(new ApiSuccessResult<List<SlideDto>>(slides));
+        var getAllSlidesResponse = await _slideService.GetAllSlidesAsync();
+        return Ok(new ApiSuccessResult<List<SlideVm>>(getAllSlidesResponse.SlideVms));
     }
 
-    [HttpGet("{id}")]
+    [HttpGet("{slideId}")]
     [AllowAnonymous]
-    public async Task<IActionResult> GetById([FromRoute] int id)
+    public async Task<IActionResult> GetSlideById([FromRoute] int slideId)
     {
-        var slide = await _slideService.GetById(id);
-        if (slide is null)
-            return Ok(new ApiFailResult(new Dictionary<string, List<string>>
-            {
-                { nameof(slide.Id), new List<string> { $"Invalid Id." } }
-            }));
+        var getSlideByIdResponse = await _slideService.GetSlideByIdAsync(
+            new GetSlideByIdRequest(slideId));
+        
+        if (getSlideByIdResponse.SlideVm is null)
+            return Ok(new ApiErrorResult("The slide with given Id does not exist."));
 
-        return Ok(new ApiSuccessResult<SlideDto>(slide));
+        return Ok(new ApiSuccessResult<SlideVm>(getSlideByIdResponse.SlideVm));
     }
 
     [HttpPost]
-    public async Task<IActionResult> Create([FromBody] SlideCreateRequest request)
+    public async Task<IActionResult> CreateSlide([FromBody] CreateSlideRequest request)
     {
-        var newSlide = await _slideService.Create(request);
-        return Ok(new ApiSuccessResult<SlideDto>(newSlide));
+        var createSlideResponse = await _slideService.CreateSlideAsync(request);
+        return Ok(new ApiSuccessResult<SlideVm>(createSlideResponse.SlideVm));
     }
 }

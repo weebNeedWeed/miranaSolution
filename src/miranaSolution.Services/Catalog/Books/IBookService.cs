@@ -1,31 +1,20 @@
 ﻿using miranaSolution.DTOs.Catalog.Books;
-using miranaSolution.DTOs.Catalog.Books.Chapters;
-using miranaSolution.DTOs.Common;
 
 namespace miranaSolution.Services.Catalog.Books;
 
 public interface IBookService
 {
-    Task<PagedResult<BookDto>> GetPaging(BookGetPagingRequest request);
+    Task<GetBookByIdResponse> GetBookByIdAsync(GetBookByIdRequest request);
 
-    Task<List<BookDto>> GetRecommended();
+    Task<GetBookBySlugResponse> GetBookBySlugAsync(GetBookBySlugRequest request);
+    
+    Task<CreateBookResponse> CreateBookAsync(CreateBookRequest request);
+    
+    Task<UpdateBookResponse> UpdateBookAsync(UpdateBookRequest request);
 
-    Task<List<ChapterDto>> GetLatestChapters(int numOfChapters);
+    Task DeleteBookAsync(DeleteBookRequest request);
 
-    Task<bool> Delete(int id);
+    Task<GetRecommendedBooksResponse> GetRecommendedBooksAsync();
 
-    Task<bool> Update(int id, BookUpdateRequest request);
-
-    Task<BookDto> Create(string userId, BookCreateRequest request);
-
-    Task<BookDto> GetById(int id);
-
-    Task<BookDto> GetBySlug(string slug);
-
-    // Task<bool> UpdateChapter();
-    //
-    // Task<bool> DeleteChapter();
-    //
-    //
-    // Task<ChapterDto> GetChapterById();
+    Task<GetAllBooksResponse> GetAllBooksAsync(GetAllBooksRequest request);
 }

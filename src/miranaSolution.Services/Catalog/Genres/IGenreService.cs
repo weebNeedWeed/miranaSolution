@@ -4,7 +4,7 @@ namespace miranaSolution.Services.Catalog.Genres;
 
 public interface IGenreService
 {
-    Task<List<GenreDto>> GetAll();
+    Task<GetAllGenresResponse> GetAllGenresAsync();
 
-    Task<GenreDto> GetById(int id);
+    Task<GetGenreByIdResponse> GetGenreByIdAsync(GetGenreByIdRequest request);
 }

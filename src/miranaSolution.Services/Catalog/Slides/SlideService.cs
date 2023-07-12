@@ -1,5 +1,4 @@
-﻿using AutoMapper;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using miranaSolution.Data.Entities;
 using miranaSolution.Data.Main;
 using miranaSolution.DTOs.Catalog.Slides;
@@ -9,43 +8,73 @@ namespace miranaSolution.Services.Catalog.Slides;
 public class SlideService : ISlideService
 {
     private readonly MiranaDbContext _context;
-    private readonly IMapper _slideDtoMapper;
 
     public SlideService(MiranaDbContext context)
     {
         _context = context;
-
-        var config = new MapperConfiguration(cfg => cfg.CreateMap<Slide, SlideDto>());
-        _slideDtoMapper = config.CreateMapper();
     }
 
-    public async Task<SlideDto> Create(SlideCreateRequest request)
+    public async Task<CreateSlideResponse> CreateSlideAsync(CreateSlideRequest request)
     {
-        var cfg = new MapperConfiguration(cfg => cfg.CreateMap<SlideCreateRequest, Slide>());
-        var mapper = cfg.CreateMapper();
-
-        var newSlide = mapper.Map<Slide>(request);
-
-        await _context.Slides.AddAsync(newSlide);
-
+        var slide = new Slide
+        {
+            Name = request.Name,
+            Genres = request.Genres,
+            ShortDescription = request.ShortDescription,
+            SortOrder = request.SortOrder,
+            ThumbnailImage = request.ThumbnailImage
+        };
+        
+        await _context.Slides.AddAsync(slide);
         await _context.SaveChangesAsync();
 
-        return _slideDtoMapper.Map<SlideDto>(newSlide);
+        var response = new CreateSlideResponse(
+            new SlideVm(
+                slide.Id,
+                slide.Name,
+                slide.ShortDescription,
+                slide.ThumbnailImage,
+                slide.Genres,
+                slide.SortOrder));
+
+        return response;
     }
 
-    public async Task<List<SlideDto>> GetAll()
+    public async Task<GetAllSlidesResponse> GetAllSlidesAsync()
     {
         var slides = await _context.Slides
             .OrderBy(x => x.SortOrder)
-            .Select(x => _slideDtoMapper.Map<SlideDto>(x))
+            .Select(x => new SlideVm(
+                x.Id,
+                x.Name,
+                x.ShortDescription,
+                x.ThumbnailImage,
+                x.Genres,
+                x.SortOrder))
             .ToListAsync();
+        
+        var response = new GetAllSlidesResponse(slides);
 
-        return slides;
+        return response;
     }
 
-    public async Task<SlideDto> GetById(int id)
+    public async Task<GetSlideByIdResponse> GetSlideByIdAsync(GetSlideByIdRequest request)
     {
-        var slide = await _context.Slides.FindAsync(id);
-        return _slideDtoMapper.Map<SlideDto>(slide);
+        var slide = await _context.Slides.FindAsync(request.SlideId);
+        if (slide is null)
+        {
+            return new GetSlideByIdResponse(null);
+        }
+        
+        var response = new GetSlideByIdResponse(
+            new SlideVm(
+                slide.Id,
+                slide.Name,
+                slide.ShortDescription,
+                slide.ThumbnailImage,
+                slide.Genres,
+                slide.SortOrder));
+
+        return response;
     }
 }

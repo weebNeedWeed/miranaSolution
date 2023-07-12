@@ -1,9 +1,4 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using miranaSolution.Services.Catalog.Genres;
 using miranaSolution.DTOs.Catalog.Genres;
@@ -26,9 +21,9 @@ public class GenresController : ControllerBase
 
     [HttpGet]
     [AllowAnonymous]
-    public async Task<IActionResult> GetAll()
+    public async Task<IActionResult> GetAllGenres()
     {
-        var data = await _genreService.GetAll();
-        return Ok(new ApiSuccessResult<List<GenreDto>>(data));
+        var getAllGenresResponse = await _genreService.GetAllGenresAsync();
+        return Ok(new ApiSuccessResult<List<GenreVm>>(getAllGenresResponse.GenreVms));
     }
 }

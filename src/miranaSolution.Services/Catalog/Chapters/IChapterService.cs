@@ -1,13 +1,14 @@
-﻿using miranaSolution.DTOs.Catalog.Books.Chapters;
-using miranaSolution.DTOs.Common;
+﻿using miranaSolution.DTOs.Catalog.Chapters;
 
 namespace miranaSolution.Services.Catalog.Chapters;
 
 public interface IChapterService
 {
-    Task<ChapterDto> AddChapter(int bookId, ChapterCreateRequest request);
+    Task<CreateChapterResponse> CreateChapterAsync(CreateChapterRequest request);
 
-    Task<PagedResult<ChapterDto>> GetChaptersPaging(int bookId, ChapterGetPagingRequest request);
+    Task<GetAllChaptersResponse> GetAllChaptersAsync(GetAllChaptersRequest request);
 
-    Task<ChapterDto> GetChapterByIndex(int bookId, int index);
+    Task<GetChapterByIndexResponse> GetChapterByIndexAsync(GetChapterByIndexRequest request);
+
+    Task<GetTotalChaptersResponse> GetTotalChaptersAsync(GetTotalChaptersRequest request);
 }
