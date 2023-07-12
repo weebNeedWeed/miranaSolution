@@ -43,7 +43,7 @@ public static class ModelBuilderExtensions
                 Genres = "Tiên Hiệp,Kiếm Hiệp",
                 SortOrder = 3
             });
-
+        
         builder.Entity<Author>().HasData(
             new Author
             {

@@ -1,4 +1,4 @@
 ﻿namespace miranaSolution.DTOs.Catalog.Chapters;
 
-public record GetTotalChaptersRequest(
+public record GetTotalBookChaptersRequest(
     int BookId);

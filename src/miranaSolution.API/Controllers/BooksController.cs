@@ -4,10 +4,10 @@ using miranaSolution.API.ViewModels.Books;
 using miranaSolution.Services.Catalog.Books;
 using miranaSolution.Services.Catalog.Chapters;
 using miranaSolution.DTOs.Catalog.Books;
+using miranaSolution.DTOs.Catalog.Chapters;
 using miranaSolution.DTOs.Common;
 using miranaSolution.Services.Exceptions;
 using miranaSolution.Utilities.Constants;
-using miranaSolution.Utilities.Exceptions;
 
 namespace miranaSolution.API.Controllers;
 
@@ -53,9 +53,8 @@ public class BooksController : ControllerBase
     // POST /api/books
     [HttpPost]
     [Consumes("multipart/form-data")]
-    public async Task<IActionResult> Create([FromForm] ApiCreateBookRequest request)
+    public async Task<IActionResult> CreateBook([FromForm] ApiCreateBookRequest request)
     {
-        var errors = new Dictionary<string, List<string>>();
         var thumbnailImageExt = Path.GetExtension(request.ThumbnailImage.FileName);
 
         try
@@ -79,84 +78,114 @@ public class BooksController : ControllerBase
         }
         catch (BookAlreadyExistsException ex)
         {
-            errors.Add(nameof(request.Slug), new List<string> { ex.Message });
-            return Ok(new ApiFailResult(errors));
+            return Ok(new ApiErrorResult(ex.Message));
         }
         catch (InvalidImageExtensionException ex)
         {
-            errors.Add(nameof(request.Slug), new List<string> { ex.Message });
-            return Ok(new ApiFailResult(errors));
+            return Ok(new ApiErrorResult(ex.Message));
         }
     }
 
     // GET /api/books/{id}
-    [HttpGet("{id:int}")]
+    [HttpGet("{bookId:int}")]
     [AllowAnonymous]
-    public async Task<IActionResult> GetById(int id)
+    public async Task<IActionResult> GetBookById([FromRoute] int bookId)
     {
-        var book = await _bookService.GetById(id);
-        if (book is null)
-            return Ok(new ApiFailResult(new Dictionary<string, List<string>>
-            {
-                { nameof(book.Id), new List<string> { $"Invalid Id." } }
-            }));
+        var getBookByIdResponse = await _bookService.GetBookByIdAsync(
+            new GetBookByIdRequest(bookId));
+        if (getBookByIdResponse.BookVm is null)
+        {
+            return Ok(new ApiErrorResult("Invalid book id."));
+        }
 
-        return Ok(new ApiSuccessResult<BookDto>(book));
+        return Ok(new ApiSuccessResult<BookVm>(getBookByIdResponse.BookVm));
     }
 
     // GET /api/books/recommended
     [HttpGet("recommended")]
     [AllowAnonymous]
-    public async Task<IActionResult> GetRecommended()
+    public async Task<IActionResult> GetRecommendedBooks()
     {
-        var books = await _bookService.GetRecommended();
-        return Ok(new ApiSuccessResult<List<BookDto>>(books));
+        var getRecommendedBooksResponse = await _bookService.GetRecommendedBooksAsync();
+        return Ok(new ApiSuccessResult<List<BookVm>>(getRecommendedBooksResponse.BookVms));
     }
 
-    // GET /api/books/chapters/latest/{numOfChapters}
-    [HttpGet("chapters/latest/{numOfChapters:int}")]
+    // GET /api/books/chapters/latest/{numberOfChapters}
+    [HttpGet("chapters/latest/{numberOfChapters:int}")]
     [AllowAnonymous]
-    public async Task<IActionResult> GetLatestChapter([FromRoute] int numOfChapters)
+    public async Task<IActionResult> GetLatestCreatedChapters([FromRoute] int numberOfChapters)
     {
-        var chapters = await _bookService.GetLatestChapters(numOfChapters);
-        return Ok(new ApiSuccessResult<List<ChapterDto>>(chapters));
+        var getLatestCreatedChaptersResponse = await _chapterService.GetLatestCreatedChaptersAsync(
+            new GetLatestCreatedChaptersRequest(numberOfChapters));
+        
+        return Ok(new ApiSuccessResult<List<ChapterVm>>(getLatestCreatedChaptersResponse.ChapterVms));
     }
 
-    // POST /api/books/{id}/chapters
-    [HttpPost("{id:int}/chapters")]
-    [AllowAnonymous]
-    public async Task<IActionResult> AddChapter([FromRoute] int id, [FromBody] ChapterCreateRequest request)
+    // POST /api/books/{bookId}/chapters
+    [HttpPost("{bookId:int}/chapters")]
+    public async Task<IActionResult> CreateBookChapter([FromRoute] int bookId, [FromBody] ApiCreateBookChapterRequest request)
     {
         try
         {
-            var chapter = await _chapterService.AddChapter(id, request);
-
-            return Ok(new ApiSuccessResult<ChapterDto>(chapter));
+            var createBookChapterResponse = await _chapterService.CreateBookChapterAsync(
+                new CreateBookChapterRequest(
+                    bookId,
+                    request.Name,
+                    request.WordCount,
+                    request.Content));
+            
+            return Ok(new ApiSuccessResult<ChapterVm>(createBookChapterResponse.ChapterVm));
         }
-        catch (MiranaBusinessException exception)
+        catch (BookNotFoundException ex)
         {
-            return BadRequest(new ApiErrorResult(exception.Message));
+            return Ok(new ApiErrorResult(ex.Message));
         }
     }
 
     // GET /api/books/{id}/chapters
-    [HttpGet("{id:int}/chapters")]
+    [HttpGet("{bookId:int}/chapters")]
     [AllowAnonymous]
-    public async Task<IActionResult> GetChaptersPaging([FromRoute] int id, [FromQuery] ChapterGetPagingRequest request)
+    public async Task<IActionResult> GetAllBookChapters([FromRoute] int bookId,[FromQuery] ApiGetAllBookChaptersRequest request)
     {
-        var chaptersPaging = await _chapterService.GetChaptersPaging(id, request);
-        return Ok(new ApiSuccessResult<PagedResult<ChapterDto>>(chaptersPaging));
+        var pagerRequest = new PagerRequest(
+            request.PageIndex,
+            request.PageSize);
+
+        var getAllBookChaptersResponse = await _chapterService.GetAllBookChaptersAsync(
+            new GetAllBookChaptersRequest(
+                bookId,
+                pagerRequest));
+
+        var response = new ApiGetAllBookChaptersResponse(
+            getAllBookChaptersResponse.ChapterVms,
+            request.PageIndex,
+            request.PageSize,
+            getAllBookChaptersResponse.PagerResponse.TotalPages);
+        
+        return Ok(new ApiSuccessResult<ApiGetAllBookChaptersResponse>(response));
     }
 
-    // GET /api/books/{id}/chapters
-    [HttpGet("{id:int}/chapters/{index:int}")]
+    // GET /api/books/{bookId}/chapters/{index}
+    [HttpGet("{bookId:int}/chapters/{index:int}")]
     [AllowAnonymous]
-    public async Task<IActionResult> GetChapterByIndex([FromRoute] int id, [FromRoute] int index)
+    public async Task<IActionResult> GetChapterByIndex([FromRoute] int bookId, [FromRoute] int index)
     {
-        var chapter = await _chapterService.GetChapterByIndex(id, index);
-        if (chapter is null) return Ok(new ApiErrorResult("Not found"));
+        try
+        {
+            var getBookChapterByIndexResponse = await _chapterService.GetBookChapterByIndexAsync(
+                new GetBookChapterByIndexRequest(bookId, index));
 
-        return Ok(new ApiSuccessResult<ChapterDto>(chapter));
+            if (getBookChapterByIndexResponse.ChapterVm is null)
+            {
+                return Ok(new ApiErrorResult("The chapter with given Index does not exist."));
+            }
+
+            return Ok(new ApiSuccessResult<ChapterVm>(getBookChapterByIndexResponse.ChapterVm));
+        }
+        catch (BookNotFoundException ex)
+        {
+            return Ok(new ApiErrorResult(ex.Message));
+        }
     }
 
     // GET /api/books/{slug}
@@ -164,11 +193,10 @@ public class BooksController : ControllerBase
     [AllowAnonymous]
     public async Task<IActionResult> GetBySlug([FromRoute] string slug)
     {
-        var book = await _bookService.GetBySlug(slug);
-        if (book is null) return Ok(new ApiErrorResult("Not found"));
+        var getBookBySlugResponse = await _bookService.GetBookBySlugAsync(new GetBookBySlugRequest(slug));
+        if (getBookBySlugResponse.BookVm is null) 
+            return Ok(new ApiErrorResult("The book with given Slug does not exist."));
 
-        return Ok(new ApiSuccessResult<BookDto>(book));
+        return Ok(new ApiSuccessResult<BookVm>(getBookBySlugResponse.BookVm));
     }
-
-    
 }

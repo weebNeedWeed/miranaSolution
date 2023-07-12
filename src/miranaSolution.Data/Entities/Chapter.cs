@@ -12,7 +12,7 @@ public class Chapter
     public string Content { get; set; } = string.Empty;
 
     public int BookId { get; set; }
-    public Book Book { get; set; } = new();
+    public Book? Book { get; set; }
 
     public List<Bookmark> Bookmarks { get; set; } = new();
 }

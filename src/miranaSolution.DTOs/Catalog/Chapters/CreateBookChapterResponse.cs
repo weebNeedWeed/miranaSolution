@@ -1,4 +1,4 @@
 ﻿namespace miranaSolution.DTOs.Catalog.Chapters;
 
-public record GetChapterByIndexResponse(
+public record CreateBookChapterResponse(
     ChapterVm ChapterVm);

@@ -3,11 +3,9 @@ using miranaSolution.Data.Entities;
 using miranaSolution.Data.Main;
 using miranaSolution.DTOs.Catalog.Books;
 using miranaSolution.DTOs.Catalog.Chapters;
-using miranaSolution.DTOs.Catalog.Chapters.Exceptions;
 using miranaSolution.DTOs.Common;
 using miranaSolution.Services.Catalog.Books;
 using miranaSolution.Services.Exceptions;
-using miranaSolution.Utilities.Exceptions;
 
 namespace miranaSolution.Services.Catalog.Chapters;
 
@@ -25,7 +23,7 @@ public class ChapterService : IChapterService
     /// <exception cref="BookNotFoundException">
     /// Thrown when the book with given Id is not found
     /// </exception>
-    public async Task<CreateChapterResponse> CreateChapterAsync(CreateChapterRequest request)
+    public async Task<CreateBookChapterResponse> CreateBookChapterAsync(CreateBookChapterRequest request)
     {
         var getBookByIdResponse = await _bookService.GetBookByIdAsync(new GetBookByIdRequest(request.BookId));
         if (getBookByIdResponse.BookVm is null)
@@ -54,9 +52,9 @@ public class ChapterService : IChapterService
         await _context.Chapters.AddAsync(chapter);
         await _context.SaveChangesAsync();
 
-        var getTotalChaptersResponse = await GetTotalChaptersAsync(new GetTotalChaptersRequest(request.BookId));
+        var getTotalChaptersResponse = await GetTotalBookChaptersAsync(new GetTotalBookChaptersRequest(request.BookId));
 
-        var response = new CreateChapterResponse(
+        var response = new CreateBookChapterResponse(
             new ChapterVm(
                 chapter.Id,
                 chapter.Index,
@@ -73,7 +71,7 @@ public class ChapterService : IChapterService
         return response;
     }
 
-    public async Task<GetAllChaptersResponse> GetAllChaptersAsync(GetAllChaptersRequest request)
+    public async Task<GetAllBookChaptersResponse> GetAllBookChaptersAsync(GetAllBookChaptersRequest request)
     {
         var query = _context.Chapters.Where(x => x.BookId == request.BookId);
         query = query
@@ -81,7 +79,7 @@ public class ChapterService : IChapterService
             .Take(request.PagerRequest.PageSize)
             .OrderBy(x => x.Index);
 
-        var getTotalChaptersResponse = await GetTotalChaptersAsync(new GetTotalChaptersRequest(request.BookId));
+        var getTotalChaptersResponse = await GetTotalBookChaptersAsync(new GetTotalBookChaptersRequest(request.BookId));
         var totalChapters = getTotalChaptersResponse.TotalChapters;
         
         var chapterVms = await query
@@ -99,7 +97,7 @@ public class ChapterService : IChapterService
             ))
             .ToListAsync();
 
-        var response = new GetAllChaptersResponse(
+        var response = new GetAllBookChaptersResponse(
             new PagerResponse(
                 request.PagerRequest.PageIndex,
                 request.PagerRequest.PageSize,
@@ -109,19 +107,25 @@ public class ChapterService : IChapterService
         return response;
     }
     
-    /// <exception cref="ChapterNotFoundException">
-    /// Thrown when the chapter with given Id is not found
+    /// <exception cref="BookNotFoundException">
+    /// Thrown when the book with given Id is not found
     /// </exception>
-    public async Task<GetChapterByIndexResponse> GetChapterByIndexAsync(GetChapterByIndexRequest request)
+    public async Task<GetBookChapterByIndexResponse> GetBookChapterByIndexAsync(GetBookChapterByIndexRequest request)
     {
+        var getBookByIdResponse = await _bookService.GetBookByIdAsync(new GetBookByIdRequest(request.BookId));
+        if (getBookByIdResponse.BookVm is null)
+        {
+            throw new BookNotFoundException("The book with given Id does not exist.");
+        }
+        
         var chapter = await _context.Chapters
             .FirstOrDefaultAsync(x => x.BookId == request.BookId && x.Index == request.ChapterIndex);
         if (chapter is null)
         {
-            throw new ChapterNotFoundException("The chapter with given Index does not exist.");
+            return new GetBookChapterByIndexResponse(null);
         }
 
-        var getTotalChaptersResponse = await GetTotalChaptersAsync(new GetTotalChaptersRequest(request.BookId));
+        var getTotalChaptersResponse = await GetTotalBookChaptersAsync(new GetTotalBookChaptersRequest(request.BookId));
 
         var chapterVm = new ChapterVm(
             chapter.Id,
@@ -135,19 +139,44 @@ public class ChapterService : IChapterService
             chapter.Index < getTotalChaptersResponse.TotalChapters,
             chapter.Index > 1);
 
-        var response = new GetChapterByIndexResponse(chapterVm);
+        var response = new GetBookChapterByIndexResponse(chapterVm);
 
         return response;
     }
 
-    public async Task<GetTotalChaptersResponse> GetTotalChaptersAsync(GetTotalChaptersRequest request)
+    public async Task<GetTotalBookChaptersResponse> GetTotalBookChaptersAsync(GetTotalBookChaptersRequest request)
     {
         var totalChapters = await _context.Chapters
             .Where(x => x.BookId == request.BookId)
             .CountAsync();
 
-        var response = new GetTotalChaptersResponse(totalChapters);
+        var response = new GetTotalBookChaptersResponse(totalChapters);
 
+        return response;
+    }
+
+    public async Task<GetLatestCreatedChaptersResponse> GetLatestCreatedChaptersAsync(GetLatestCreatedChaptersRequest request)
+    {
+        var query = _context.Chapters
+            .OrderByDescending(x => x.CreatedAt)
+            .Take(request.NumberOfChapters);
+        
+        var chapterVms = await query
+            .Select(x => new ChapterVm(
+                x.Id,
+                x.Index,
+                x.Name,
+                x.CreatedAt,
+                x.UpdatedAt,
+                x.ReadCount,
+                x.WordCount,
+                x.Content,
+                false,
+                false
+            ))
+            .ToListAsync();
+
+        var response = new GetLatestCreatedChaptersResponse(chapterVms);
         return response;
     }
 }

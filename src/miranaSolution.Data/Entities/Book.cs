@@ -14,7 +14,7 @@ public class Book
     public bool IsDone { get; set; }
 
     public int AuthorId { get; set; }
-    public Author Author { get; set; } = new();
+    public Author? Author { get; set; }
 
     public Guid? UserId { get; set; }
     public AppUser? AppUser { get; set; }

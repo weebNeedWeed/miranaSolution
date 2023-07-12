@@ -4,7 +4,6 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using miranaSolution.Data.Entities;
 using miranaSolution.DTOs.Auth.Users;
-using miranaSolution.Utilities.Exceptions;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
@@ -34,7 +33,7 @@ public class UserService : IUserService
         var result =
             await _signInManager.PasswordSignInAsync(request.UserName, request.Password, request.RememberMe, false);
 
-        if (!result.Succeeded) throw new MiranaBusinessException("Invalid credentials.");
+        if (!result.Succeeded) throw new Exception("Invalid credentials.");
 
         var user = await _userManager.FindByNameAsync(request.UserName);
 
@@ -114,7 +113,7 @@ public class UserService : IUserService
 
         var createResult = await _userManager.CreateAsync(newUser, request.Password);
 
-        if (!createResult.Succeeded) throw new MiranaBusinessException("Cannot create new User");
+        if (!createResult.Succeeded) throw new Exception("Cannot create new User");
 
         await _userManager.AddToRolesAsync(newUser, new[] { "User" });
 

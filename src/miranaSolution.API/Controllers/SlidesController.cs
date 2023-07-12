@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using miranaSolution.API.ViewModels.Slides;
 using miranaSolution.Services.Catalog.Slides;
 using miranaSolution.DTOs.Catalog.Slides;
 using miranaSolution.DTOs.Common;
@@ -41,9 +42,16 @@ public class SlidesController : ControllerBase
     }
 
     [HttpPost]
-    public async Task<IActionResult> CreateSlide([FromBody] CreateSlideRequest request)
+    public async Task<IActionResult> CreateSlide([FromBody] ApiCreateSlideRequest request)
     {
-        var createSlideResponse = await _slideService.CreateSlideAsync(request);
+        var createSlideResponse = await _slideService.CreateSlideAsync(
+            new CreateSlideRequest(
+                request.Name,
+                request.ShortDescription,
+                request.ThumbnailImage,
+                request.Genres,
+                request.SortOrder));
+        
         return Ok(new ApiSuccessResult<SlideVm>(createSlideResponse.SlideVm));
     }
 }

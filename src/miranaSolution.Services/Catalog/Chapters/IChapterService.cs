@@ -4,11 +4,13 @@ namespace miranaSolution.Services.Catalog.Chapters;
 
 public interface IChapterService
 {
-    Task<CreateChapterResponse> CreateChapterAsync(CreateChapterRequest request);
+    Task<CreateBookChapterResponse> CreateBookChapterAsync(CreateBookChapterRequest request);
 
-    Task<GetAllChaptersResponse> GetAllChaptersAsync(GetAllChaptersRequest request);
+    Task<GetAllBookChaptersResponse> GetAllBookChaptersAsync(GetAllBookChaptersRequest request);
 
-    Task<GetChapterByIndexResponse> GetChapterByIndexAsync(GetChapterByIndexRequest request);
+    Task<GetBookChapterByIndexResponse> GetBookChapterByIndexAsync(GetBookChapterByIndexRequest request);
 
-    Task<GetTotalChaptersResponse> GetTotalChaptersAsync(GetTotalChaptersRequest request);
+    Task<GetTotalBookChaptersResponse> GetTotalBookChaptersAsync(GetTotalBookChaptersRequest request);
+
+    Task<GetLatestCreatedChaptersResponse> GetLatestCreatedChaptersAsync(GetLatestCreatedChaptersRequest request);
 }

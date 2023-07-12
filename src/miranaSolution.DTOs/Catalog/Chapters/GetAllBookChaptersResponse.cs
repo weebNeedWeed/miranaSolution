@@ -2,6 +2,6 @@
 
 namespace miranaSolution.DTOs.Catalog.Chapters;
 
-public record GetAllChaptersResponse(
+public record GetAllBookChaptersResponse(
     PagerResponse PagerResponse,
     List<ChapterVm> ChapterVms);

@@ -4,8 +4,6 @@ using Microsoft.AspNetCore.Mvc;
 using miranaSolution.Services.Auth.Users;
 using miranaSolution.DTOs.Auth.Users;
 using miranaSolution.DTOs.Common;
-using miranaSolution.Utilities.Constants;
-using miranaSolution.Utilities.Exceptions;
 
 namespace miranaSolution.API.Controllers;
 
@@ -56,7 +54,7 @@ public class UsersController : ControllerBase
         {
             newUser = await _userService.Register(request);
         }
-        catch (MiranaBusinessException ex)
+        catch (Exception ex)
         {
             return Ok(new ApiFailResult(new Dictionary<string, List<string>>
             {
@@ -77,7 +75,7 @@ public class UsersController : ControllerBase
         {
             accessToken = await _userService.Authentication(request);
         }
-        catch (MiranaBusinessException ex)
+        catch (Exception ex)
         {
             return Ok(new ApiFailResult(new Dictionary<string, List<string>>
             {

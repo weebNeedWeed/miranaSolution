@@ -1,5 +1,4 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using miranaSolution.Data.Entities;
 using miranaSolution.Data.Main;
 using miranaSolution.DTOs.Catalog.Books;
@@ -32,7 +31,7 @@ public class BookService : IBookService
     private bool IsValidExtension(string fileExtension)
     {
         var allowedExt = new List<string>() { ".jpg", ".jpeg", ".png" };
-        return allowedExt.Contains(Path.GetExtension(fileExtension));
+        return allowedExt.Contains(fileExtension);
     }
 
     public async Task<GetBookByIdResponse> GetBookByIdAsync(GetBookByIdRequest request)
@@ -43,24 +42,7 @@ public class BookService : IBookService
             return new GetBookByIdResponse(null);
         }
 
-        var authorName = book.Author.Name;
-
-        var genres = book.BookGenres
-            .Select(x => x.Genre.Name).ToList();
-
-        var bookVm = new BookVm(
-            book.Id,
-            book.Name,
-            book.ShortDescription,
-            book.LongDescription,
-            book.CreatedAt,
-            book.UpdatedAt,
-            book.ThumbnailImage,
-            book.IsRecommended,
-            book.Slug,
-            authorName,
-            genres,
-            book.IsDone);
+        var bookVm = MapBookIntoBookVm(book);
 
         var response = new GetBookByIdResponse(bookVm);
         
@@ -69,30 +51,13 @@ public class BookService : IBookService
 
     public async Task<GetBookBySlugResponse> GetBookBySlugAsync(GetBookBySlugRequest request)
     {
-        var book = await _context.Books.FirstOrDefaultAsync(x => x.Slug == request.Slug);
+        var book = await _context.Books.FirstOrDefaultAsync(x => x.Slug.Equals(request.Slug));
         if (book is null)
         {
             return new GetBookBySlugResponse(null);
         }
 
-        var authorName = book.Author.Name;
-
-        var genres = book.BookGenres
-            .Select(x => x.Genre.Name).ToList();
-
-        var bookVm = new BookVm(
-            book.Id,
-            book.Name,
-            book.ShortDescription,
-            book.LongDescription,
-            book.CreatedAt,
-            book.UpdatedAt,
-            book.ThumbnailImage,
-            book.IsRecommended,
-            book.Slug,
-            authorName,
-            genres,
-            book.IsDone);
+        var bookVm = MapBookIntoBookVm(book);
 
         var response = new GetBookBySlugResponse(bookVm);
         
@@ -115,7 +80,7 @@ public class BookService : IBookService
             throw new BookAlreadyExistsException("The book with given Slug already exists.");
         }
 
-        if (IsValidExtension(request.ThumbnailImageExtension))
+        if (!IsValidExtension(request.ThumbnailImageExtension))
         {
             throw new InvalidImageExtensionException(
                 "Invalid thumbnail image's extension. Only allow .jpg, .png and .jpeg.");
@@ -137,25 +102,8 @@ public class BookService : IBookService
 
         await _context.Books.AddAsync(book);
         await _context.SaveChangesAsync();
-        
-        var authorName = book.Author.Name;
 
-        var genres = book.BookGenres
-            .Select(x => x.Genre.Name).ToList();
-
-        var bookVm = new BookVm(
-            book.Id,
-            book.Name,
-            book.ShortDescription,
-            book.LongDescription,
-            book.CreatedAt,
-            book.UpdatedAt,
-            book.ThumbnailImage,
-            book.IsRecommended,
-            book.Slug,
-            authorName,
-            genres,
-            book.IsDone);
+        var bookVm = MapBookIntoBookVm(book);
         
         var response = new CreateBookResponse(bookVm);
 
@@ -203,25 +151,8 @@ public class BookService : IBookService
             }
         
         await _context.SaveChangesAsync();
-        
-        var authorName = book.Author.Name;
-        var genres = book.BookGenres
-            .Select(x => x.Genre.Name).ToList();
 
-        var bookVm = new BookVm(
-            book.Id,
-            book.Name,
-            book.ShortDescription,
-            book.LongDescription,
-            book.CreatedAt,
-            book.UpdatedAt,
-            book.ThumbnailImage,
-            book.IsRecommended,
-            book.Slug,
-            authorName,
-            genres,
-            book.IsDone);
-        
+        var bookVm = MapBookIntoBookVm(book);
         var response = new UpdateBookResponse(bookVm);
 
         return response;
@@ -248,28 +179,7 @@ public class BookService : IBookService
             .Where(x => x.IsRecommended)
             .ToListAsync();
 
-        var bookVms = books.Select(book =>
-        {
-            var authorName = book.Author.Name;
-            var genres = book.BookGenres
-                .Select(x => x.Genre.Name).ToList();
-
-            var bookVm = new BookVm(
-                book.Id,
-                book.Name,
-                book.ShortDescription,
-                book.LongDescription,
-                book.CreatedAt,
-                book.UpdatedAt,
-                book.ThumbnailImage,
-                book.IsRecommended,
-                book.Slug,
-                authorName,
-                genres,
-                book.IsDone);
-
-            return bookVm;
-        }).ToList();
+        var bookVms = books.Select(MapBookIntoBookVm).ToList();
         
         return new GetRecommendedBooksResponse(bookVms);
     }
@@ -315,28 +225,7 @@ public class BookService : IBookService
             .Take(pageSize)
             .ToListAsync();
         
-        var bookVms = books.Select(book =>
-        {
-            var authorName = book.Author.Name;
-            var genres = book.BookGenres
-                .Select(x => x.Genre.Name).ToList();
-
-            var bookVm = new BookVm(
-                book.Id,
-                book.Name,
-                book.ShortDescription,
-                book.LongDescription,
-                book.CreatedAt,
-                book.UpdatedAt,
-                book.ThumbnailImage,
-                book.IsRecommended,
-                book.Slug,
-                authorName,
-                genres,
-                book.IsDone);
-
-            return bookVm;
-        }).ToList();
+        var bookVms = books.Select(MapBookIntoBookVm).ToList();
 
         var pagerResponse = new PagerResponse(
             request.PagerRequest.PageIndex,
@@ -348,5 +237,44 @@ public class BookService : IBookService
             pagerResponse);
         
         return response;
+    }
+
+    private BookVm MapBookIntoBookVm(Book book)
+    {
+        _context.Attach(book);
+        _context.Entry(book)
+            .Reference(x => x.Author)
+            .Load();
+        _context.Entry(book)
+            .Collection(x => x.BookGenres)
+            .Load();
+
+        var authorName = book.Author!.Name;
+        var genres = book.BookGenres
+            .Select(bookGenre => 
+            {
+                _context.Attach(bookGenre);
+                _context.Entry(bookGenre)
+                    .Reference(x => x.Genre)
+                    .Load();
+
+                return bookGenre.Genre!.Name;
+            }).ToList();
+
+        var bookVm = new BookVm(
+            book.Id,
+            book.Name,
+            book.ShortDescription,
+            book.LongDescription,
+            book.CreatedAt,
+            book.UpdatedAt,
+            book.ThumbnailImage,
+            book.IsRecommended,
+            book.Slug,
+            authorName,
+            genres,
+            book.IsDone);
+
+        return bookVm;
     }
 }

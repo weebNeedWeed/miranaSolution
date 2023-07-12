@@ -4,8 +4,8 @@ namespace miranaSolution.Data.Entities;
 
 public class AppUser : IdentityUser<Guid>
 {
-    public string? FirstName { get; set; }
-    public string? LastName { get; set; }
+    public string FirstName { get; set; } = string.Empty;
+    public string LastName { get; set; } = string.Empty;
 
     public List<Book> Books { get; set; } = new();
 
@@ -17,5 +17,5 @@ public class AppUser : IdentityUser<Guid>
 
     public List<CommentReaction> CommentReactions { get; set; } = new();
 
-    public string? Avatar { get; set; }
+    public string Avatar { get; set; } = string.Empty;
 }

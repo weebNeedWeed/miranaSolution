@@ -2,7 +2,7 @@
 
 namespace miranaSolution.DTOs.Catalog.Chapters;
 
-public record GetAllChaptersRequest(
+public record GetAllBookChaptersRequest(
     int BookId,
     PagerRequest PagerRequest
     );
