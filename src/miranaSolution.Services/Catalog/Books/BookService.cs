@@ -19,13 +19,12 @@ public class BookService : IBookService
         _fileService = fileService;
     }
 
-    private async Task<string> SaveFileAsync(Stream stream, string fileExtension)
+    private async Task<string> SaveBookThumbnailAsync(Stream fileStream, string fileExtension)
     {
         var newName = $"{Guid.NewGuid().ToString()}{fileExtension}";
-        await _fileService.SaveFileAsync(
-            stream, newName);
+        await _fileService.SaveFileAsync(fileStream, newName);
 
-        return _fileService.GetPath(newName);
+        return _fileService.GetFilePath(newName);
     }
     
     private bool IsValidExtension(string fileExtension)
@@ -95,7 +94,7 @@ public class BookService : IBookService
             Slug = request.Slug,
             IsDone = request.IsDone,
             ThumbnailImage = 
-                await SaveFileAsync(request.ThumbnailImage, request.ThumbnailImageExtension),
+                await SaveBookThumbnailAsync(request.ThumbnailImage, request.ThumbnailImageExtension),
             UserId = request.UserId,
             AuthorId = request.AuthorId
         };

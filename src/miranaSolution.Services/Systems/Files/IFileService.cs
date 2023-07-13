@@ -2,7 +2,9 @@ namespace miranaSolution.Services.Systems.Files;
 
 public interface IFileService
 {
-    Task<string> SaveFileAsync(Stream stream, string fileName);
-    Task DeleteFileAsync(string fileName);
-    string GetPath(string fileName);
+    Task<bool> SaveFileAsync(Stream fileStream, string fileName);
+    
+    Task<bool> DeleteFileAsync(string fileName);
+    
+    string GetFilePath(string fileName);
 }

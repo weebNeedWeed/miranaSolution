@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 using miranaSolution.Data.Entities;
 using miranaSolution.Data.Main;
 using miranaSolution.DTOs.Catalog.Slides;
@@ -9,7 +10,7 @@ public class SlideService : ISlideService
 {
     private readonly MiranaDbContext _context;
 
-    public SlideService(MiranaDbContext context)
+    public SlideService(MiranaDbContext context, IOptions<JwtOptions> jwtOptions)
     {
         _context = context;
     }

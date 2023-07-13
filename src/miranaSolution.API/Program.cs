@@ -14,10 +14,11 @@ builder.Services.Configure<ApiBehaviorOptions>(x => { x.SuppressModelStateInvali
 // Add project's logical layers
 builder.Services
     .AddDataLayer()
-    .AddAuth(builder.Configuration)
-    .AddSwagger();
+    .AddBusinessLayer();
 
-builder.Services.AddBusinessLayer();
+builder.Services
+    .AddAuth()
+    .AddSwagger();
 
 builder.Services.AddCors(options =>
 {

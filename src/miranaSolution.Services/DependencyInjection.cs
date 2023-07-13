@@ -1,5 +1,6 @@
-﻿using Microsoft.Extensions.DependencyInjection;
-using miranaSolution.Services.Auth.Users;
+﻿using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+using miranaSolution.Services.Authentication.Users;
 using miranaSolution.Services.Catalog.Authors;
 using miranaSolution.Services.Catalog.Books;
 using miranaSolution.Services.Catalog.Chapters;
@@ -13,6 +14,12 @@ public static class DependencyInjection
 {
     public static IServiceCollection AddBusinessLayer(this IServiceCollection services)
     {
+        var serviceProvider = services.BuildServiceProvider();
+        var configuration = serviceProvider.GetService<IConfiguration>();
+        
+        // Get Jwt Settings from the configuration file.
+        services.Configure<JwtOptions>(configuration!.GetSection(JwtOptions.SectionName));
+        
         // Register application's services
         services.AddTransient<ISlideService, SlideService>();
         services.AddTransient<IBookService, BookService>();

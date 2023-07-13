@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using miranaSolution.API.ViewModels.Common;
 using miranaSolution.DTOs.Catalog.Authors;
 using miranaSolution.Services.Catalog.Authors;
 using miranaSolution.DTOs.Common;

@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using miranaSolution.API.ViewModels.Common;
 using miranaSolution.API.ViewModels.Slides;
 using miranaSolution.Services.Catalog.Slides;
 using miranaSolution.DTOs.Catalog.Slides;

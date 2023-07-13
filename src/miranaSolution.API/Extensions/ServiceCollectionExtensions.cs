@@ -2,18 +2,22 @@ using System.Reflection;
 using System.Text;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using miranaSolution.Data.Entities;
 using miranaSolution.Data.Main;
+using miranaSolution.Services;
 
 namespace miranaSolution.API.Extensions;
 
 public static class ServiceCollectionExtensions
 {
-    public static IServiceCollection AddAuth(this IServiceCollection services,
-        ConfigurationManager configurationManager)
+    public static IServiceCollection AddAuth(this IServiceCollection services)
     {
+        var serviceProvider = services.BuildServiceProvider();
+        var jwtOptions = serviceProvider.GetService<IOptions<JwtOptions>>()!.Value;
+        
         services.AddIdentity<AppUser, AppRole>()
             .AddEntityFrameworkStores<MiranaDbContext>()
             .AddDefaultTokenProviders();
@@ -48,10 +52,12 @@ public static class ServiceCollectionExtensions
                 ValidateAudience = true,
                 ValidateLifetime = true,
                 ValidateIssuerSigningKey = true,
-                ValidIssuer = configurationManager["Jwt:Issuer"],
-                ValidAudience = configurationManager["Jwt:Issuer"],
-                IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configurationManager["Jwt:Key"])),
-                RequireExpirationTime = true
+                ValidIssuer = jwtOptions.Issuer,
+                ValidAudience = jwtOptions.Audience,
+                IssuerSigningKey = 
+                    new SymmetricSecurityKey(
+                        Encoding.UTF8.GetBytes(jwtOptions.Secret)),
+                RequireExpirationTime = true,
             };
         });
 

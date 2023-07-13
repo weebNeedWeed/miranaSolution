@@ -1,4 +1,4 @@
-﻿namespace miranaSolution.DTOs.Common;
+﻿namespace miranaSolution.API.ViewModels.Common;
 
 public class ApiResult<TData>
 {
