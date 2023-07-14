@@ -1,36 +1,27 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using miranaSolution.Data.Entities;
 using miranaSolution.Data.Main;
+using miranaSolution.DTOs.Authentication.Users;
 using miranaSolution.DTOs.Catalog.Books;
 using miranaSolution.DTOs.Common;
+using miranaSolution.Services.Authentication.Users;
 using miranaSolution.Services.Exceptions;
-using miranaSolution.Services.Systems.Files;
+using miranaSolution.Services.Systems.Images;
 
 namespace miranaSolution.Services.Catalog.Books;
 
 public class BookService : IBookService
 {
     private readonly MiranaDbContext _context;
-    private readonly IFileService _fileService;
+    private readonly IUserService _userService;
+
+    private readonly IImageSaver _imageSaver;
     //
-    public BookService(MiranaDbContext context, IFileService fileService)
+    public BookService(MiranaDbContext context, IUserService userService, IImageSaver imageSaver)
     {
         _context = context;
-        _fileService = fileService;
-    }
-
-    private async Task<string> SaveBookThumbnailAsync(Stream fileStream, string fileExtension)
-    {
-        var newName = $"{Guid.NewGuid().ToString()}{fileExtension}";
-        await _fileService.SaveFileAsync(fileStream, newName);
-
-        return _fileService.GetFilePath(newName);
-    }
-    
-    private bool IsValidExtension(string fileExtension)
-    {
-        var allowedExt = new List<string>() { ".jpg", ".jpeg", ".png" };
-        return allowedExt.Contains(fileExtension);
+        _userService = userService;
+        _imageSaver = imageSaver;
     }
 
     public async Task<GetBookByIdResponse> GetBookByIdAsync(GetBookByIdRequest request)
@@ -63,15 +54,20 @@ public class BookService : IBookService
         return response;
     }
     
+    /// <exception cref="UserNotFoundException">
+    /// Thrown when the user with given Id does not exist
+    /// </exception>
     /// <exception cref="BookAlreadyExistsException">
     /// Thrown when the book with given Slug already exists
     /// </exception>
-    /// <exception cref="InvalidImageExtensionException">
-    /// Thrown when the extension of thumbnail image is not allowed
-    /// </exception>
     public async Task<CreateBookResponse> CreateBookAsync(CreateBookRequest request)
     {
-        // TODO: Use FindUserById here
+        var getUserByIdResponse = await _userService.GetUserByIdAsync(
+            new GetUserByIdRequest(request.UserId));
+        if (getUserByIdResponse.UserVm is not null)
+        {
+            throw new UserNotFoundException("The user with given Id does not exist.");
+        }
 
         var book = await _context.Books.FirstOrDefaultAsync(x => x.Slug.Equals(request.Slug));
         if (book is not null)
@@ -79,12 +75,6 @@ public class BookService : IBookService
             throw new BookAlreadyExistsException("The book with given Slug already exists.");
         }
 
-        if (!IsValidExtension(request.ThumbnailImageExtension))
-        {
-            throw new InvalidImageExtensionException(
-                "Invalid thumbnail image's extension. Only allow .jpg, .png and .jpeg.");
-        }
-        
         book = new Book
         {
             Name = request.Name,
@@ -94,7 +84,7 @@ public class BookService : IBookService
             Slug = request.Slug,
             IsDone = request.IsDone,
             ThumbnailImage = 
-                await SaveBookThumbnailAsync(request.ThumbnailImage, request.ThumbnailImageExtension),
+                await _imageSaver.SaveImageAsync(request.ThumbnailImage, request.ThumbnailImageExtension),
             UserId = request.UserId,
             AuthorId = request.AuthorId
         };

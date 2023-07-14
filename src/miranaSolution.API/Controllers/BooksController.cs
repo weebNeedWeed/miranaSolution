@@ -111,10 +111,10 @@ public class BooksController : ControllerBase
         return Ok(new ApiSuccessResult<List<BookVm>>(getRecommendedBooksResponse.BookVms));
     }
 
-    // GET /api/books/chapters/latest/{numberOfChapters}
-    [HttpGet("chapters/latest/{numberOfChapters:int}")]
+    // GET /api/books/chapters/latest
+    [HttpGet("chapters/latest")]
     [AllowAnonymous]
-    public async Task<IActionResult> GetLatestCreatedChapters([FromRoute] int numberOfChapters)
+    public async Task<IActionResult> GetLatestCreatedChapters([FromQuery] int numberOfChapters)
     {
         var getLatestCreatedChaptersResponse = await _chapterService.GetLatestCreatedChaptersAsync(
             new GetLatestCreatedChaptersRequest(numberOfChapters));

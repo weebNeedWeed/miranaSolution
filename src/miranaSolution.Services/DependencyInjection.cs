@@ -7,6 +7,8 @@ using miranaSolution.Services.Catalog.Chapters;
 using miranaSolution.Services.Catalog.Genres;
 using miranaSolution.Services.Catalog.Slides;
 using miranaSolution.Services.Systems.Files;
+using miranaSolution.Services.Systems.Images;
+using miranaSolution.Services.Systems.JwtTokenGenerators;
 
 namespace miranaSolution.Services;
 
@@ -28,6 +30,8 @@ public static class DependencyInjection
         services.AddTransient<IAuthorService, AuthorService>();
         services.AddTransient<IGenreService, GenreService>();
         services.AddTransient<IChapterService, ChapterService>();
+        services.AddTransient<IJwtTokenGenerator, JwtTokenGenerator>();
+        services.AddTransient<IImageSaver, ImageSaver>();
 
         return services;
     }
