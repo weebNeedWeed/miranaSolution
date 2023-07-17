@@ -41,7 +41,7 @@ public class FileService : IFileService
         return true;
     }
 
-    public string GetFilePath(string fileName)
+    public string GetRelativeFilePath(string fileName)
     {
         var path = _folder + "/" + fileName;
         return path;

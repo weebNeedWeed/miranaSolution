@@ -1,5 +1,6 @@
 ﻿using miranaSolution.Services.Exceptions;
 using miranaSolution.Services.Systems.Files;
+using FileNotFoundException = miranaSolution.Services.Exceptions.FileNotFoundException;
 
 namespace miranaSolution.Services.Systems.Images;
 
@@ -26,12 +27,25 @@ public class ImageSaver : IImageSaver
         var newName = $"{Guid.NewGuid().ToString()}{imageExtension}";
         await _fileService.SaveFileAsync(imageStream, newName);
 
-        return _fileService.GetFilePath(newName);
+        return _fileService.GetRelativeFilePath(newName);
     }
-    
+
+    public async Task DeleteImageIfExistAsync(string imagePath)
+    {
+        // Extracting the file name from a path having the format "<dir>/filename.ext"
+        var name = imagePath.Split("/")[1];
+        try
+        {
+            await _fileService.DeleteFileAsync(name);
+        }
+        catch (FileNotFoundException)
+        {
+        }
+    }
+
     private bool IsValidExtension(string fileExtension)
     {
-        var allowedExt = new List<string>() { ".jpg", ".jpeg", ".png" };
+        var allowedExt = new List<string> { ".jpg", ".jpeg", ".png" };
         return allowedExt.Contains(fileExtension);
     }
 }

@@ -38,4 +38,5 @@ public class MiranaDbContext : IdentityDbContext<AppUser, AppRole, Guid>
     public DbSet<Comment> Comments { get; set; }
     public DbSet<Bookmark> Bookmarks { get; set; }
     public DbSet<CommentReaction> CommentReactions { get; set; }
+    public DbSet<BookUpvote> BookUpvotes { get; set; }
 }

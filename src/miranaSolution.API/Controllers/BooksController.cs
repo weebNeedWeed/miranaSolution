@@ -2,11 +2,11 @@
 using Microsoft.AspNetCore.Mvc;
 using miranaSolution.API.ViewModels.Books;
 using miranaSolution.API.ViewModels.Common;
-using miranaSolution.Services.Catalog.Books;
-using miranaSolution.Services.Catalog.Chapters;
-using miranaSolution.DTOs.Catalog.Books;
-using miranaSolution.DTOs.Catalog.Chapters;
 using miranaSolution.DTOs.Common;
+using miranaSolution.DTOs.Core.Books;
+using miranaSolution.DTOs.Core.Chapters;
+using miranaSolution.Services.Core.Books;
+using miranaSolution.Services.Core.Chapters;
 using miranaSolution.Services.Exceptions;
 using miranaSolution.Utilities.Constants;
 
@@ -134,10 +134,14 @@ public class BooksController : ControllerBase
                     request.Name,
                     request.WordCount,
                     request.Content));
-            
+
             return Ok(new ApiSuccessResult<ChapterVm>(createBookChapterResponse.ChapterVm));
         }
         catch (BookNotFoundException ex)
+        {
+            return Ok(new ApiErrorResult(ex.Message));
+        }
+        catch (InvalidImageExtensionException ex)
         {
             return Ok(new ApiErrorResult(ex.Message));
         }

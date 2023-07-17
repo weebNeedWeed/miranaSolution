@@ -1,67 +1,63 @@
-import {ApiResult} from "../models/ApiResult";
+import {ApiResult} from "../models/common/ApiResult";
 import {BaseApiHelper} from "./BaseApiHelper";
-import {UserRegisterRequest} from "../models/auth/UserRegisterRequest";
 import {User} from "../models/auth/User";
-import {UserUpdateInfoRequest} from "../models/auth/UserUpdateInfoRequest";
-import {UserUpdatePasswordRequest} from "../models/auth/UserUpdatePasswordRequest";
-
-type AuthenticationData = {
-    accessToken: string;
-};
-
-export type ValidateFailedMessage<T> = {
-    [P in keyof T]: string[];
-}
+import {RegisterUserRequest} from "../models/auth/RegisterUserRequest";
+import {ValidationFailedMessages} from "../models/common/ValidationFailedMessages";
+import {AuthenticateUserRequest} from "../models/auth/AuthenticateUserRequest";
+import {AuthenticateUserResponse} from "../models/auth/AuthenticateUserResponse";
+import {UpdateUserInformationRequest} from "../models/auth/UpdateUserInformationRequest";
+import {UpdateUserPasswordRequest} from "../models/auth/UpdateUserPasswordRequest";
 
 class UserApiHelper extends BaseApiHelper {
-    async authenticate(credentials: {
-        userName: string;
-        password: string;
-    }): Promise<AuthenticationData | null> {
-        const response = await this.init().post<
-            ApiResult<AuthenticationData>
-        >("/users/authenticate", credentials);
+    constructor() {
+        super();
+        this.baseUrl = import.meta.env.VITE_BASE_ADDRESS + "/";
+    }
 
-        if (response.data.status === "error" || response.data.status === "fail") {
-            return null;
+    async authenticate(request: AuthenticateUserRequest): Promise<AuthenticateUserResponse | ValidationFailedMessages<AuthenticateUserResponse>> {
+        const response = await this.init()
+            .post<ApiResult<AuthenticateUserResponse | ValidationFailedMessages<AuthenticateUserResponse>>>("/auth/authenticate", request);
+
+        if (response.data.status === "error") {
+            throw new Error(response.data.message);
+        }
+
+        if (response.data.status === "fail") {
+            return response.data.data as ValidationFailedMessages<AuthenticateUserResponse>;
         }
 
         return response.data.data;
     }
 
-    async register(userRegisterRequest: UserRegisterRequest): Promise<User | ValidateFailedMessage<UserRegisterRequest> | null> {
+    async register(request: RegisterUserRequest): Promise<User | ValidationFailedMessages<RegisterUserRequest>> {
         const response = await this.init()
-            .post<ApiResult<User | ValidateFailedMessage<UserRegisterRequest>>>("/users", userRegisterRequest);
+            .post<ApiResult<User | ValidationFailedMessages<RegisterUserRequest>>>("/auth/register", request);
 
         if (response.data.status === "error") {
-            return null;
+            throw new Error(response.data.message);
         }
 
         if (response.data.status === "fail") {
-            return response.data.data as ValidateFailedMessage<UserRegisterRequest>;
+            return response.data.data as ValidationFailedMessages<RegisterUserRequest>;
         }
 
         return response.data.data as User;
     }
 
-    async getUserInformation(accessToken: string): Promise<User | null> {
+    async getUserInformation(accessToken: string): Promise<User> {
         const headers = {
             Authorization: `Bearer ${accessToken}`,
         }
 
-        try {
-            const response = await this.init(headers).get<ApiResult<User>>("/users/info");
-            if (response.data.status === "fail" || response.data.status === "error") {
-                throw new Error();
-            }
-
-            return response.data.data;
-        } catch (err) {
-            return null;
+        const response = await this.init(headers).get<ApiResult<User>>("/auth/information");
+        if (response.data.status === "error") {
+            throw new Error(response.data.message);
         }
+
+        return response.data.data;
     }
 
-    async updateUserInfo(accessToken: string, request: UserUpdateInfoRequest): Promise<User | null> {
+    async updateUserInformation(accessToken: string, request: UpdateUserInformationRequest): Promise<User | ValidationFailedMessages<UpdateUserInformationRequest>> {
         const headers = {
             Authorization: `Bearer ${accessToken}`,
         }
@@ -75,38 +71,35 @@ class UserApiHelper extends BaseApiHelper {
         formData.append("lastName", request.lastName);
         formData.append("email", request.email);
 
-        try {
-            const response = await this.init(headers).post<ApiResult<User>>("/users/info", formData);
-            if (response.data.status === "fail" || response.data.status === "error") {
-                throw new Error();
-            }
-
-            return response.data.data;
-        } catch (ex) {
-            return null;
+        const response = await this.init(headers).post<ApiResult<
+            User | ValidationFailedMessages<UpdateUserInformationRequest>>>("/auth/information", formData);
+        if (response.data.status === "error") {
+            throw new Error(response.data.message);
         }
+
+        if (response.data.status === "fail") {
+            return response.data.data as ValidationFailedMessages<UpdateUserInformationRequest>;
+        }
+
+        return response.data.data;
     }
 
-    async updatePassword(accessToken: string, request: UserUpdatePasswordRequest): Promise<User | null> {
+    async updateUserPassword(accessToken: string, request: UpdateUserPasswordRequest): Promise<User | ValidationFailedMessages<UpdateUserPasswordRequest>> {
         const headers = {
             Authorization: `Bearer ${accessToken}`,
         }
 
-        const formData = new FormData();
-        formData.append("oldPassword", request.oldPassword);
-        formData.append("newPassword", request.newPassword);
-        formData.append("newPasswordConfirmation", request.newPasswordConfirmation);
-
-        try {
-            const response = await this.init(headers).post<ApiResult<User>>("/users/password", formData);
-            if (response.data.status === "fail" || response.data.status === "error") {
-                throw new Error();
-            }
-
-            return response.data.data;
-        } catch (ex) {
-            return null;
+        const response = await this.init(headers)
+            .post<ApiResult<User | ValidationFailedMessages<UpdateUserPasswordRequest>>>("/auth/password", request);
+        if (response.data.status === "error") {
+            throw new Error(response.data.message);
         }
+
+        if (response.data.status === "fail") {
+            return response.data.data as ValidationFailedMessages<UpdateUserPasswordRequest>;
+        }
+
+        return response.data.data;
     }
 }
 

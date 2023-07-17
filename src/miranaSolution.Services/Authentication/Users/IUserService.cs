@@ -18,4 +18,6 @@ public interface IUserService
     Task<UpdateUserPasswordResponse> UpdateUserPasswordAsync(UpdateUserPasswordRequest request);
 
     Task<GetUserByIdResponse> GetUserByIdAsync(GetUserByIdRequest request);
+
+    Task DeleteUserAsync(DeleteUserRequest request);
 }

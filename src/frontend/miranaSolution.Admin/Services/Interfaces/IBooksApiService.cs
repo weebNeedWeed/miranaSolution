@@ -1,4 +1,3 @@
-using miranaSolution.DTOs.Catalog.Books;
 using miranaSolution.DTOs.Catalog.Books.Chapters;
 using miranaSolution.DTOs.Common;
 using Refit;

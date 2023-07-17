@@ -2,9 +2,9 @@
 using Microsoft.AspNetCore.Mvc;
 using miranaSolution.API.ViewModels.Common;
 using miranaSolution.API.ViewModels.Slides;
-using miranaSolution.Services.Catalog.Slides;
-using miranaSolution.DTOs.Catalog.Slides;
 using miranaSolution.DTOs.Common;
+using miranaSolution.DTOs.Core.Slides;
+using miranaSolution.Services.Core.Slides;
 using miranaSolution.Utilities.Constants;
 
 namespace miranaSolution.API.Controllers;

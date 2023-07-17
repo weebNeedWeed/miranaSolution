@@ -7,12 +7,10 @@ import {genreApiHelper} from "../../helpers/apis/GenreApiHelper";
 import {useNavigate, useLocation, useSearchParams} from "react-router-dom";
 import clsx from "clsx";
 import {bookApiHelper} from "../../helpers/apis/BookApiHelper";
-import {BookGetPagingRequest} from "../../helpers/models/catalog/books/BookGetPagingRequest";
 import {useEffect, useMemo, useState} from "react";
 import {Genre} from "../../helpers/models/catalog/books/Genre";
 import {useMediaQuery} from "../../helpers/hooks/useMediaQuery";
-import {VscArrowSmallLeft, VscArrowSmallRight} from "react-icons/vsc";
-import {PagedResult} from "../../helpers/models/common/PagedResult";
+import {GetAllBooksRequest} from "../../helpers/models/catalog/books/GetAllBooksRequest";
 
 type FilterButtonProps = {
     title: string;
@@ -76,7 +74,7 @@ const FilterSectionInner = (props: FilterSectionInnerProps) => {
     };
 
     if (isMobile) {
-        return <div className="px-4 py-2 w-full bg-darkVanilla">
+        return <div className="px-4 py-3 w-full bg-darkVanilla">
             <button onClick={() => setOpenFilterDialog(!openFilterDialog)}
                     className="flex flex-row justify-center items-center w-full cursor-pointer gap-x-1 bg-deepKoamaru rounded text-white px-3 py-1.5">
                 <AiOutlinePlus className="text-lg"/>
@@ -146,12 +144,13 @@ const FilterSectionInner = (props: FilterSectionInnerProps) => {
         </div>;
     }
 
-    return <div className="hidden w-[25%] md:flex flex-col shrink-0 grow-0 bg-darkVanilla justify-start p-4">
+    return <div
+        className="hidden w-[25%] md:flex flex-col shrink-0 grow-0 bg-oldRose justify-start p-4 rounded-l-md shadow-black shadow-sm">
 
         <div>
           <span className="flex flex-row justify-start items-center gap-x-2">
             <AiFillCheckCircle/>
-            <p className="text-lg font-semibold">Đã chọn</p>
+            <p className="text-lg font-bold">Đã chọn</p>
           </span>
 
             <div className="flex flex-row flex-wrap mt-2 gap-2">
@@ -164,7 +163,7 @@ const FilterSectionInner = (props: FilterSectionInnerProps) => {
         <div>
             <span className="flex flex-row justify-start items-center gap-x-2">
             <FaSwatchbook/>
-            <p className="text-lg font-semibold">Thể loại</p>
+            <p className="text-lg font-bold">Thể loại</p>
             </span>
 
             <div className="flex flex-row flex-wrap mt-2 gap-2">
@@ -179,7 +178,7 @@ const FilterSectionInner = (props: FilterSectionInnerProps) => {
         <div>
           <span className="flex flex-row justify-start items-center gap-x-2">
             <CgTimelapse/>
-            <p className="text-lg font-semibold">Trạng thái</p>
+            <p className="text-lg font-bold">Trạng thái</p>
           </span>
 
             <div className="flex flex-row flex-wrap mt-2 gap-2">
@@ -323,7 +322,7 @@ const SearchForm = (props: SearchFormProps): JSX.Element => {
 
     return <form
         onSubmit={handleSubmitForm}
-        className="bg-darkVanilla w-full flex flex-row justify-start items-center px-4 pb-4 pt-0 md:pt-4 gap-4">
+        className="bg-[rgba(255,255,255,0.8)] w-full flex flex-row justify-start items-center px-5 pt-4 md:pt-4 gap-4">
         <div className="w-full grow h-full relative">
             <input type="text"
                    value={keyword}
@@ -344,9 +343,9 @@ const getBookGetPagingRequest = (
     _pageSize: number,
     _genreIds: string | null,
     _status: string | null,
-    _keyword: string | null): BookGetPagingRequest => {
+    _keyword: string | null): GetAllBooksRequest => {
 
-    const _request: BookGetPagingRequest = {
+    const _request: GetAllBooksRequest = {
         pageSize: _pageSize,
         pageIndex: _pageIndex
     };
@@ -375,36 +374,36 @@ const BookCardList = (props: BookCardListProps): JSX.Element => {
     const status = searchParams.get("status");
     const keyword = searchParams.get("keyword");
 
-    let request = useMemo<BookGetPagingRequest>(
+    let request = useMemo<GetAllBooksRequest>(
         () => getBookGetPagingRequest(pageIndex, pageSize, genreIds, status, keyword),
         [pageSize, pageIndex, genreIds, status, keyword]
     );
 
     const {isLoading, error, data} = useQuery(
         ["books", request.pageIndex, request.pageSize, request.genreIds, request.isDone, request.keyword],
-        () => bookApiHelper.getPaging(request),
+        () => bookApiHelper.getAllBooks(request),
     );
 
-    return <div className="w-full p-5 bg-[rgba(255,255,255,0.8)] h-full min-h-[600px] flex flex-col">
+    return <div className="w-full p-5 bg-[rgba(255,255,255,0.8)] h-full min-h-[600px] flex flex-col  rounded-br-md">
         <div className="flex flex-row flex-wrap md:mr-[-0.75rem]">
             {(isLoading || error || !data) && <>Loading...</>}
-            {data && data.items.map(book => <BookCard slug={book.slug} key={book.id} name={book.name}
+            {data && data.books.map(book => <BookCard slug={book.slug} key={book.id} name={book.name}
                                                       shortDescription={book.shortDescription}
                                                       thumbnailImage={book.thumbnailImage}/>)}
         </div>
 
         <div className="mt-auto">
-            {data && <Pager pagedResult={data as PagedResult<any>}/>}
+            {data && <Pager pageSize={data.pageSize} pageIndex={data.pageIndex} totalPages={data.totalPages}/>}
         </div>
     </div>;
 }
 
 const BooksIndex = (): JSX.Element => {
     return <Section className="text-deepKoamaru">
-        <div className="flex flex-col md:flex-row items-stretch shadow-sm shadow-slate-500">
+        <div className="flex flex-col md:flex-row items-stretch shadow-sm shadow-slate-500 rounded-md">
             <FilterSection/>
 
-            <div className="grow">
+            <div className="grow rounded-md">
                 <div className="flex flex-col h-full">
                     <SearchForm/>
 

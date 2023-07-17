@@ -38,32 +38,41 @@ const InfoChangingForm = (): JSX.Element => {
             return;
         }
 
-        const result = await userApiHelper.updateUserInfo(accessToken, {
-            firstName,
-            lastName,
-            email,
-            avatar
-        });
+        try {
+            const user: any = await userApiHelper.updateUserInformation(accessToken, {
+                firstName,
+                lastName,
+                email,
+                avatar
+            });
 
-        if (result === null) {
+            if (typeof user.userName !== "string") {
+                systemDispatch({
+                    type: "addToast", payload: {
+                        title: "Có lỗi xảy ra! Vui lòng thử lại.",
+                        variant: ToastVariant.Error
+                    }
+                });
+            } else {
+                systemDispatch({
+                    type: "addToast", payload: {
+                        title: "Cập nhật thành công.",
+                        variant: ToastVariant.Success
+                    }
+                })
+
+                // Reload after 2 secs
+                setTimeout(() => {
+                    navigate(0);
+                }, 2000);
+            }
+        } catch (error: any) {
             systemDispatch({
                 type: "addToast", payload: {
-                    title: "Có lỗi xảy ra! Vui lòng thử lại.",
+                    title: error.message,
                     variant: ToastVariant.Error
                 }
             });
-        } else {
-            systemDispatch({
-                type: "addToast", payload: {
-                    title: "Cập nhật thành công.",
-                    variant: ToastVariant.Success
-                }
-            })
-
-            // Reload after 2 secs
-            setTimeout(() => {
-                navigate(0);
-            }, 2000);
         }
     }
 
@@ -125,7 +134,7 @@ const InfoChangingForm = (): JSX.Element => {
             >
                 Ảnh đại diện
             </label>
-            {typeof authenticationState.user.avatar !== "undefined" ?
+            {authenticationState.user.avatar !== "" ?
                 (typeof avatar !== "undefined" ?
                     <Avatar imageUrl={URL.createObjectURL(avatar)} className="w-16 h-16 mb-2"/> :
                     <Avatar imageUrl={baseUrl + authenticationState.user.avatar} className="w-16 h-16 mb-2"/>)
@@ -184,7 +193,7 @@ const UserProfile = (): JSX.Element => {
 
     return <div className="flex flex-col items-center justify-start mx-auto md:w-[400px] max-w-full">
         <span className="w-full flex flex-col justify-start mt-4 items-center">
-            {typeof state.user.avatar !== "undefined" ?
+            {state.user.avatar !== "" ?
                 <Avatar imageUrl={baseUrl + state.user.avatar} className="w-28 h-28 sm:w-40 sm:h-40"/> :
                 <Avatar className="w-28 h-28 sm:w-40 sm:h-40"/>}
 

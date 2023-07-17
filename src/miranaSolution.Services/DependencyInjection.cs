@@ -1,11 +1,15 @@
 ﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using miranaSolution.Services.Authentication.Users;
-using miranaSolution.Services.Catalog.Authors;
-using miranaSolution.Services.Catalog.Books;
-using miranaSolution.Services.Catalog.Chapters;
-using miranaSolution.Services.Catalog.Genres;
-using miranaSolution.Services.Catalog.Slides;
+using miranaSolution.Services.Core.Authors;
+using miranaSolution.Services.Core.Bookmarks;
+using miranaSolution.Services.Core.Books;
+using miranaSolution.Services.Core.BookUpvotes;
+using miranaSolution.Services.Core.Chapters;
+using miranaSolution.Services.Core.CommentReactions;
+using miranaSolution.Services.Core.Comments;
+using miranaSolution.Services.Core.Genres;
+using miranaSolution.Services.Core.Slides;
 using miranaSolution.Services.Systems.Files;
 using miranaSolution.Services.Systems.Images;
 using miranaSolution.Services.Systems.JwtTokenGenerators;
@@ -32,6 +36,10 @@ public static class DependencyInjection
         services.AddTransient<IChapterService, ChapterService>();
         services.AddTransient<IJwtTokenGenerator, JwtTokenGenerator>();
         services.AddTransient<IImageSaver, ImageSaver>();
+        services.AddTransient<ICommentService, CommentService>();
+        services.AddTransient<ICommentReactionService, CommentReactionService>();
+        services.AddTransient<IBookUpvoteService, BookUpvoteService>();
+        services.AddTransient<IBookmarkService, BookmarkService>();
 
         return services;
     }

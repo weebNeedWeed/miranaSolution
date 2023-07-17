@@ -2,11 +2,14 @@
 
 public class Bookmark
 {
-    public int ChapterId { get; set; }
-    public Chapter? Chapter { get; set; }
+    public int ChapterIndex { get; set; }
 
+    public int BookId { get; set; }
+    public Book? Book { get; set; }
+    
     public Guid UserId { get; set; }
     public AppUser? AppUser { get; set; }
 
     public DateTime CreatedAt { get; set; }
+    public DateTime UpdatedAt { get; set; }
 }

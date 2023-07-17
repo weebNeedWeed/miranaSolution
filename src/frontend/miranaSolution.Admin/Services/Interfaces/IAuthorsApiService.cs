@@ -1,4 +1,3 @@
-using miranaSolution.DTOs.Catalog.Authors;
 using miranaSolution.DTOs.Common;
 using Refit;
 

@@ -1,9 +1,9 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using miranaSolution.API.ViewModels.Common;
-using miranaSolution.Services.Catalog.Genres;
-using miranaSolution.DTOs.Catalog.Genres;
 using miranaSolution.DTOs.Common;
+using miranaSolution.DTOs.Core.Genres;
+using miranaSolution.Services.Core.Genres;
 using miranaSolution.Utilities.Constants;
 
 namespace miranaSolution.API.Controllers;

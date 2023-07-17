@@ -135,6 +135,10 @@ public class AuthenticationController : ControllerBase
         {
             return Ok(new ApiErrorResult(ex.Message));
         }
+        catch (InvalidImageExtensionException ex)
+        {
+            return Ok(new ApiErrorResult(ex.Message));
+        }
     }
     
     // TODO: Implement validation
@@ -164,6 +168,10 @@ public class AuthenticationController : ControllerBase
             return Ok(new ApiSuccessResult<ApiUpdateUserPasswordResponse>(response));
         }
         catch (UserNotFoundException ex)
+        {
+            return Ok(new ApiErrorResult(ex.Message));
+        }
+        catch (InvalidCredentialException ex)
         {
             return Ok(new ApiErrorResult(ex.Message));
         }

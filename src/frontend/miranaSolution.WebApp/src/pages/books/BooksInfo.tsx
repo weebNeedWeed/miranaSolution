@@ -74,7 +74,8 @@ const BooksInfo = (): JSX.Element => {
     }, [slug]);
 
     return <Section className="text-deepKoamaru">
-        <div className="w-full bg-darkVanilla shadow-sm shadow-slate-500 flex flex-col">
+        <div
+            className="w-full bg-[rgba(255,255,255,0.8)] rounded-md shadow-sm shadow-black shadow-sm shadow-slate-500 flex flex-col">
             <div className="w-full flex flex-row items-stretch p-6">
                 <span
                     className="w-36 aspect-[3/4] shrink-0 block rounded-md bg-cover bg-center bg-no-repeat drop-shadow-md"

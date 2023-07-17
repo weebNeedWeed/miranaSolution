@@ -12,15 +12,15 @@ import {useNavigate} from "react-router-dom";
 
 const PasswordChangingForm = (): JSX.Element => {
     const [ableToSubmit, setAbleToSubmit] = useState<boolean>(false)
-    const [oldPassword, setOldPassword] = useState<string>("");
+    const [currentPassword, setCurrentPassword] = useState<string>("");
     const [newPassword, setNewPassword] = useState<string>("");
     const [newPasswordConfirmation, setNewPasswordConfirmation] = useState<string>("");
     const [accessToken, setAccessToken] = useAccessToken();
     const {state: systemState, dispatch: systemDispatch} = useSystemContext();
     const navigate = useNavigate();
 
-    const validateForm = (oldPassword: string, newPassword: string, newPasswordConfirmation: string) => {
-        if (oldPassword.trim().length === 0) {
+    const validateForm = (currentPassword: string, newPassword: string, newPasswordConfirmation: string) => {
+        if (currentPassword.trim().length === 0) {
             setAbleToSubmit(false);
             return;
         }
@@ -41,18 +41,18 @@ const PasswordChangingForm = (): JSX.Element => {
     const handleOldPasswordChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         const _oldPassword = event.target.value;
         validateForm(_oldPassword, newPassword, newPasswordConfirmation);
-        setOldPassword(_oldPassword);
+        setCurrentPassword(_oldPassword);
     }
 
     const handleNewPasswordChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         const _newPassword = event.target.value;
-        validateForm(oldPassword, _newPassword, newPasswordConfirmation);
+        validateForm(currentPassword, _newPassword, newPasswordConfirmation);
         setNewPassword(_newPassword);
     }
 
     const handleNewPasswordConfirmationChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         const _newPasswordConfirmation = event.target.value;
-        validateForm(oldPassword, newPassword, _newPasswordConfirmation);
+        validateForm(currentPassword, newPassword, _newPasswordConfirmation);
         setNewPasswordConfirmation(_newPasswordConfirmation);
     }
 
@@ -61,43 +61,52 @@ const PasswordChangingForm = (): JSX.Element => {
         if (!ableToSubmit) {
             return;
         }
+        try {
+            const result: any = await userApiHelper.updateUserPassword(accessToken, {
+                currentPassword,
+                newPassword,
+                newPasswordConfirmation
+            });
 
-        const result = await userApiHelper.updatePassword(accessToken, {
-            oldPassword,
-            newPassword,
-            newPasswordConfirmation
-        });
+            if (typeof result.userName === "string") {
+                systemDispatch({
+                    type: "addToast", payload: {
+                        title: "Cập nhật mật khẩu thành công.",
+                        variant: ToastVariant.Success
+                    }
+                })
 
-        if (result === null) {
+                // Reload after 2 secs
+                setTimeout(() => {
+                    navigate(0);
+                }, 2000);
+            } else {
+                systemDispatch({
+                    type: "addToast", payload: {
+                        title: "Có lỗi xảy ra! Vui lòng thử lại.",
+                        variant: ToastVariant.Error
+                    }
+                });
+            }
+        } catch (error: any) {
             systemDispatch({
                 type: "addToast", payload: {
-                    title: "Có lỗi xảy ra! Vui lòng thử lại.",
+                    title: error.message,
                     variant: ToastVariant.Error
                 }
             });
-        } else {
-            systemDispatch({
-                type: "addToast", payload: {
-                    title: "Cập nhật mật khẩu thành công.",
-                    variant: ToastVariant.Success
-                }
-            })
-
-            // Reload after 2 secs
-            setTimeout(() => {
-                navigate(0);
-            }, 2000);
         }
+
     }
 
     return <form onSubmit={handleSubmit} className="w-full">
         <div className="w-full">
             <TextInput
-                label={"Mật khẩu cũ"}
+                label={"Mật khẩu hiện tại"}
                 icon={<FaLock/>}
-                placeholder={"Nhập mật khẩu cũ"}
+                placeholder={"Nhập mật khẩu hiện tại"}
                 type="password"
-                value={oldPassword}
+                value={currentPassword}
                 onChange={handleOldPasswordChange}
             />
         </div>

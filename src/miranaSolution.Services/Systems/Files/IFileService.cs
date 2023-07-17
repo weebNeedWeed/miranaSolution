@@ -6,5 +6,5 @@ public interface IFileService
     
     Task<bool> DeleteFileAsync(string fileName);
     
-    string GetFilePath(string fileName);
+    string GetRelativeFilePath(string fileName);
 }

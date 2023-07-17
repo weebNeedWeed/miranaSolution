@@ -1,10 +1,12 @@
-import {useId} from "react";
-import {AiOutlineUser, AiOutlineLock} from "react-icons/ai";
+import {useId, useState} from "react";
+import {AiOutlineLock, AiOutlineUser} from "react-icons/ai";
 import {Link, useNavigate} from "react-router-dom";
-import {useState, useEffect} from "react";
 import {userApiHelper} from "../../helpers/apis/UserApiHelper";
 import {useSystemContext} from "../../contexts/SystemContext";
 import {useAccessToken} from "../../helpers/hooks/useAccessToken";
+import {ToastVariant} from "../../components/Toast";
+import {AuthenticateUserResponse} from "../../helpers/models/auth/AuthenticateUserResponse";
+import {ValidationFailedMessages} from "../../helpers/models/common/ValidationFailedMessages";
 
 const Login = (): JSX.Element => {
     const userNameId = useId();
@@ -38,11 +40,11 @@ const Login = (): JSX.Element => {
         let errors: Array<string> = [];
 
         setAbleToSubmit(true);
-        const regex = new RegExp(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{8,}$/);
+        const regex = new RegExp(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/);
 
         if (!password.trim().match(regex)) {
             errors.push(
-                "Password must contain minimum eight characters, at least one uppercase letter, one lowercase letter and one number!"
+                "Password must contain Minimum eight characters, at least one uppercase letter, one lowercase letter, one number and one special character!"
             );
             setAbleToSubmit(false);
         }
@@ -71,25 +73,48 @@ const Login = (): JSX.Element => {
             return;
         }
 
-        const authData = await userApiHelper.authenticate({userName, password});
-        if (!authData) {
-            setUserNameErrors(["Invalid Credentials."]);
-            return;
-        }
+        try {
+            const response = await userApiHelper.authenticate({userName, password});
+            if ("token" in response) {
+                systemContext.dispatch({
+                    type: "addToast", payload: {
+                        title: "Đăng nhập thành công",
+                        variant: ToastVariant.Success
+                    }
+                });
 
-        systemContext.dispatch({
-            type: "addToast", payload: {
-                title: "Đăng nhập thành công"
+                // Save access token into the localStorage
+                let authData = response as AuthenticateUserResponse;
+                setAccessToken(authData.token);
+
+                setTimeout(() => {
+                    navigate("/");
+                }, 3000);
+
+                return;
             }
-        });
 
-        // Save access token into the localStorage
-        const _accessToken = authData.accessToken;
-        setAccessToken(_accessToken);
-
-        setTimeout(() => {
-            navigate("/");
-        }, 3000);
+            const errors: any = response as ValidationFailedMessages<AuthenticateUserResponse>;
+            for (let key in errors) {
+                switch (key) {
+                    case "UserName":
+                        setUserNameErrors(errors[key]);
+                        break;
+                    case "Password":
+                        setPasswordErrors(errors[key]);
+                        break;
+                    default:
+                        break;
+                }
+            }
+        } catch (error: any) {
+            systemContext.dispatch({
+                type: "addToast", payload: {
+                    title: error.message,
+                    variant: ToastVariant.Error
+                }
+            });
+        }
     };
 
     return (

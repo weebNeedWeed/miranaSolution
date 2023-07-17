@@ -70,7 +70,7 @@ public class UserService : IUserService
         var user = await _userManager.FindByNameAsync(request.UserName);
         if (user is null)
         {
-            throw new UserNotFoundException("The user with given Email does not exists.");
+            throw new UserNotFoundException("The user with given User Name does not exists.");
         }
 
         var signInResult = await _signInManager.PasswordSignInAsync(
@@ -136,7 +136,8 @@ public class UserService : IUserService
         user.Email = request.Email;
 
         if (request.Avatar is not null)
-        { 
+        {
+            await _imageSaver.DeleteImageIfExistAsync(user.Avatar);
             user.Avatar = await _imageSaver.SaveImageAsync(request.Avatar, request.AvatarExtension!);
         }
         
@@ -150,6 +151,9 @@ public class UserService : IUserService
 
     /// <exception cref="UserNotFoundException">
     /// Thrown when the user with given User Name does not exist
+    /// </exception>
+    /// <exception cref="InvalidCredentialException">
+    /// Thrown when the request's password does not match the current password of the user
     /// </exception>
     public async Task<UpdateUserPasswordResponse> UpdateUserPasswordAsync(UpdateUserPasswordRequest request)
     {
@@ -185,6 +189,22 @@ public class UserService : IUserService
 
         var response = new GetUserByIdResponse(userVm);
         return response;
+    }
+
+    public async Task DeleteUserAsync(DeleteUserRequest request)
+    {
+        var user = await _userManager.FindByIdAsync(request.UserId.ToString());
+        if (user is null)
+        {
+            throw new UserNotFoundException("The user with given Id does not exist.");
+        }
+
+        if (!string.IsNullOrEmpty(user.Avatar))
+        {
+            await _imageSaver.DeleteImageIfExistAsync(user.Avatar);
+        }
+
+        await _userManager.DeleteAsync(user);
     }
 
     private UserVm MapUserIntoUserVm(AppUser user)

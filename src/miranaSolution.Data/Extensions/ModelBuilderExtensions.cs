@@ -167,14 +167,7 @@ public static class ModelBuilderExtensions
             Email = "admin@admin.com",
             SecurityStamp = Guid.NewGuid().ToString()
         });
-
-        builder.Entity<Bookmark>()
-            .HasData(new Bookmark
-            {
-                ChapterId = 1,
-                UserId = adminUserId
-            });
-
+        
         builder.Entity<IdentityUserRole<Guid>>().HasData(new IdentityUserRole<Guid>
         {
             RoleId = adminRoleId,

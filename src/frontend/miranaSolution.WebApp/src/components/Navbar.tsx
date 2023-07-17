@@ -87,7 +87,7 @@ const AutoUpdatedAvatar = ({className}: AutoUpdatedAvatarProps): JSX.Element => 
     const baseUrl = useBaseUrl();
 
     return <>
-        {typeof state.user.avatar !== "undefined" ?
+        {state.user.avatar !== "" ?
             <Avatar imageUrl={baseUrl + state.user.avatar} className={className}/> :
             <Avatar className={className}/>}
     </>

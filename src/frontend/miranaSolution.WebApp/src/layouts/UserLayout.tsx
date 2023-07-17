@@ -33,7 +33,7 @@ const UserLayout = (): JSX.Element => {
                 </div>
             </div>
 
-            <div className="bg-[rgba(255,255,255,0.6)] grow w-full p-3 md:p-6 rounded-r-md min-h-[800px]">
+            <div className="bg-[rgba(255,255,255,0.8)] grow w-full p-3 md:p-6 rounded-r-md min-h-[800px]">
                 <Outlet/>
             </div>
         </div>

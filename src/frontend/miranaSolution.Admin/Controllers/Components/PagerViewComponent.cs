@@ -1,5 +1,4 @@
 using Microsoft.AspNetCore.Mvc;
-using miranaSolution.DTOs.Catalog.Books;
 using miranaSolution.DTOs.Common;
 
 namespace miranaSolution.Admin.Controllers.Components;

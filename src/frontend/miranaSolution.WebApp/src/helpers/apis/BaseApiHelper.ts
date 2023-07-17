@@ -8,19 +8,15 @@ import {
 
 export class BaseApiHelper {
 
-    private client: AxiosInstance | null;
-    private token: string;
-    private baseUrl: string;
+    public client: AxiosInstance | null;
+    public baseUrl: string;
 
     constructor() {
         this.client = null;
-        this.baseUrl = "";
-        this.token = "";
+        this.baseUrl = import.meta.env.VITE_BASE_ADDRESS + "api/";
     }
 
     init(headers: RawAxiosRequestHeaders = {}): AxiosInstance {
-        this.baseUrl = import.meta.env.VITE_BASE_ADDRESS + "api/";
-
         this.client = axios.create({
             baseURL: this.baseUrl,
             timeout: 1000,

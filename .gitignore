@@ -480,4 +480,4 @@ appsettings.development.json
 Migrations
 .idea
 
-wwwroot/users
+wwwroot/uploads

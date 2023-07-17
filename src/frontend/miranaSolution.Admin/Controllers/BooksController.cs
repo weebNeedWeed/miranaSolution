@@ -3,8 +3,6 @@ using Refit;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using miranaSolution.Admin.Services.Interfaces;
-using miranaSolution.DTOs.Catalog.Authors;
-using miranaSolution.DTOs.Catalog.Books;
 using miranaSolution.DTOs.Catalog.Books.Chapters;
 using Newtonsoft.Json;
 

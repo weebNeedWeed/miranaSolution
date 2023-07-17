@@ -1,5 +1,4 @@
 import {VscArrowSmallLeft, VscArrowSmallRight} from "react-icons/vsc";
-import {PagedResult} from "../helpers/models/common/PagedResult";
 import {useLocation, useNavigate, useSearchParams} from "react-router-dom";
 import clsx from "clsx";
 
@@ -19,16 +18,18 @@ const PagerButton = (props: PagerButtonProps): JSX.Element => {
 }
 
 type PagerProps = {
-    pagedResult: PagedResult<any>
+    pageIndex: number;
+    pageSize: number;
+    totalPages: number;
 };
 const Pager = (props: PagerProps): JSX.Element => {
-    const {pagedResult} = props;
+    const {pageIndex, pageSize, totalPages} = props;
     const [searchParams] = useSearchParams();
     const location = useLocation();
     const navigate = useNavigate();
 
-    const doesPreviousButtonExist = pagedResult.pageIndex !== 1;
-    const doesNextButtonExist = pagedResult.pageIndex !== pagedResult.totalPages;
+    const doesPreviousButtonExist = pageIndex !== 1;
+    const doesNextButtonExist = pageIndex !== totalPages;
 
     const handleGoToFirstPage = (event: React.MouseEvent<HTMLButtonElement>) => {
         const queryString = new URLSearchParams();
@@ -60,7 +61,7 @@ const Pager = (props: PagerProps): JSX.Element => {
         }
 
         if (doesPreviousButtonExist) {
-            queryString.append("pageIndex", pagedResult.totalPages.toString());
+            queryString.append("pageIndex", totalPages.toString());
         }
 
         navigate(location.pathname + "?" + queryString.toString());
@@ -85,17 +86,17 @@ const Pager = (props: PagerProps): JSX.Element => {
             navigate(location.pathname + "?" + queryString.toString());
         }
 
-    const startPageNumber = (pagedResult.pageIndex - 1) < 1 ? 1 : pagedResult.pageIndex - 1;
-    const endPageNumber = (pagedResult.pageIndex + 1) > pagedResult.totalPages ? pagedResult.totalPages : pagedResult.pageIndex + 1;
+    const startPageNumber = (pageIndex - 1) < 1 ? 1 : pageIndex - 1;
+    const endPageNumber = (pageIndex + 1) > totalPages ? totalPages : pageIndex + 1;
 
     const numberButtons: JSX.Element[] = [];
     for (let page = startPageNumber; page <= endPageNumber; ++page) {
-        numberButtons.push(<PagerButton isActive={page === pagedResult.pageIndex}
+        numberButtons.push(<PagerButton isActive={page === pageIndex}
                                         onClick={handleGoToSpecificPageFnFactory(page)}>{page}</PagerButton>);
     }
 
     return <div
-        className="bg-[rgba(255,255,255,0.8)] flex flex-row justify-center w-full py-4 gap-x-2 text-deepKoamaru">
+        className="bg-transparent flex flex-row justify-center w-full py-4 gap-x-2 text-deepKoamaru">
         {doesPreviousButtonExist && <PagerButton onClick={handleGoToFirstPage}>
             <VscArrowSmallLeft/>
         </PagerButton>}

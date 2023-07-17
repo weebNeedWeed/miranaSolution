@@ -1,10 +1,11 @@
 import {useId, useState} from "react";
-import {AiOutlineUser, AiOutlineLock} from "react-icons/ai";
+import {AiOutlineLock, AiOutlineUser} from "react-icons/ai";
 import {Link, useNavigate} from "react-router-dom";
-import {userApiHelper, ValidateFailedMessage} from "../../helpers/apis/UserApiHelper";
-import {UserRegisterRequest} from "../../helpers/models/auth/UserRegisterRequest";
+import {userApiHelper} from "../../helpers/apis/UserApiHelper";
 import {User} from "../../helpers/models/auth/User";
 import {useSystemContext} from "../../contexts/SystemContext";
+import {ToastVariant} from "../../components/Toast";
+import {RegisterUserRequest} from "../../helpers/models/auth/RegisterUserRequest";
 
 const Register = (): JSX.Element => {
     const navigate = useNavigate();
@@ -47,61 +48,67 @@ const Register = (): JSX.Element => {
             return;
         }
 
-        const userRegisterRequest: UserRegisterRequest = {
-            FirstName: firstName,
-            LastName: lastName,
-            Email: email,
-            UserName: userName,
-            Password: password
+        const registerUserRequest: RegisterUserRequest = {
+            firstName: firstName,
+            lastName: lastName,
+            email: email,
+            userName: userName,
+            password: password,
+            passwordConfirmation: confirmPassword
         };
 
-        const res = await userApiHelper.register(userRegisterRequest);
+        try {
+            const res = await userApiHelper.register(registerUserRequest);
 
-        if (res === null) {
-            setFirstNameErrors(["Unknown errors. Please try again later!"]);
-            return;
-        }
+            function isUser(obj: any): obj is User {
+                return Object.keys(obj).some(x => typeof obj[x] !== "object");
+            }
 
-
-        function isUser(obj: any): obj is User {
-            return Object.keys(obj).some(x => typeof obj[x] !== "object");
-        }
-
-        if (!isUser(res)) {
-            for (let key in res) {
-                switch (key) {
-                    case "Email":
-                        setEmailErrors(res[key]);
-                        break;
-                    case "FirstName":
-                        setFirstNameErrors(res[key]);
-                        break;
-                    case "LastName":
-                        setLastNameErrors(res[key]);
-                        break;
-                    case "Password":
-                        setPasswordErrors(res[key]);
-                        break;
-                    case "UserName":
-                        setUserNameErrors(res[key]);
-                        break;
-                    default:
-                        break;
+            if (!isUser(res)) {
+                const errors: any = res;
+                for (let key in errors) {
+                    switch (key) {
+                        case "Email":
+                            setEmailErrors(errors[key]);
+                            break;
+                        case "FirstName":
+                            setFirstNameErrors(errors[key]);
+                            break;
+                        case "LastName":
+                            setLastNameErrors(errors[key]);
+                            break;
+                        case "Password":
+                            setPasswordErrors(errors[key]);
+                            break;
+                        case "UserName":
+                            setUserNameErrors(errors[key]);
+                            break;
+                        case "PasswordConfirmation":
+                            setConfirmPasswordErrors(errors[key]);
+                            break;
+                        default:
+                            break;
+                    }
                 }
             }
 
-            return;
+            dispatch({
+                type: "addToast", payload: {
+                    title: "Đăng ký thành công, vui lòng đăng nhập"
+                }
+            });
+
+            setTimeout(() => {
+                navigate("/auth/login");
+            }, 3000);
+        } catch (err: any) {
+            dispatch({
+                type: "addToast", payload: {
+                    title: err.message,
+                    variant: ToastVariant.Error
+                }
+            });
         }
-
-        dispatch({
-            type: "addToast", payload: {
-                title: "Đăng ký thành công, vui lòng đăng nhập"
-            }
-        });
-
-        setTimeout(() => {
-            navigate("/auth/login");
-        }, 3000);
     };
 
     const handleInputChange = (
@@ -172,12 +179,12 @@ const Register = (): JSX.Element => {
 
         setAbleToSubmit(true);
 
-        const regex = new RegExp(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{8,}$/);
+        const regex = new RegExp(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/);
 
         if (!password.trim().match(regex)) {
             setAbleToSubmit(false);
             errors.push(
-                "Password must contain minimum eight characters, at least one uppercase letter, one lowercase letter and one number!"
+                "Password must contain Minimum eight characters, at least one uppercase letter, one lowercase letter, one number and one special character!"
             );
         }
 

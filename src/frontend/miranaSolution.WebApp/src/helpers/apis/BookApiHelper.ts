@@ -1,12 +1,12 @@
-import {ApiResult} from '../models/ApiResult';
+import {ApiResult} from '../models/common/ApiResult';
 import {Book} from '../models/catalog/books/Book';
 import {BaseApiHelper} from './BaseApiHelper';
 import {Chapter} from "../models/catalog/books/Chapter";
-import {BookGetPagingRequest} from "../models/catalog/books/BookGetPagingRequest";
-import {PagedResult} from "../models/common/PagedResult";
+import {GetAllBooksResponse} from "../models/catalog/books/GetAllBooksResponse";
+import {GetAllBooksRequest} from "../models/catalog/books/GetAllBooksRequest";
 
 class BookApiHelper extends BaseApiHelper {
-    async getPaging(request: BookGetPagingRequest): Promise<PagedResult<Book> | null> {
+    async getAllBooks(request: GetAllBooksRequest): Promise<GetAllBooksResponse> {
         const params = new URLSearchParams();
         params.append("pageIndex", request.pageIndex.toString());
         params.append("pageSize", request.pageSize.toString());
@@ -22,56 +22,39 @@ class BookApiHelper extends BaseApiHelper {
         if (request.isDone != null) {
             params.append("isDone", request.isDone ? "true" : "false");
         }
-        
-        try {
-            const response = await this.init().get<ApiResult<PagedResult<Book>>>("/books?" + params.toString());
-            if (response.data.status === "fail" || response.data.status === "error") {
-                throw new Error();
-            }
 
-            return response.data.data;
-        } catch (ex) {
-            return null;
-        }
+        const response = await this.init()
+            .get<ApiResult<GetAllBooksResponse>>("/books?" + params.toString());
+
+        return response.data.data;
     }
 
-    async getRecommended(): Promise<Array<Book> | null> {
-        try {
-            const response = await this.init().get<ApiResult<Array<Book>>>("/books/recommended");
-            return response.data.data;
-        } catch (ex) {
-            return null;
-        }
+    async getRecommendedBooks(): Promise<Array<Book>> {
+        const response = await this.init()
+            .get<ApiResult<Array<Book>>>("/books/recommended");
+        return response.data.data;
     }
 
-    async getBookBySlug(slug: string): Promise<Book | null> {
+    async getBookBySlug(slug: string): Promise<Book> {
         const url = `/books/${encodeURIComponent(slug)}`;
 
-        try {
-            const response = await this.init().get<ApiResult<Book>>(url);
-            if (response.data.status === "error" || response.data.status === "fail") {
-                throw new Error();
-            }
-
-            return response.data.data;
-        } catch (ex) {
-            return null;
+        const response = await this.init().get<ApiResult<Book>>(url);
+        if (response.data.status === "error") {
+            throw new Error(response.data.message);
         }
+
+        return response.data.data;
     }
 
-    async getChapterByIndex(id: number, index: number): Promise<Chapter | null> {
-        const url = `/books/${id}/chapters/${index}`;
+    async getBookChapterByIndex(bookId: number, index: number): Promise<Chapter> {
+        const url = `/books/${bookId}/chapters/${index}`;
 
-        try {
-            const response = await this.init().get<ApiResult<Chapter>>(url);
-            if (response.data.status === "error" || response.data.status === "fail") {
-                throw new Error();
-            }
-
-            return response.data.data;
-        } catch (ex) {
-            return null;
+        const response = await this.init().get<ApiResult<Chapter>>(url);
+        if (response.data.status === "error") {
+            throw new Error(response.data.message);
         }
+
+        return response.data.data;
     }
 }
 

@@ -10,9 +10,11 @@ public class CommentReactionConfiguration : IEntityTypeConfiguration<CommentReac
     {
         builder.ToTable("CommmentReactions");
 
-        builder.HasKey(x => x.Id);
-
-        builder.Property(x => x.Id).UseIdentityColumn();
+        builder.HasKey(x => new
+        {
+            x.UserId,
+            x.CommentId
+        });
 
         builder.HasOne(x => x.Comment)
             .WithMany(x => x.CommentReactions)
@@ -22,6 +24,6 @@ public class CommentReactionConfiguration : IEntityTypeConfiguration<CommentReac
         builder.HasOne(x => x.User)
             .WithMany(x => x.CommentReactions)
             .HasForeignKey(x => x.UserId)
-            .OnDelete(DeleteBehavior.SetNull);
+            .OnDelete(DeleteBehavior.Cascade);
     }
 }
