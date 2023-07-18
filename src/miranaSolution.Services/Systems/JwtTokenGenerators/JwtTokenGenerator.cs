@@ -1,6 +1,8 @@
 ﻿using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using miranaSolution.Data.Entities;
@@ -10,9 +12,11 @@ namespace miranaSolution.Services.Systems.JwtTokenGenerators;
 public class JwtTokenGenerator : IJwtTokenGenerator
 {
     private readonly JwtOptions _jwtOptions;
+    private readonly RoleManager<AppRole> _roleManager;
 
-    public JwtTokenGenerator(IOptions<JwtOptions> jwtOptions)
+    public JwtTokenGenerator(IOptions<JwtOptions> jwtOptions, RoleManager<AppRole> roleManager)
     {
+        _roleManager = roleManager;
         _jwtOptions = jwtOptions.Value;
     }
 
@@ -27,6 +31,12 @@ public class JwtTokenGenerator : IJwtTokenGenerator
             new(JwtRegisteredClaimNames.Sid, user.Id.ToString()),
             new(JwtRegisteredClaimNames.Sub, user.UserName)
         };
+
+        var roles = _roleManager.Roles.ToList();
+        roles.ForEach((role) =>
+        {
+            claims.Add(new Claim(ClaimTypes.Role, role.Name));
+        });
 
         var signingCredentials = new SigningCredentials(
             key: new SymmetricSecurityKey(

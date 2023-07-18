@@ -49,29 +49,23 @@ public static class ModelBuilderExtensions
             {
                 Id = 1,
                 Name = "Trạch Trư",
-                Slug = "trach-tru"
             },
             new Author
             {
                 Id = 2,
                 Name = "Phật Tiền Hiến Hoa",
-                Slug = "phat-tien-hien-hoa"
             });
 
         builder.Entity<Genre>().HasData(
             new Genre
             {
                 Id = 1,
-                Name = "Khoa Huyễn",
-                Slug = "khoa-huyen",
-                ShortDescription = ""
+                Name = "Khoa Huyễn"
             },
             new Genre
             {
                 Id = 2,
-                Name = "Võng Du",
-                Slug = "vong-du",
-                ShortDescription = ""
+                Name = "Võng Du"
             });
 
         builder.Entity<Book>().HasData(

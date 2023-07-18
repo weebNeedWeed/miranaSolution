@@ -1,6 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
 using miranaSolution.Data.Main;
 
@@ -15,6 +15,7 @@ public static class DependencyInjection
         services.AddDbContext<MiranaDbContext>((serviceProvider, options) =>
         {
             var databaseOptions = serviceProvider.GetService<IOptions<DatabaseOptions>>()!.Value;
+            var hostingEnvironment = serviceProvider.GetService<IHostingEnvironment>();
 
             options.UseSqlServer(
                 databaseOptions.ConnectionString,
@@ -25,6 +26,8 @@ public static class DependencyInjection
                     x.CommandTimeout(databaseOptions.CommandTimeout);
                 });
 
+            // Check if the environment is development, then enabling detail logging mode
+            if (!hostingEnvironment.IsDevelopment()) return;
             options.EnableDetailedErrors(databaseOptions.EnableDetailedErrors);
             options.EnableSensitiveDataLogging(databaseOptions.EnableSensitiveDataLogging);
         });

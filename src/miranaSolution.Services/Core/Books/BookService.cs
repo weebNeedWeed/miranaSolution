@@ -1,10 +1,8 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using miranaSolution.Data.Entities;
 using miranaSolution.Data.Main;
-using miranaSolution.DTOs.Authentication.Users;
 using miranaSolution.DTOs.Common;
 using miranaSolution.DTOs.Core.Books;
-using miranaSolution.Services.Authentication.Users;
 using miranaSolution.Services.Exceptions;
 using miranaSolution.Services.Systems.Images;
 
@@ -13,14 +11,11 @@ namespace miranaSolution.Services.Core.Books;
 public class BookService : IBookService
 {
     private readonly MiranaDbContext _context;
-    private readonly IUserService _userService;
-
     private readonly IImageSaver _imageSaver;
-    //
-    public BookService(MiranaDbContext context, IUserService userService, IImageSaver imageSaver)
+    
+    public BookService(MiranaDbContext context, IImageSaver imageSaver)
     {
         _context = context;
-        _userService = userService;
         _imageSaver = imageSaver;
     }
 
@@ -62,13 +57,6 @@ public class BookService : IBookService
     /// </exception>
     public async Task<CreateBookResponse> CreateBookAsync(CreateBookRequest request)
     {
-        var getUserByIdResponse = await _userService.GetUserByIdAsync(
-            new GetUserByIdRequest(request.UserId));
-        if (getUserByIdResponse.UserVm is not null)
-        {
-            throw new UserNotFoundException("The user with given Id does not exist.");
-        }
-
         var book = await _context.Books.FirstOrDefaultAsync(x => x.Slug.Equals(request.Slug));
         if (book is not null)
         {
@@ -85,7 +73,6 @@ public class BookService : IBookService
             IsDone = request.IsDone,
             ThumbnailImage = 
                 await _imageSaver.SaveImageAsync(request.ThumbnailImage, request.ThumbnailImageExtension),
-            UserId = request.UserId,
             AuthorId = request.AuthorId
         };
 
@@ -108,6 +95,13 @@ public class BookService : IBookService
         if (book is null)
         {
             throw new BookNotFoundException("The book with given Id does not exists.");
+        }
+        
+        // Validate the new slug must be unique
+        if (await _context.Books.AnyAsync(
+                x => !x.Slug.Equals(book.Slug) && x.Slug.Equals(request.Slug)))
+        {
+            throw new BookAlreadyExistsException("The book with given Slug already exists.");
         }
         
         book.Name = request.Name;

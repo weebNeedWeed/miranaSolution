@@ -20,8 +20,7 @@ public class AuthorService : IAuthorService
         var authorVms = await _context.Authors
             .Select(x => new AuthorVm(
                 x.Id,
-                x.Name,
-                x.Slug))
+                x.Name))
             .ToListAsync();
 
         var response = new GetAllAuthorsResponse(authorVms);
@@ -31,16 +30,9 @@ public class AuthorService : IAuthorService
 
     public async Task<CreateAuthorResponse> CreateAuthorAsync(CreateAuthorRequest request)
     {
-        var author = await _context.Authors.FirstOrDefaultAsync(x => x.Slug == request.Slug);
-        if (author is not null)
+        var author = new Author
         {
-            throw new AuthorAlreadyExistsException("The author with given Slug already exists.");
-        }
-
-        author = new Author
-        {
-            Name = request.Name,
-            Slug = request.Slug
+            Name = request.Name
         };
 
         await _context.Authors.AddAsync(author);
@@ -48,8 +40,7 @@ public class AuthorService : IAuthorService
 
         var authorVm = new AuthorVm(
             author.Id,
-            author.Name,
-            author.Slug);
+            author.Name);
 
         return new CreateAuthorResponse(authorVm);
     }
@@ -73,16 +64,14 @@ public class AuthorService : IAuthorService
         {
             throw new AuthorNotFoundException("The author with given Id does not exist.");
         }
-
-        author.Slug = request.Slug;
+        
         author.Name = request.Name;
 
         await _context.SaveChangesAsync();
         
         var authorVm = new AuthorVm(
             author.Id,
-            author.Name,
-            author.Slug);
+            author.Name);
 
         return new UpdateAuthorResponse(authorVm);
     }

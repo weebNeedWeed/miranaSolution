@@ -8,7 +8,11 @@ using miranaSolution.Data;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-builder.Services.AddControllersWithViews(x => x.Filters.Add<HandleModelStateFilter>());
+builder.Services.AddControllersWithViews(x =>
+{
+    x.Filters.Add<ModelStateFilter>();
+    x.Filters.Add<ApiExceptionFilter>();
+});
 builder.Services.Configure<ApiBehaviorOptions>(x => { x.SuppressModelStateInvalidFilter = true; });
 
 // Add project's logical layers

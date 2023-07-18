@@ -1,5 +1,4 @@
-﻿using miranaSolution.DTOs.Auth.Users;
-using miranaSolution.DTOs.Authentication.Users;
+﻿using miranaSolution.DTOs.Authentication.Users;
 
 namespace miranaSolution.Services.Authentication.Users;
 

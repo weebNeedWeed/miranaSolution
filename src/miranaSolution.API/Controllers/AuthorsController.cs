@@ -1,9 +1,12 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using miranaSolution.API.ViewModels.Authors;
 using miranaSolution.API.ViewModels.Common;
 using miranaSolution.DTOs.Common;
 using miranaSolution.DTOs.Core.Authors;
+using miranaSolution.DTOs.Core.Genres;
 using miranaSolution.Services.Core.Authors;
+using miranaSolution.Services.Exceptions;
 using miranaSolution.Utilities.Constants;
 
 namespace miranaSolution.API.Controllers;
@@ -26,5 +29,46 @@ public class AuthorsController : ControllerBase
     {
         var getAllAuthorsResponse = await _authorService.GetAllAuthorsAsync();
         return Ok(new ApiSuccessResult<List<AuthorVm>>(getAllAuthorsResponse.AuthorVms));
+    }
+
+    [HttpPost]
+    public async Task<IActionResult> CreateAuthor([FromBody] ApiCreateAuthorRequest request)
+    {
+        var createAuthorResponse = await _authorService.CreateAuthorAsync(
+            new CreateAuthorRequest(request.Name));
+        return Ok(new ApiSuccessResult<AuthorVm>(createAuthorResponse.AuthorVm));
+    }
+    
+    [HttpPatch("{authorId:int}")]
+    public async Task<IActionResult> UpdateAuthor([FromRoute] int authorId, [FromBody] ApiUpdateAuthorRequest request)
+    {
+        try
+        {
+            var updateAuthorResponse = await _authorService.UpdateAuthorAsync(
+                new UpdateAuthorRequest(
+                    authorId,
+                    request.Name));
+            return Ok(new ApiSuccessResult<AuthorVm>(updateAuthorResponse.AuthorVm));
+        }
+        catch (AuthorNotFoundException ex)
+        {
+            return Ok(new ApiErrorResult(ex.Message));
+        }
+    }
+    
+    [HttpDelete("{authorId:int}")]
+    public async Task<IActionResult> DeleteAuthor([FromRoute] int authorId)
+    {
+        try
+        {
+            await _authorService.DeleteAuthorAsync(
+                new DeleteAuthorRequest(
+                    authorId));
+            return Ok(new ApiSuccessResult<object>());
+        }
+        catch (AuthorNotFoundException ex)
+        {
+            return Ok(new ApiErrorResult(ex.Message));
+        }
     }
 }

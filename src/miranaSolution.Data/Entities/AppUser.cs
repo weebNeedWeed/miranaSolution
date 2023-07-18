@@ -9,8 +9,6 @@ public class AppUser : IdentityUser<Guid>
     
     public string Avatar { get; set; } = string.Empty;
 
-    public List<Book> Books { get; set; } = new();
-
     public List<Rating> Ratings { get; set; } = new();
 
     public List<Comment> Comments { get; set; } = new();

@@ -1,9 +1,10 @@
 ﻿namespace miranaSolution.API.ViewModels.Users;
 
-public record ApiRegisterUserRequest(
+public record ApiGetUserInformationResponse(
+    Guid Id,
     string FirstName,
     string LastName,
     string UserName,
     string Email,
-    string Password,
-    string PasswordConfirmation);
+    string? Avatar, 
+    int TotalComments);

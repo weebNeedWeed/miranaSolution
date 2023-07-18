@@ -13,9 +13,5 @@ public class AuthorConfiguration : IEntityTypeConfiguration<Author>
         builder.HasKey(x => x.Id);
 
         builder.Property(x => x.Id).UseIdentityColumn();
-
-        builder.Property(x => x.Slug).IsRequired().IsUnicode();
-
-        builder.HasIndex(x => x.Slug).IsUnique();
     }
 }

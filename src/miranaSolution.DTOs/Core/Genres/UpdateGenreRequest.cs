@@ -2,6 +2,4 @@
 
 public record UpdateGenreRequest(
     int GenreId,
-    string Name,
-    string ShortDescription,
-    string Slug);
+    string Name);

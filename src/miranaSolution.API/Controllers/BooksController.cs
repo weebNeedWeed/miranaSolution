@@ -1,12 +1,15 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using System.IdentityModel.Tokens.Jwt;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using miranaSolution.API.ViewModels.Books;
 using miranaSolution.API.ViewModels.Common;
 using miranaSolution.DTOs.Common;
 using miranaSolution.DTOs.Core.Books;
 using miranaSolution.DTOs.Core.Chapters;
+using miranaSolution.DTOs.Core.Comments;
 using miranaSolution.Services.Core.Books;
 using miranaSolution.Services.Core.Chapters;
+using miranaSolution.Services.Core.Comments;
 using miranaSolution.Services.Exceptions;
 using miranaSolution.Utilities.Constants;
 
@@ -19,11 +22,13 @@ public class BooksController : ControllerBase
 {
     private readonly IBookService _bookService;
     private readonly IChapterService _chapterService;
+    private readonly ICommentService _commentService;
 
-    public BooksController(IBookService bookService, IChapterService chapterService)
+    public BooksController(IBookService bookService, IChapterService chapterService, ICommentService commentService)
     {
         _bookService = bookService;
         _chapterService = chapterService;
+        _commentService = commentService;
     }
 
     // GET /api/books
@@ -57,12 +62,11 @@ public class BooksController : ControllerBase
     public async Task<IActionResult> CreateBook([FromForm] ApiCreateBookRequest request)
     {
         var thumbnailImageExt = Path.GetExtension(request.ThumbnailImage.FileName);
-
+        var thumbnailImageStream = request.ThumbnailImage.OpenReadStream();
+        
         try
         {
-            var userId = User.Claims.First(x => x.Type == "sid").Value;
             var createBookRequest = new CreateBookRequest(
-                new Guid(userId),
                 request.Name,
                 request.ShortDescription,
                 request.LongDescription,
@@ -70,7 +74,7 @@ public class BooksController : ControllerBase
                 request.IsDone,
                 request.Slug,
                 request.AuthorId,
-                request.ThumbnailImage.OpenReadStream(),
+                thumbnailImageStream,
                 thumbnailImageExt);
 
             var createBookResponse = await _bookService.CreateBookAsync(createBookRequest);
@@ -196,12 +200,159 @@ public class BooksController : ControllerBase
     // GET /api/books/{slug}
     [HttpGet("{slug}")]
     [AllowAnonymous]
-    public async Task<IActionResult> GetBySlug([FromRoute] string slug)
+    public async Task<IActionResult> GetBookBySlug([FromRoute] string slug)
     {
         var getBookBySlugResponse = await _bookService.GetBookBySlugAsync(new GetBookBySlugRequest(slug));
         if (getBookBySlugResponse.BookVm is null) 
             return Ok(new ApiErrorResult("The book with given Slug does not exist."));
 
         return Ok(new ApiSuccessResult<BookVm>(getBookBySlugResponse.BookVm));
+    }
+
+    [HttpPost("{bookId:int}")]
+    [Consumes("multipart/form-data")]
+    public async Task<IActionResult> UpdateBook([FromRoute] int bookId, [FromForm] ApiUpdateBookRequest request)
+    {
+        Stream? thumbnailImage = null;
+        string? fileExtension = null;
+
+        if (request.ThumbnailImage is not null)
+        {
+            thumbnailImage = request.ThumbnailImage.OpenReadStream();
+            fileExtension = Path.GetExtension(request.ThumbnailImage.FileName);
+        }
+
+        try
+        {
+            var updateBookResponse = await _bookService.UpdateBookAsync(
+                new UpdateBookRequest(
+                    bookId,
+                    request.Name,
+                    request.ShortDescription,
+                    request.LongDescription,
+                    request.IsRecommended,
+                    request.Slug,
+                    request.AuthorId,
+                    request.IsDone,
+                    thumbnailImage,
+                    fileExtension,
+                    request.GenreCheckboxItems));
+
+            return Ok(new ApiSuccessResult<BookVm>(updateBookResponse.BookVm));
+        }
+        catch (BookNotFoundException ex)
+        {
+            return Ok(new ApiErrorResult(ex.Message));
+        }
+        catch (BookAlreadyExistsException ex)
+        {
+            return Ok(new ApiErrorResult(ex.Message));
+        }
+        catch (InvalidImageExtensionException ex)
+        {
+            return Ok(new ApiErrorResult(ex.Message));
+        }
+    }
+
+    [HttpDelete("{bookId:int}")]
+    public async Task<IActionResult> DeleteBook([FromRoute] int bookId)
+    {
+        try
+        {
+            await _bookService.DeleteBookAsync(
+                new DeleteBookRequest(
+                    bookId));
+
+            return Ok(new ApiSuccessResult<object>());
+        }
+        catch (BookNotFoundException ex)
+        {
+            return Ok(new ApiErrorResult(ex.Message));
+        }
+    }
+
+    [HttpPost("{bookdId:int}/comments")]
+    [Authorize]
+    public async Task<IActionResult> CreateBookComment([FromRoute] int bookId, [FromBody] ApiCreateBookCommentRequest request)
+    {
+        var userId = GetUserIdFromClaim();
+        
+        try
+        {
+            var createBookCommentResponse = await _commentService.CreateBookCommentAsync(
+                new CreateBookCommentRequest(
+                    bookId,
+                    userId,
+                    request.Content,
+                    request.ParentId));
+
+            return Ok(new ApiSuccessResult<CommentVm>(createBookCommentResponse.CommentVm));
+        }
+        catch (UserNotFoundException ex)
+        {
+            return Ok(new ApiErrorResult(ex.Message));
+        }
+        catch (BookNotFoundException ex)
+        {
+            return Ok(new ApiErrorResult(ex.Message));
+        }
+    }
+
+    [HttpDelete("{bookId:int}/comments/{commentId:int}")]
+    [Authorize]
+    public async Task<IActionResult> DeleteBookComment([FromRoute] int bookId, [FromRoute] int commentId)
+    {
+        var userId = GetUserIdFromClaim();
+
+        try
+        {
+            // Set forceDelete = false, so the user can only delete their own comments
+            await _commentService.DeleteBookCommentAsync(
+                new DeleteBookCommentRequest(
+                    commentId,
+                    bookId,
+                    userId,
+                    false));
+
+            return Ok(new ApiSuccessResult<object>());
+        }
+        catch (CommentNotFoundException ex)
+        {
+            return Ok(new ApiErrorResult(ex.Message));
+        }
+        catch (UserNotFoundException ex)
+        {
+            return Ok(new ApiErrorResult(ex.Message));
+        }
+    }
+
+    [HttpGet("{bookId:int}/comments")]
+    [Authorize]
+    public async Task<IActionResult> GetAllBookComments([FromRoute] int bookId, [FromQuery] ApiGetAllBookCommentsRequest request)
+    {
+        try
+        {
+            var getAllBookCommentsResponse = await _commentService.GetAllBookCommentsAsync(
+                new GetAllBookCommentsRequest(
+                    bookId,
+                    new PagerRequest(request.PageIndex, request.PageSize)));
+
+            return Ok(new ApiGetAllBookCommentsResponse(
+                getAllBookCommentsResponse.CommentVms,
+                request.PageIndex,
+                request.PageSize,
+                getAllBookCommentsResponse.PagerResponse.TotalPages));
+        }
+        catch (BookNotFoundException ex)
+        {
+            return Ok(new ApiErrorResult(ex.Message));
+        }
+    }
+    
+    private Guid GetUserIdFromClaim()
+    {
+        string userId = User.Claims.First(
+            x => x.Type == JwtRegisteredClaimNames.Sid).Value;
+        return new Guid(userId);
     }
 }

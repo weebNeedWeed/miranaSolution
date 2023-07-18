@@ -5,7 +5,7 @@ using miranaSolution.DTOs.Common;
 
 namespace miranaSolution.API.Filters;
 
-public class HandleModelStateFilter : IAsyncActionFilter
+public class ModelStateFilter : IAsyncActionFilter
 {
     public async Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)
     {

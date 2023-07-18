@@ -1,4 +1,4 @@
-﻿namespace miranaSolution.API.ViewModels.Users;
+﻿namespace miranaSolution.API.ViewModels.Authentication;
 
 public record ApiAuthenticateUserResponse(
     Guid Id,

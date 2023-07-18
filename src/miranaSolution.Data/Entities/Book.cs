@@ -16,9 +16,6 @@ public class Book
     public int AuthorId { get; set; }
     public Author? Author { get; set; }
 
-    public Guid? UserId { get; set; }
-    public AppUser? AppUser { get; set; }
-
     public List<Chapter> Chapters { get; set; } = new();
 
     public List<BookGenre> BookGenres { get; set; } = new();

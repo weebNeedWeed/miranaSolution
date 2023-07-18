@@ -18,7 +18,7 @@ public class GenreService : IGenreService
     public async Task<GetAllGenresResponse> GetAllGenresAsync()
     {
         var genres = await _context.Genres
-            .Select(x => new GenreVm(x.Id, x.Name, x.ShortDescription, x.Slug))
+            .Select(x => new GenreVm(x.Id, x.Name))
             .ToListAsync();
 
         var response = new GetAllGenresResponse(genres);
@@ -37,26 +37,16 @@ public class GenreService : IGenreService
         var response = new GetGenreByIdResponse(
             new GenreVm(
                 genre.Id,
-                genre.Name,
-                genre.ShortDescription,
-                genre.Slug));
+                genre.Name));
 
         return response;
     }
 
     public async Task<CreateGenreResponse> CreateGenreAsync(CreateGenreRequest request)
     {
-        var genre = await _context.Genres.FirstOrDefaultAsync(x => x.Slug == request.Slug);
-        if (genre is not null)
+        var genre = new Genre
         {
-            throw new GenreAlreadyExistsException("The genre with given Slug already exists.");
-        }
-
-        genre = new Genre
-        {
-            Name = request.Name,
-            ShortDescription = request.ShortDescription,
-            Slug = request.Slug
+            Name = request.Name
         };
 
         await _context.Genres.AddAsync(genre);
@@ -65,9 +55,7 @@ public class GenreService : IGenreService
         var response = new CreateGenreResponse(
             new GenreVm(
                 genre.Id,
-                genre.Name,
-                genre.ShortDescription,
-                genre.Slug));
+                genre.Name));
 
         return response;
     }
@@ -93,17 +81,13 @@ public class GenreService : IGenreService
         }
         
         genre.Name = request.Name;
-        genre.ShortDescription = request.ShortDescription;
-        genre.Slug = request.Slug;
-        
+
         await _context.SaveChangesAsync();
         
         var response = new UpdateGenreResponse(
             new GenreVm(
                 genre.Id,
-                genre.Name,
-                genre.ShortDescription,
-                genre.Slug));
+                genre.Name));
 
         return response;
     }

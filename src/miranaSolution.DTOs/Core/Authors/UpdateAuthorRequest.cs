@@ -2,5 +2,4 @@
 
 public record UpdateAuthorRequest(
     int AuthorId,
-    string Name,
-    string Slug);
+    string Name);

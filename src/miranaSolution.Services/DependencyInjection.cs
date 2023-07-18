@@ -22,7 +22,7 @@ public static class DependencyInjection
     {
         var serviceProvider = services.BuildServiceProvider();
         var configuration = serviceProvider.GetService<IConfiguration>();
-        
+
         // Get Jwt Settings from the configuration file.
         services.Configure<JwtOptions>(configuration!.GetSection(JwtOptions.SectionName));
         

@@ -1,7 +1,6 @@
 ﻿namespace miranaSolution.DTOs.Core.Books;
 
 public record CreateBookRequest(
-    Guid UserId,
     string Name,
     string ShortDescription,
     string LongDescription,
