@@ -1,8 +1,9 @@
 import jwtDecode, {JwtPayload} from "jwt-decode";
 import {userApiHelper} from "../apis/UserApiHelper";
-import {User} from "../models/auth/User";
+import {User} from "../models/catalog/user/User";
+import {GetUserProfileRequest} from "../models/catalog/user/GetUserProfileRequest";
 
-export const getUserByAccessToken = async (accessToken: string): Promise<User | null> => {
+export const getUserByAccessToken = async (accessToken: string): Promise<GetUserProfileRequest | null> => {
     try {
         const decoded = jwtDecode<JwtPayload>(accessToken);
         // Check for expire time
@@ -14,8 +15,12 @@ export const getUserByAccessToken = async (accessToken: string): Promise<User | 
         }
 
         // Check for user's information
-        const user = await userApiHelper.getUserInformation(accessToken);
-        return user;
+        try {
+            const getUserProfileResult = await userApiHelper.getUserProfile(accessToken);
+            return getUserProfileResult;
+        } catch (error: any) {
+            return null;
+        }
     } catch (error) {
         return null;
     }

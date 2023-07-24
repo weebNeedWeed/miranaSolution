@@ -4,8 +4,14 @@ using Microsoft.AspNetCore.Mvc;
 using miranaSolution.API.ViewModels.Common;
 using miranaSolution.API.ViewModels.Users;
 using miranaSolution.DTOs.Authentication.Users;
+using miranaSolution.DTOs.Core.Bookmarks;
+using miranaSolution.DTOs.Core.BookUpvotes;
+using miranaSolution.DTOs.Core.CommentReactions;
 using miranaSolution.DTOs.Core.Comments;
 using miranaSolution.Services.Authentication.Users;
+using miranaSolution.Services.Core.Bookmarks;
+using miranaSolution.Services.Core.BookUpvotes;
+using miranaSolution.Services.Core.CommentReactions;
 using miranaSolution.Services.Core.Comments;
 using miranaSolution.Services.Exceptions;
 using miranaSolution.Utilities.Constants;
@@ -19,15 +25,21 @@ public class UsersController : ControllerBase
 {
     private readonly IUserService _userService;
     private readonly ICommentService _commentService;
+    private readonly ICommentReactionService _commentReactionService;
+    private readonly IBookmarkService _bookmarkService;
+    private readonly IBookUpvoteService _bookUpvoteService;
 
-    public UsersController(IUserService userService, ICommentService commentService)
+    public UsersController(IUserService userService, ICommentService commentService, ICommentReactionService commentReactionService, IBookmarkService bookmarkService, IBookUpvoteService bookUpvoteService)
     {
         _userService = userService;
         _commentService = commentService;
+        _commentReactionService = commentReactionService;
+        _bookmarkService = bookmarkService;
+        _bookUpvoteService = bookUpvoteService;
     }
     
-    [HttpGet("information")]
-    public async Task<IActionResult> GetUserInformation()
+    [HttpGet("profile")]
+    public async Task<IActionResult> GetUserProfile()
     {
         var userName = GetUserNameFromClaims();
         
@@ -39,25 +51,41 @@ public class UsersController : ControllerBase
             return Ok(new ApiErrorResult("The user does not exist."));
         }
 
-        var countCommentByUserIdResponse = await _commentService.CountCommentByUserIdAsync(
-            new CountCommentByUserIdRequest(getUserByUserNameResponse.UserVm.Id));
         var userVm = getUserByUserNameResponse.UserVm;
         
-        var response = new ApiGetUserInformationResponse(
-            userVm.Id,
-            userVm.FirstName,
-            userVm.LastName,
-            userVm.UserName,
-            userVm.Email,
-            userVm.Avatar,
-            countCommentByUserIdResponse.TotalComments);
+        // Calculate the summation of comments that user has written
+        var countCommentByUserIdResponse = await _commentService.CountCommentByUserIdAsync(
+            new CountCommentByUserIdRequest(userVm.Id));
+        var totalComments = countCommentByUserIdResponse.TotalComments;
         
-        return Ok(new ApiSuccessResult<ApiGetUserInformationResponse>(response));
+        // Calculate the summation of reactions that user has reacted
+        var countReactionByUserIdResponse = await _commentReactionService.CountCommentReactionByUserIdAsync(
+            new CountCommentReactionByUserIdRequest(userVm.Id));
+        var totalReactions = countReactionByUserIdResponse.TotalReactions;
+        
+        // Calculate the summation of bookmarks that user has marked
+        var getAllBookmarkByUserIdResponse = await _bookmarkService.GetAllBookmarksByUserIdAsync(
+            new GetAllBookmarksByUserIdRequest(userVm.Id, null));
+        var totalBookmarks = getAllBookmarkByUserIdResponse.BookmarkVms.Count();
+        
+        // Calculate the summation of upvotes that user has done
+        var countBookUpvoteByUserIdResponse = await _bookUpvoteService.CountBookUpvoteByUserIdAsync(
+            new CountBookUpvoteByUserIdRequest(userVm.Id));
+        var totalUpvotes = countBookUpvoteByUserIdResponse.TotalUpvotes;
+        
+        var response = new ApiGetUserProfileResponse(
+            userVm,
+            totalComments,
+            totalReactions,
+            totalBookmarks,
+            totalUpvotes);
+        
+        return Ok(new ApiSuccessResult<ApiGetUserProfileResponse>(response));
     }
     
-    [HttpPost("information")]
+    [HttpPost("profile")]
     [Consumes("multipart/form-data")]
-    public async Task<IActionResult> UpdateUserInformation([FromForm] ApiUpdateUserInformationRequest request)
+    public async Task<IActionResult> UpdateUserProfile([FromForm] ApiUpdateUserProfileRequest request)
     {
         var userName = GetUserNameFromClaims();
 
@@ -72,8 +100,8 @@ public class UsersController : ControllerBase
                 avatarExtension = Path.GetExtension(request.Avatar.FileName);
             }
 
-            var updateUserInformationResponse = await _userService.UpdateUserInformationAsync(
-                new UpdateUserInformationRequest(
+            var updateUserInformationResponse = await _userService.UpdateUserProfileAsync(
+                new UpdateUserProfileRequest(
                     userName,
                     request.FirstName,
                     request.LastName,
@@ -83,7 +111,7 @@ public class UsersController : ControllerBase
                 ));
 
             var userVm = updateUserInformationResponse.UserVm;
-            var response = new ApiUpdateUserInformationResponse(
+            var response = new ApiUpdateUserProfileResponse(
                 userVm.Id,
                 userVm.FirstName,
                 userVm.LastName,
@@ -91,7 +119,7 @@ public class UsersController : ControllerBase
                 userVm.Email,
                 userVm.Avatar);
 
-            return Ok(new ApiSuccessResult<ApiUpdateUserInformationResponse>(response));
+            return Ok(new ApiSuccessResult<ApiUpdateUserProfileResponse>(response));
         }
         catch (UserNotFoundException ex)
         {
@@ -103,7 +131,6 @@ public class UsersController : ControllerBase
         }
     }
     
-    // TODO: Implement validation
     [HttpPost("password")]
     public async Task<IActionResult> UpdateUserPassword([FromBody] ApiUpdateUserPasswordRequest request)
     {
@@ -115,7 +142,8 @@ public class UsersController : ControllerBase
                 new UpdateUserPasswordRequest(
                     userName,
                     request.CurrentPassword,
-                    request.NewPassword));
+                    request.NewPassword,
+                    request.NewPasswordConfirmation));
 
             var userVm = updateUserPasswordResponse.UserVm;
             var response = new ApiUpdateUserPasswordResponse(

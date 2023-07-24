@@ -1,10 +1,7 @@
-﻿namespace miranaSolution.API.ViewModels.Authentication;
+﻿using miranaSolution.DTOs.Authentication.Users;
+
+namespace miranaSolution.API.ViewModels.Authentication;
 
 public record ApiAuthenticateUserResponse(
-    Guid Id,
-    string FirstName,
-    string LastName,
-    string UserName,
-    string Email,
-    string? Avatar,
+    UserVm User,
     string Token);

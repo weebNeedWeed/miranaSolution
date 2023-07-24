@@ -1,6 +1,8 @@
-﻿using Microsoft.AspNetCore.Diagnostics;
+﻿using FluentValidation;
+using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
+using miranaSolution.API.Extensions;
 using miranaSolution.API.ViewModels.Common;
 
 namespace miranaSolution.API.Filters;
@@ -16,6 +18,13 @@ public class ApiExceptionFilter : IExceptionFilter
     
     public void OnException(ExceptionContext context)
     {
+        // Automatic catching the validation error, then return the api fail result to clients
+        if (context.Exception is ValidationException exception)
+        {
+            context.Result = new JsonResult(exception.Errors.ToApiFailResult());
+            return;
+        }
+        
         if (!_webHostEnvironment.IsDevelopment())
         {
             // TODO: Implementing logging here

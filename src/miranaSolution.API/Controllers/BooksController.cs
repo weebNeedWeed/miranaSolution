@@ -1,17 +1,21 @@
 ﻿using System.IdentityModel.Tokens.Jwt;
+using FluentValidation;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using miranaSolution.API.ViewModels.Books;
 using miranaSolution.API.ViewModels.Common;
 using miranaSolution.DTOs.Common;
 using miranaSolution.DTOs.Core.Books;
+using miranaSolution.DTOs.Core.BookUpvotes;
 using miranaSolution.DTOs.Core.Chapters;
 using miranaSolution.DTOs.Core.Comments;
 using miranaSolution.Services.Core.Books;
+using miranaSolution.Services.Core.BookUpvotes;
 using miranaSolution.Services.Core.Chapters;
 using miranaSolution.Services.Core.Comments;
 using miranaSolution.Services.Exceptions;
 using miranaSolution.Utilities.Constants;
+using miranaSolution.API.Extensions;
 
 namespace miranaSolution.API.Controllers;
 
@@ -23,12 +27,15 @@ public class BooksController : ControllerBase
     private readonly IBookService _bookService;
     private readonly IChapterService _chapterService;
     private readonly ICommentService _commentService;
+    private readonly IBookUpvoteService _bookUpvoteService;
 
-    public BooksController(IBookService bookService, IChapterService chapterService, ICommentService commentService)
+    public BooksController(IBookService bookService, IChapterService chapterService, ICommentService commentService,
+        IBookUpvoteService bookUpvoteService)
     {
         _bookService = bookService;
         _chapterService = chapterService;
         _commentService = commentService;
+        _bookUpvoteService = bookUpvoteService;
     }
 
     // GET /api/books
@@ -39,7 +46,7 @@ public class BooksController : ControllerBase
         var pagerRequest = new PagerRequest(
             request.PageIndex,
             request.PageSize);
-        
+
         var getAllBooksResponse = await _bookService.GetAllBooksAsync(
             new GetAllBooksRequest(
                 request.Keyword,
@@ -52,7 +59,7 @@ public class BooksController : ControllerBase
             getAllBooksResponse.PagerResponse.PageIndex,
             getAllBooksResponse.PagerResponse.PageSize,
             getAllBooksResponse.PagerResponse.TotalPages);
-        
+
         return Ok(new ApiSuccessResult<ApiGetAllBooksResponse>(apiGetAllBooksResponse));
     }
 
@@ -61,9 +68,9 @@ public class BooksController : ControllerBase
     [Consumes("multipart/form-data")]
     public async Task<IActionResult> CreateBook([FromForm] ApiCreateBookRequest request)
     {
-        var thumbnailImageExt = Path.GetExtension(request.ThumbnailImage.FileName);
-        var thumbnailImageStream = request.ThumbnailImage.OpenReadStream();
-        
+        var thumbnailImageExt = Path.GetExtension(request.ThumbnailImage?.FileName);
+        var thumbnailImageStream = request.ThumbnailImage?.OpenReadStream();
+
         try
         {
             var createBookRequest = new CreateBookRequest(
@@ -80,6 +87,10 @@ public class BooksController : ControllerBase
             var createBookResponse = await _bookService.CreateBookAsync(createBookRequest);
 
             return Ok(new ApiSuccessResult<BookVm>(createBookResponse.BookVm));
+        }
+        catch (AuthorNotFoundException ex)
+        {
+            return Ok(new ApiErrorResult(ex.Message));
         }
         catch (BookAlreadyExistsException ex)
         {
@@ -100,7 +111,7 @@ public class BooksController : ControllerBase
             new GetBookByIdRequest(bookId));
         if (getBookByIdResponse.BookVm is null)
         {
-            return Ok(new ApiErrorResult("Invalid book id."));
+            return Ok(new ApiErrorResult("The book with given Id does not exist."));
         }
 
         return Ok(new ApiSuccessResult<BookVm>(getBookByIdResponse.BookVm));
@@ -112,7 +123,10 @@ public class BooksController : ControllerBase
     public async Task<IActionResult> GetRecommendedBooks()
     {
         var getRecommendedBooksResponse = await _bookService.GetRecommendedBooksAsync();
-        return Ok(new ApiSuccessResult<List<BookVm>>(getRecommendedBooksResponse.BookVms));
+        var response = new ApiGetRecommendedBooksResponse(
+            getRecommendedBooksResponse.BookVms);
+        
+        return Ok(new ApiSuccessResult<ApiGetRecommendedBooksResponse>(response));
     }
 
     // GET /api/books/chapters/latest
@@ -122,13 +136,16 @@ public class BooksController : ControllerBase
     {
         var getLatestCreatedChaptersResponse = await _chapterService.GetLatestCreatedChaptersAsync(
             new GetLatestCreatedChaptersRequest(numberOfChapters));
-        
-        return Ok(new ApiSuccessResult<List<ChapterVm>>(getLatestCreatedChaptersResponse.ChapterVms));
+        var response = new ApiGetLatestCreatedChaptersResponse(
+            getLatestCreatedChaptersResponse.ChapterVms);
+
+        return Ok(new ApiSuccessResult<ApiGetLatestCreatedChaptersResponse>(response));
     }
 
     // POST /api/books/{bookId}/chapters
     [HttpPost("{bookId:int}/chapters")]
-    public async Task<IActionResult> CreateBookChapter([FromRoute] int bookId, [FromBody] ApiCreateBookChapterRequest request)
+    public async Task<IActionResult> CreateBookChapter([FromRoute] int bookId,
+        [FromBody] ApiCreateBookChapterRequest request)
     {
         try
         {
@@ -154,7 +171,8 @@ public class BooksController : ControllerBase
     // GET /api/books/{id}/chapters
     [HttpGet("{bookId:int}/chapters")]
     [AllowAnonymous]
-    public async Task<IActionResult> GetAllBookChapters([FromRoute] int bookId,[FromQuery] ApiGetAllBookChaptersRequest request)
+    public async Task<IActionResult> GetAllBookChapters([FromRoute] int bookId,
+        [FromQuery] ApiGetAllBookChaptersRequest request)
     {
         var pagerRequest = new PagerRequest(
             request.PageIndex,
@@ -169,8 +187,9 @@ public class BooksController : ControllerBase
             getAllBookChaptersResponse.ChapterVms,
             request.PageIndex,
             request.PageSize,
-            getAllBookChaptersResponse.PagerResponse.TotalPages);
-        
+            getAllBookChaptersResponse.PagerResponse.TotalPages,
+            getAllBookChaptersResponse.PagerResponse.TotalRecords);
+
         return Ok(new ApiSuccessResult<ApiGetAllBookChaptersResponse>(response));
     }
 
@@ -203,10 +222,17 @@ public class BooksController : ControllerBase
     public async Task<IActionResult> GetBookBySlug([FromRoute] string slug)
     {
         var getBookBySlugResponse = await _bookService.GetBookBySlugAsync(new GetBookBySlugRequest(slug));
-        if (getBookBySlugResponse.BookVm is null) 
+        if (getBookBySlugResponse.BookVm is null)
             return Ok(new ApiErrorResult("The book with given Slug does not exist."));
 
-        return Ok(new ApiSuccessResult<BookVm>(getBookBySlugResponse.BookVm));
+        var countBookUpvoteResponse = await _bookUpvoteService.CountBookUpvoteByBookIdAsync(
+            new CountBookUpvoteByBookIdRequest(getBookBySlugResponse.BookVm.Id));
+        
+        var response = new ApiGetBookBySlugResponse(
+            getBookBySlugResponse.BookVm,
+            countBookUpvoteResponse.TotalUpvotes);
+        
+        return Ok(new ApiSuccessResult<ApiGetBookBySlugResponse>(response));
     }
 
     [HttpPost("{bookId:int}")]
@@ -271,12 +297,13 @@ public class BooksController : ControllerBase
         }
     }
 
-    [HttpPost("{bookdId:int}/comments")]
+    [HttpPost("{bookId:int}/comments")]
     [Authorize]
-    public async Task<IActionResult> CreateBookComment([FromRoute] int bookId, [FromBody] ApiCreateBookCommentRequest request)
+    public async Task<IActionResult> CreateBookComment([FromRoute] int bookId,
+        [FromBody] ApiCreateBookCommentRequest request)
     {
         var userId = GetUserIdFromClaim();
-        
+
         try
         {
             var createBookCommentResponse = await _commentService.CreateBookCommentAsync(
@@ -328,7 +355,8 @@ public class BooksController : ControllerBase
 
     [HttpGet("{bookId:int}/comments")]
     [Authorize]
-    public async Task<IActionResult> GetAllBookComments([FromRoute] int bookId, [FromQuery] ApiGetAllBookCommentsRequest request)
+    public async Task<IActionResult> GetAllBookComments([FromRoute] int bookId,
+        [FromQuery] ApiGetAllBookCommentsRequest request)
     {
         try
         {
@@ -348,7 +376,65 @@ public class BooksController : ControllerBase
             return Ok(new ApiErrorResult(ex.Message));
         }
     }
-    
+
+    [HttpPost("{bookId:int}/upvotes")]
+    [Authorize]
+    public async Task<IActionResult> CreateBookUpvote([FromRoute] int bookId)
+    {
+        var userId = GetUserIdFromClaim();
+
+        try
+        {
+            var createBookUpvoteResponse = await _bookUpvoteService.CreateBookUpvoteAsync(
+                new CreateBookUpvoteRequest(userId, bookId));
+
+            return Ok(new ApiSuccessResult<BookUpvoteVm>(createBookUpvoteResponse.BookUpvoteVm));
+        }
+        catch (UserNotFoundException ex)
+        {
+            return Ok(new ApiErrorResult(ex.Message));
+        }
+        catch (BookNotFoundException ex)
+        {
+            return Ok(new ApiErrorResult(ex.Message));
+        }
+    }
+
+    [HttpDelete("{bookId:int}/upvotes")]
+    [Authorize]
+    public async Task<IActionResult> DeleteBookUpvote([FromRoute] int bookId)
+    {
+        var userId = GetUserIdFromClaim();
+
+        try
+        {
+            await _bookUpvoteService.DeleteBookUpvoteAsync(
+                new DeleteBookUpvoteRequest(userId, bookId));
+
+            return Ok(new ApiSuccessResult<object>());
+        }
+        catch (UserNotFoundException ex)
+        {
+            return Ok(new ApiErrorResult(ex.Message));
+        }
+        catch (BookNotFoundException ex)
+        {
+            return Ok(new ApiErrorResult(ex.Message));
+        }
+    }
+
+    [HttpGet("most_reading")]
+    [AllowAnonymous]
+    public async Task<IActionResult> GetMostReadingBooks([FromQuery] int numberOfBooks)
+    {
+        var getMostReadingBooksResponse = await _bookService.GetMostReadingBooks(
+            new GetMostReadingBooksRequest(numberOfBooks));
+
+        var response = new ApiGetMostReadingBooksResponse(getMostReadingBooksResponse.BookVms);
+
+        return Ok(new ApiSuccessResult<ApiGetMostReadingBooksResponse>(response));
+    }
+
     private Guid GetUserIdFromClaim()
     {
         string userId = User.Claims.First(

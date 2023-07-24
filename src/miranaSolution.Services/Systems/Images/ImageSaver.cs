@@ -33,9 +33,15 @@ public class ImageSaver : IImageSaver
     public async Task DeleteImageIfExistAsync(string imagePath)
     {
         // Extracting the file name from a path having the format "<dir>/filename.ext"
-        var name = imagePath.Split("/")[1];
+        var split = imagePath.Split("/");
+        if (split.Length != 2)
+        {
+            return;
+        }
+        
         try
         {
+            var name = split[1];
             await _fileService.DeleteFileAsync(name);
         }
         catch (FileNotFoundException)

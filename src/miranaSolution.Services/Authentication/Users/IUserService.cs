@@ -12,7 +12,7 @@ public interface IUserService
     
     Task<GetUserByEmailResponse> GetUserByEmailAsync(GetUserByEmailRequest request);
 
-    Task<UpdateUserInformationResponse> UpdateUserInformationAsync(UpdateUserInformationRequest request);
+    Task<UpdateUserProfileResponse> UpdateUserProfileAsync(UpdateUserProfileRequest request);
     
     Task<UpdateUserPasswordResponse> UpdateUserPasswordAsync(UpdateUserPasswordRequest request);
 

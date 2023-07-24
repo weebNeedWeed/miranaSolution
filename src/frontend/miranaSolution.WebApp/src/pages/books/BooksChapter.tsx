@@ -1,4 +1,4 @@
-import {Link, useLoaderData} from "react-router-dom";
+import {Link, useLoaderData, useParams} from "react-router-dom";
 import {Book} from "../../helpers/models/catalog/books/Book";
 import {Chapter} from "../../helpers/models/catalog/books/Chapter";
 import {IoIosArrowBack, IoIosArrowForward} from "react-icons/io";
@@ -6,6 +6,9 @@ import {VscBook} from "react-icons/vsc";
 import {AiFillEye} from "react-icons/ai";
 import {MdOutlineUpdate} from "react-icons/md";
 import {BiText} from "react-icons/bi";
+import {useQuery} from "react-query";
+import {bookApiHelper} from "../../helpers/apis/BookApiHelper";
+import {useEffect, useState} from "react";
 
 type ChapterHeaderProps = {
     book: Book;
@@ -89,14 +92,29 @@ const ChapterContent = (props: { content: string }): JSX.Element => {
 };
 
 const BooksChapter = (): JSX.Element => {
-    const loaderData: any = useLoaderData();
+    const {slug, index} = useParams();
+    const [chapter, setChapter] = useState<Chapter>();
+    const [book, setBook] = useState<Book>()
 
-    if (!loaderData) {
-        return <div>error</div>;
+    useEffect(() => {
+        (async () => {
+            try {
+                const result = await bookApiHelper.getBookBySlug(slug!);
+                const bookId = result.book.id;
+
+                const _chapter = await bookApiHelper.getBookChapterByIndex(bookId, Number.parseInt(index!, 10));
+
+                setBook(result.book);
+                setChapter(_chapter);
+
+            } catch (error: any) {
+            }
+        })();
+    }, [slug, index]);
+
+    if (!book || !chapter) {
+        return <div></div>;
     }
-
-    const book = loaderData.book as Book;
-    const chapter = loaderData.chapter as Chapter;
 
     return <div
         className="mx-auto w-100% md:w-[768px] lg:w-[980px] max-w-full px-8 md:px-0 text-deepKoamaru mb-16">

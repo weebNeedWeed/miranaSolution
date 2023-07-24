@@ -3,16 +3,19 @@ using miranaSolution.Data.Entities;
 using miranaSolution.Data.Main;
 using miranaSolution.DTOs.Core.Authors;
 using miranaSolution.Services.Exceptions;
+using miranaSolution.Services.Validations;
 
 namespace miranaSolution.Services.Core.Authors;
 
 public class AuthorService : IAuthorService
 {
     private readonly MiranaDbContext _context;
-
-    public AuthorService(MiranaDbContext context)
+    private readonly IValidatorProvider _validatorProvider;
+    
+    public AuthorService(MiranaDbContext context, IValidatorProvider validatorProvider)
     {
         _context = context;
+        _validatorProvider = validatorProvider;
     }
 
     public async Task<GetAllAuthorsResponse> GetAllAuthorsAsync()
@@ -30,6 +33,8 @@ public class AuthorService : IAuthorService
 
     public async Task<CreateAuthorResponse> CreateAuthorAsync(CreateAuthorRequest request)
     {
+        _validatorProvider.Validate(request);
+        
         var author = new Author
         {
             Name = request.Name
@@ -59,6 +64,8 @@ public class AuthorService : IAuthorService
 
     public async Task<UpdateAuthorResponse> UpdateAuthorAsync(UpdateAuthorRequest request)
     {
+        _validatorProvider.Validate(request);
+        
         var author = await _context.Authors.FirstOrDefaultAsync(x => x.Id == request.AuthorId);
         if (author is null)
         {

@@ -1,11 +1,10 @@
-import {useId, useState} from "react";
+import React, {useId, useState} from "react";
 import {AiOutlineLock, AiOutlineUser} from "react-icons/ai";
 import {Link, useNavigate} from "react-router-dom";
-import {userApiHelper} from "../../helpers/apis/UserApiHelper";
-import {User} from "../../helpers/models/auth/User";
 import {useSystemContext} from "../../contexts/SystemContext";
 import {ToastVariant} from "../../components/Toast";
-import {RegisterUserRequest} from "../../helpers/models/auth/RegisterUserRequest";
+import {RegisterUserRequest} from "../../helpers/models/catalog/user/RegisterUserRequest";
+import {authApiHelper} from "../../helpers/apis/AuthApiHelper";
 
 const Register = (): JSX.Element => {
     const navigate = useNavigate();
@@ -33,18 +32,52 @@ const Register = (): JSX.Element => {
     const [passwordErrors, setPasswordErrors] = useState<string[]>([]);
     const [confirmPasswordErrors, setConfirmPasswordErrors] = useState<string[]>([]);
 
-    const [ableToSubmit, setAbleToSubmit] = useState(false);
+    const isValidForm = React.useCallback((): boolean => {
+
+        if (lastName.trim().length === 0) {
+            setLastNameErrors(["Họ không được trống."]);
+            return false;
+        }
+
+        if (firstName.trim().length === 0) {
+            setFirstNameErrors(["Tên không được trống."]);
+            return false;
+        }
+
+        if (email.trim().length === 0) {
+            setEmailErrors(["Email không được trống."]);
+            return false;
+        }
+
+        if (userName.trim().length === 0) {
+            setUserNameErrors(["Tài khoản không được trống."]);
+            return false;
+        }
+
+        if (password.trim().length === 0) {
+            setPasswordErrors(["Mật khẩu không được trống."]);
+            return false;
+        }
+
+        if (confirmPassword.trim().length === 0) {
+            setConfirmPasswordErrors(["Vui lòng nhập lại mật khẩu."]);
+            return false;
+        }
+
+        const pattern = new RegExp(/^[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,4}$/);
+
+        if (!pattern.test(email)) {
+            setEmailErrors(["Phải là email."]);
+            return false;
+        }
+
+        return true;
+    }, [lastName, firstName, email, userName, password, confirmPassword]);
 
     const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
 
-        if (!ableToSubmit) {
-            validateName(setLastNameErrors, "Last name")(lastName);
-            validateName(setFirstNameErrors, "First name")(firstName);
-            validateEmail(email);
-            validateUserName(userName);
-            validatePassword(password);
-            validateConfirmPassword(confirmPassword);
+        if (!isValidForm()) {
             return;
         }
 
@@ -58,43 +91,11 @@ const Register = (): JSX.Element => {
         };
 
         try {
-            const res = await userApiHelper.register(registerUserRequest);
-
-            function isUser(obj: any): obj is User {
-                return Object.keys(obj).some(x => typeof obj[x] !== "object");
-            }
-
-            if (!isUser(res)) {
-                const errors: any = res;
-                for (let key in errors) {
-                    switch (key) {
-                        case "Email":
-                            setEmailErrors(errors[key]);
-                            break;
-                        case "FirstName":
-                            setFirstNameErrors(errors[key]);
-                            break;
-                        case "LastName":
-                            setLastNameErrors(errors[key]);
-                            break;
-                        case "Password":
-                            setPasswordErrors(errors[key]);
-                            break;
-                        case "UserName":
-                            setUserNameErrors(errors[key]);
-                            break;
-                        case "PasswordConfirmation":
-                            setConfirmPasswordErrors(errors[key]);
-                            break;
-                        default:
-                            break;
-                    }
-                }
-            }
+            const res = await authApiHelper.register(registerUserRequest);
 
             dispatch({
                 type: "addToast", payload: {
-                    title: "Đăng ký thành công, vui lòng đăng nhập"
+                    title: "Đăng ký thành công, vui lòng đăng nhập!"
                 }
             });
 
@@ -111,100 +112,69 @@ const Register = (): JSX.Element => {
         }
     };
 
-    const handleInputChange = (
-        setValueFn: React.Dispatch<string>,
-        validateFn: (data: string) => void) => {
-        return (event: React.ChangeEvent<HTMLInputElement>) => {
-            const value = event.target.value;
-            setValueFn(value);
-            validateFn(value);
-        };
-    };
+    const handleLastNameChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        const _lastName = event.target.value;
 
-    const validateName = (setErrorsFn: React.Dispatch<string[]>, fieldName: string) => {
-        return (name: string) => {
-            const errors: string[] = [];
+        if (_lastName.trim().length === 0) {
+            setLastNameErrors(["Họ không được trống."]);
+        }
 
-            setAbleToSubmit(true);
+        setLastName(_lastName);
+    }
 
-            if (name.trim().length === 0) {
-                setAbleToSubmit(false);
-                errors.push(fieldName + " is required");
-            }
+    const handleFirstNameChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        const _firstName = event.target.value;
+        if (_firstName.trim().length === 0) {
+            setFirstNameErrors(["Tên không được trống."]);
+        }
 
-            setErrorsFn(errors);
-        };
-    };
+        setFirstName(_firstName);
+    }
 
-    const validateEmail = (email: string) => {
-        const errors: string[] = [];
+    const handleEmailChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        const _email = event.target.value;
 
-        setAbleToSubmit(true);
-
-        if (email.trim().length === 0) {
-            setAbleToSubmit(false);
-            errors.push("Email is required");
+        if (_email.trim().length === 0) {
+            setEmailErrors(["Email không được trống."]);
         }
 
         const pattern = new RegExp(/^[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,4}$/);
 
-        if (!pattern.test(email)) {
-            setAbleToSubmit(false);
-            errors.push("Input must be an email.");
+        if (!pattern.test(_email)) {
+            setEmailErrors(["Phải là email."]);
         }
 
-        setEmailErrors(errors);
-    };
+        setEmail(_email);
+    }
 
-    const validateUserName = (userName: string) => {
-        const errors: string[] = [];
-
-        setAbleToSubmit(true);
-
-        if (userName.trim().length === 0) {
-            setAbleToSubmit(false);
-            errors.push("User name is required");
+    const handleUserNameChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        const _userName = event.target.value;
+        if (_userName.trim().length === 0) {
+            setUserNameErrors(["Tài khoản không được trống."]);
         }
 
-        if (userName.length < 8) {
-            setAbleToSubmit(false);
-            errors.push("User name must be at least 8 characters");
+
+        setUserName(_userName);
+    }
+
+    const handlePasswordChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        const _password = event.target.value;
+        if (_password.trim().length === 0) {
+            setPasswordErrors(["Mật khẩu không được trống."]);
         }
 
-        setUserNameErrors(errors);
-    };
+        setPassword(_password);
+    }
 
-    const validatePassword = (password: string) => {
-        var errors: Array<string> = [];
+    const handleConfirmPasswordChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        const _confirmPassword = event.target.value;
 
-        setAbleToSubmit(true);
-
-        const regex = new RegExp(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/);
-
-        if (!password.trim().match(regex)) {
-            setAbleToSubmit(false);
-            errors.push(
-                "Password must contain Minimum eight characters, at least one uppercase letter, one lowercase letter, one number and one special character!"
-            );
+        if (_confirmPassword.trim().length === 0) {
+            setConfirmPasswordErrors(["Vui lòng nhập lại mật khẩu."]);
         }
 
-        setPasswordErrors(errors);
-    };
-
-    const validateConfirmPassword = (confirmPassword: string) => {
-        var errors: Array<string> = [];
-
-        setAbleToSubmit(true);
-
-        if (password !== confirmPassword) {
-            setAbleToSubmit(false);
-            errors.push(
-                "Password is not equal"
-            );
-        }
-
-        setConfirmPasswordErrors(errors);
-    };
+        setConfirmPassword(_confirmPassword);
+    }
 
     return (
         <form method="POST" onSubmit={handleSubmit}
@@ -225,7 +195,7 @@ const Register = (): JSX.Element => {
                     <AiOutlineUser className="text-slate-400"/>
                     <input
                         value={lastName}
-                        onChange={handleInputChange(setLastName, validateName(setLastNameErrors, "Last name"))}
+                        onChange={handleLastNameChange}
                         type="text"
                         id={lastNameId}
                         className="text-slate-400 grow focus:border-0 outline-none"
@@ -254,7 +224,7 @@ const Register = (): JSX.Element => {
                     <input
                         type="text"
                         value={firstName}
-                        onChange={handleInputChange(setFirstName, validateName(setFirstNameErrors, "First name"))}
+                        onChange={handleFirstNameChange}
                         id={firstNameId}
                         className="text-slate-400 grow focus:border-0 outline-none"
                         placeholder="Nhập tên của bạn"
@@ -282,7 +252,7 @@ const Register = (): JSX.Element => {
                     <input
                         type="email"
                         value={email}
-                        onChange={handleInputChange(setEmail, validateEmail)}
+                        onChange={handleEmailChange}
                         id={emailId}
                         className="text-slate-400 grow focus:border-0 outline-none"
                         placeholder="Nhập email"
@@ -311,7 +281,7 @@ const Register = (): JSX.Element => {
                         type="text"
                         id={userNameId}
                         value={userName}
-                        onChange={handleInputChange(setUserName, validateUserName)}
+                        onChange={handleUserNameChange}
                         className="text-slate-400 grow focus:border-0 outline-none"
                         placeholder="Nhập tài khoản"
                     />
@@ -338,7 +308,7 @@ const Register = (): JSX.Element => {
                     <input
                         id={passwordId}
                         value={password}
-                        onChange={handleInputChange(setPassword, validatePassword)}
+                        onChange={handlePasswordChange}
                         type="password"
                         className="text-slate-400 grow focus:border-0 outline-none"
                         placeholder="Nhập mật khẩu"
@@ -368,7 +338,7 @@ const Register = (): JSX.Element => {
                         id={confirmPasswordId}
                         type="password"
                         value={confirmPassword}
-                        onChange={handleInputChange(setConfirmPassword, validateConfirmPassword)}
+                        onChange={handleConfirmPasswordChange}
                         className="text-slate-400 grow focus:border-0 outline-none"
                         placeholder="Nhập lại mật khẩu"
                     />

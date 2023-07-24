@@ -1,7 +1,7 @@
 import {Link} from "react-router-dom";
 import logo from "../assets/logo.svg";
 import {BsFacebook, BsTwitter, BsReddit, BsTelegram} from "react-icons/bs";
-import {Section} from "./Section";
+import {Section} from "../components/Section";
 
 const Footer = (): JSX.Element => {
     return (

@@ -7,7 +7,6 @@ import {DefaultLayout, UserLayout} from "../../layouts";
 import {Test} from "../../pages/Test";
 import {AuthLayout} from "../../layouts";
 import {BooksChapter, BooksIndex, BooksInfo} from "../../pages/books";
-import {booksInfoLoader} from "./loaders/booksLoader";
 import React from "react";
 import {UserPassword, UserProfile} from "../../pages/user";
 import {Login, Register} from "../../pages/auth";
@@ -41,8 +40,7 @@ const routes: RouteObject[] = [
                             },
                             {
                                 path: "chapters/:index",
-                                element: <BooksChapter/>,
-                                loader: booksInfoLoader
+                                element: <BooksChapter/>
                             },
                         ]
                     },

@@ -10,6 +10,7 @@ import {useAccessToken} from "../../helpers/hooks/useAccessToken";
 import {useSystemContext} from "../../contexts/SystemContext";
 import {ToastVariant} from "../../components/Toast";
 import {useNavigate} from "react-router-dom";
+import {useQuery} from "react-query";
 
 const InfoChangingForm = (): JSX.Element => {
     const [firstName, setFirstName] = useState<string>("");
@@ -39,33 +40,24 @@ const InfoChangingForm = (): JSX.Element => {
         }
 
         try {
-            const user: any = await userApiHelper.updateUserInformation(accessToken, {
+            const user: any = await userApiHelper.updateUserProfile(accessToken, {
                 firstName,
                 lastName,
                 email,
                 avatar
             });
 
-            if (typeof user.userName !== "string") {
-                systemDispatch({
-                    type: "addToast", payload: {
-                        title: "Có lỗi xảy ra! Vui lòng thử lại.",
-                        variant: ToastVariant.Error
-                    }
-                });
-            } else {
-                systemDispatch({
-                    type: "addToast", payload: {
-                        title: "Cập nhật thành công.",
-                        variant: ToastVariant.Success
-                    }
-                })
+            systemDispatch({
+                type: "addToast", payload: {
+                    title: "Cập nhật thành công.",
+                    variant: ToastVariant.Success
+                }
+            })
 
-                // Reload after 2 secs
-                setTimeout(() => {
-                    navigate(0);
-                }, 2000);
-            }
+            // Reload after 2 secs
+            setTimeout(() => {
+                navigate(0);
+            }, 2000);
         } catch (error: any) {
             systemDispatch({
                 type: "addToast", payload: {
@@ -184,8 +176,18 @@ const InfoChangingForm = (): JSX.Element => {
 const UserProfile = (): JSX.Element => {
     const {state, dispatch} = useAuthenticationContext();
     const [openDialog, setOpenDialog] = useState<boolean>(false);
+    const [accessToken, setAccessToken] = useAccessToken();
 
     const baseUrl = useBaseUrl();
+
+    const {isLoading, error, data} = useQuery(
+        "profile",
+        () => userApiHelper.getUserProfile(accessToken)
+    );
+
+    if (!data || isLoading || error) {
+        return <div></div>
+    }
 
     const handleCloseDialog = () => {
         setOpenDialog(!openDialog);
@@ -206,7 +208,7 @@ const UserProfile = (): JSX.Element => {
             <BsPencil/> <span>Sửa thông tin</span>
         </button>
 
-        <ul className="mt-12 self-start text-base sm:text-lg">
+        <ul className="mt-10 self-start text-base sm:text-lg flex flex-col gap-y-3">
             <li className="flex flex-row gap-x-2 items-center">
                 <span className="w-4 h-4 bg-oldRose block shrink-0 self-start mt-1"></span>
                 <span className="font-semibold">
@@ -225,7 +227,28 @@ const UserProfile = (): JSX.Element => {
             <li className="flex flex-row gap-x-2 items-center">
                 <span className="w-4 h-4 bg-oldRose block shrink-0 self-start mt-1"></span>
                 <span className="font-semibold">
-                    Bình luận: <span className="text-oldRose">0</span>
+                    Đã bình luận: <span className="text-oldRose">{data.totalComments}</span>
+                </span>
+            </li>
+
+            <li className="flex flex-row gap-x-2 items-center">
+                <span className="w-4 h-4 bg-oldRose block shrink-0 self-start mt-1"></span>
+                <span className="font-semibold">
+                    Đã đề cử: <span className="text-oldRose">{data.totalUpvotes}</span>
+                </span>
+            </li>
+
+            <li className="flex flex-row gap-x-2 items-center">
+                <span className="w-4 h-4 bg-oldRose block shrink-0 self-start mt-1"></span>
+                <span className="font-semibold">
+                    Đã đánh dấu: <span className="text-oldRose">{data.totalBookmarks}</span>
+                </span>
+            </li>
+
+            <li className="flex flex-row gap-x-2 items-center">
+                <span className="w-4 h-4 bg-oldRose block shrink-0 self-start mt-1"></span>
+                <span className="font-semibold">
+                    Đã thích: <span className="text-oldRose">{data.totalReactions}</span>
                 </span>
             </li>
         </ul>

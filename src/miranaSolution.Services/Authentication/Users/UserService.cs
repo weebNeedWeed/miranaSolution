@@ -4,6 +4,7 @@ using miranaSolution.DTOs.Authentication.Users;
 using miranaSolution.Services.Exceptions;
 using miranaSolution.Services.Systems.Images;
 using miranaSolution.Services.Systems.JwtTokenGenerators;
+using miranaSolution.Services.Validations;
 
 namespace miranaSolution.Services.Authentication.Users;
 
@@ -13,16 +14,18 @@ public class UserService : IUserService
     private readonly SignInManager<AppUser> _signInManager;
     private readonly IJwtTokenGenerator _jwtTokenGenerator;
     private readonly IImageSaver _imageSaver;
+    private readonly IValidatorProvider _validatorProvider;
 
     public UserService(
         UserManager<AppUser> userManager, 
         SignInManager<AppUser> signInManager,
-        IJwtTokenGenerator jwtTokenGenerator, IImageSaver imageSaver)
+        IJwtTokenGenerator jwtTokenGenerator, IImageSaver imageSaver, IValidatorProvider validatorProvider)
     {
         _userManager = userManager;
         _signInManager = signInManager;
         _jwtTokenGenerator = jwtTokenGenerator;
         _imageSaver = imageSaver;
+        _validatorProvider = validatorProvider;
     }
     
     /// <exception cref="UserAlreadyExistsException">
@@ -30,6 +33,8 @@ public class UserService : IUserService
     /// </exception>
     public async Task<RegisterUserResponse> RegisterUserAsync(RegisterUserRequest request)
     {
+        _validatorProvider.Validate(request);
+        
         var user = await _userManager.FindByEmailAsync(request.Email);
         if (user is not null)
         {
@@ -67,6 +72,8 @@ public class UserService : IUserService
     /// </exception>
     public async Task<AuthenticateUserResponse> AuthenticateUserAsync(AuthenticateUserRequest request)
     {
+        _validatorProvider.Validate(request);
+        
         var user = await _userManager.FindByNameAsync(request.UserName);
         if (user is null)
         {
@@ -123,8 +130,10 @@ public class UserService : IUserService
     /// <exception cref="UserNotFoundException">
     /// Thrown when the user with given User Name does not exist
     /// </exception>
-    public async Task<UpdateUserInformationResponse> UpdateUserInformationAsync(UpdateUserInformationRequest request)
+    public async Task<UpdateUserProfileResponse> UpdateUserProfileAsync(UpdateUserProfileRequest request)
     {
+        _validatorProvider.Validate(request);
+        
         var user = await _userManager.FindByNameAsync(request.UserName);
         if (user is null)
         {
@@ -145,7 +154,7 @@ public class UserService : IUserService
         
         var userVm = MapUserIntoUserVm(user);
 
-        var response = new UpdateUserInformationResponse(userVm);
+        var response = new UpdateUserProfileResponse(userVm);
         return response;
     }
 
@@ -157,6 +166,8 @@ public class UserService : IUserService
     /// </exception>
     public async Task<UpdateUserPasswordResponse> UpdateUserPasswordAsync(UpdateUserPasswordRequest request)
     {
+        _validatorProvider.Validate(request);
+        
         var user = await _userManager.FindByNameAsync(request.UserName);
         if (user is null)
         {

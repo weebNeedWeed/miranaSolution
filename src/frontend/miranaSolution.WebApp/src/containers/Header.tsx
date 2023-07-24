@@ -1,5 +1,5 @@
 import {useState} from "react";
-import {GenreTag, Section, Slider} from "./index";
+import {GenreTag, Section, Slider} from "../components";
 import {BsBoxArrowInRight} from "react-icons/bs";
 import {AnimatePresence, motion} from "framer-motion";
 import {useQuery} from "react-query";

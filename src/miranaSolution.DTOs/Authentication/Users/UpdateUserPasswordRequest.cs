@@ -3,4 +3,5 @@
 public record UpdateUserPasswordRequest(
     string UserName, 
     string CurrentPassword,
-    string NewPassword);
+    string NewPassword,
+    string NewPasswordConfirmation);

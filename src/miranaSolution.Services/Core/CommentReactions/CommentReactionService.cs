@@ -21,17 +21,12 @@ public class CommentReactionService : ICommentReactionService
 
     public async Task<CreateCommentReactionResponse> CreateCommentReactionAsync(CreateCommentReactionRequest request)
     {
-        var getUserByIdResponse = await _userService.GetUserByIdAsync(
-            new GetUserByIdRequest(request.UserId));
-        if (getUserByIdResponse.UserVm is null)
+        // Validated the user has not reacted to the comment
+        var userAlreadyReacts = await _context.CommentReactions.AnyAsync(
+            x => x.CommentId == request.CommentId && x.UserId == request.UserId);
+        if (userAlreadyReacts)
         {
-            throw new UserNotFoundException("The user with given Id does not exist.");
-        }
-        
-        var comment = await _context.Comments.FindAsync(request.CommentId);
-        if (comment is null)
-        {
-            throw new CommentNotFoundException("The comment with given Id does not exist.");
+            throw new UserAlreadyReactsToCommentException("The user already reacts to the comment.");
         }
 
         var commentReaction = new CommentReaction
@@ -50,17 +45,11 @@ public class CommentReactionService : ICommentReactionService
 
     public async Task DeleteCommentReactionAsync(DeleteCommentReactionRequest request)
     {
-        var getUserByIdResponse = await _userService.GetUserByIdAsync(
-            new GetUserByIdRequest(request.UserId));
-        if (getUserByIdResponse.UserVm is null)
+        var userAlreadyReacts = await _context.CommentReactions.AnyAsync(
+            x => x.CommentId == request.CommentId && x.UserId == request.UserId);
+        if (!userAlreadyReacts)
         {
-            throw new UserNotFoundException("The user with given Id does not exist.");
-        }
-        
-        var comment = await _context.Comments.FindAsync(request.CommentId);
-        if (comment is null)
-        {
-            throw new CommentNotFoundException("The comment with given Id does not exist.");
+            throw new UserNotReactedToCommentException("The user does not react to the comment.");
         }
 
         var commentReaction = new CommentReaction

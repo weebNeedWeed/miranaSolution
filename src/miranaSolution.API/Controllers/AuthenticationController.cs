@@ -33,7 +33,8 @@ public class AuthenticationController : ControllerBase
                     request.LastName,
                     request.UserName,
                     request.Email,
-                    request.Password));
+                    request.Password,
+                    request.PasswordConfirmation));
             
             return Ok(new ApiSuccessResult<UserVm>(registerUserResponse.UserVm));
         }
@@ -50,15 +51,9 @@ public class AuthenticationController : ControllerBase
         {
             var authenticateUserResponse = await _userService.AuthenticateUserAsync(
                 new AuthenticateUserRequest(request.UserName, request.Password));
-
-            var userVm = authenticateUserResponse.UserVm;
+            
             var response = new ApiAuthenticateUserResponse(
-                userVm.Id,
-                userVm.FirstName,
-                userVm.LastName,
-                userVm.UserName,
-                userVm.Email,
-                userVm.Avatar,
+                authenticateUserResponse.UserVm,
                 authenticateUserResponse.Token);
                 
             return Ok(new ApiSuccessResult<ApiAuthenticateUserResponse>(response));

@@ -201,7 +201,7 @@ const FilterSection = (props: FIltersSectionProps): JSX.Element => {
     const [searchParams] = useSearchParams();
     const {isLoading, error, data: genresData} = useQuery(
         "genres",
-        () => genreApiHelper.getAll());
+        () => genreApiHelper.getAllGenres());
     if (isLoading || error || !genresData) {
         return <div></div>;
     }
@@ -384,7 +384,7 @@ const BookCardList = (props: BookCardListProps): JSX.Element => {
         () => bookApiHelper.getAllBooks(request),
     );
 
-    return <div className="w-full p-5 bg-[rgba(255,255,255,0.8)] h-full min-h-[600px] flex flex-col  rounded-br-md">
+    return <div className="w-full p-5 bg-[rgba(255,255,255,0.8)] h-full min-h-[850px] flex flex-col  rounded-br-md">
         <div className="flex flex-row flex-wrap md:mr-[-0.75rem]">
             {(isLoading || error || !data) && <>Loading...</>}
             {data && data.books.map(book => <BookCard slug={book.slug} key={book.id} name={book.name}

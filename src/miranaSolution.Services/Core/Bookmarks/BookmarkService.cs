@@ -112,9 +112,22 @@ public class BookmarkService : IBookmarkService
             throw new UserNotFoundException("The user with given Id does not exist.");
         }
 
-        var bookmarks = await _context.Bookmarks
-            .Where(x => x.UserId == request.UserId)
-            .ToListAsync();
+        var query = _context.Bookmarks
+            .Where(x => x.UserId == request.UserId);
+        
+        if (request.BookId.HasValue)
+        {
+            var getBookByIdResponse = await _bookService.GetBookByIdAsync(
+                new GetBookByIdRequest(request.BookId ?? default));
+            if (getBookByIdResponse.BookVm is null)
+            {
+                throw new BookNotFoundException("The book with given Id does not exist.");
+            }
+
+            query = query.Where(x => x.BookId == getBookByIdResponse.BookVm.Id);
+        }
+
+        var bookmarks = await query.ToListAsync();
 
         var bookmarkVms = bookmarks.Select(
             x => new BookmarkVm(

@@ -7,4 +7,5 @@ public record ApiGetAllBookChaptersResponse(
     List<ChapterVm> Chapters,
     int PageIndex,
     int PageSize,
-    int TotalPages);
+    int TotalPages,
+    int TotalChapters);

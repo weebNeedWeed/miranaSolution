@@ -17,7 +17,7 @@ const Dialog = (props: DialogProps): JSX.Element => {
         children,
     } = props;
 
-    return <div className={clsx(open ? "block" : "hidden", "absolute top-0 left-0 w-[100vw] h-[100vh]")}>
+    return <div className={clsx(open ? "block" : "hidden", "z-40 absolute top-0 left-0 w-[100vw] h-[100vh]")}>
         <div className="fixed bg-[rgba(0,0,0,0.7)] w-full h-full"></div>
         <div className="fixed w-full mt-20 top-0 left-0 text-deepKoamaru px-8">
             <div className="mx-auto bg-white shadow-black shadow p-5 rounded max-w-full" style={{width: width}}>

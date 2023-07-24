@@ -1,6 +1,6 @@
 ﻿namespace miranaSolution.API.ViewModels.Users;
 
-public record ApiUpdateUserInformationRequest(
+public record ApiUpdateUserProfileRequest(
     string FirstName,
     string LastName,
     string Email,

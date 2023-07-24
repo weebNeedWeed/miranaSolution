@@ -8,6 +8,7 @@ using miranaSolution.DTOs.Core.Comments;
 using miranaSolution.Services.Authentication.Users;
 using miranaSolution.Services.Core.Books;
 using miranaSolution.Services.Exceptions;
+using miranaSolution.Services.Validations;
 
 namespace miranaSolution.Services.Core.Comments;
 
@@ -16,16 +17,20 @@ public class CommentService : ICommentService
     private readonly IUserService _userService;
     private readonly IBookService _bookService;
     private readonly MiranaDbContext _context;
+    private readonly IValidatorProvider _validatorProvider;
     
-    public CommentService(IUserService userService, IBookService bookService, MiranaDbContext context)
+    public CommentService(IUserService userService, IBookService bookService, MiranaDbContext context, IValidatorProvider validatorProvider)
     {
         _userService = userService;
         _bookService = bookService;
         _context = context;
+        _validatorProvider = validatorProvider;
     }
 
     public async Task<CreateBookCommentResponse> CreateBookCommentAsync(CreateBookCommentRequest request)
     {
+        _validatorProvider.Validate(request);
+        
         var getUserByIdResponse = await _userService.GetUserByIdAsync(
             new GetUserByIdRequest(request.UserId));
         if (getUserByIdResponse.UserVm is null)

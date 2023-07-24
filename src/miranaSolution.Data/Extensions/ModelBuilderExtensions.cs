@@ -157,7 +157,7 @@ public static class ModelBuilderExtensions
             LastName = "Admin",
             UserName = "adminadmin",
             NormalizedUserName = "ADMINADMIN",
-            PasswordHash = new PasswordHasher<AppUser>().HashPassword(null, "Admin123"),
+            PasswordHash = new PasswordHasher<AppUser>().HashPassword(null, "@Admin123"),
             Email = "admin@admin.com",
             SecurityStamp = Guid.NewGuid().ToString()
         });

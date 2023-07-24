@@ -21,9 +21,9 @@ const DefaultLayout = (): JSX.Element => {
 
         (async () => {
             if (accessToken && accessToken !== "") {
-                const user = await getUserByAccessToken(accessToken);
+                const result = await getUserByAccessToken(accessToken);
 
-                if (user === null) {
+                if (result === null) {
                     setAccessToken("");
                     systemDispatch({
                         type: "addToast", payload: {
@@ -35,7 +35,17 @@ const DefaultLayout = (): JSX.Element => {
                     return;
                 }
 
-                authenticationDispatch({type: "setUserData", payload: user});
+                authenticationDispatch({
+                    type: "setUserData", payload: {
+                        user: result.user
+                    }
+                });
+
+                authenticationDispatch({
+                    type: "setLoginStatus", payload: {
+                        status: true
+                    }
+                });
             }
         })();
 

@@ -6,6 +6,7 @@ using miranaSolution.DTOs.Core.Books;
 using miranaSolution.DTOs.Core.Chapters;
 using miranaSolution.Services.Core.Books;
 using miranaSolution.Services.Exceptions;
+using miranaSolution.Services.Validations;
 
 namespace miranaSolution.Services.Core.Chapters;
 
@@ -13,11 +14,13 @@ public class ChapterService : IChapterService
 {
     private readonly MiranaDbContext _context;
     private readonly IBookService _bookService;
+    private readonly IValidatorProvider _validatorProvider;
 
-    public ChapterService(MiranaDbContext context, IBookService bookService)
+    public ChapterService(MiranaDbContext context, IBookService bookService, IValidatorProvider validatorProvider)
     {
         _context = context;
         _bookService = bookService;
+        _validatorProvider = validatorProvider;
     }
     
     /// <exception cref="BookNotFoundException">
@@ -25,6 +28,8 @@ public class ChapterService : IChapterService
     /// </exception>
     public async Task<CreateBookChapterResponse> CreateBookChapterAsync(CreateBookChapterRequest request)
     {
+        _validatorProvider.Validate(request);
+        
         var getBookByIdResponse = await _bookService.GetBookByIdAsync(new GetBookByIdRequest(request.BookId));
         if (getBookByIdResponse.BookVm is null)
         {
@@ -65,7 +70,8 @@ public class ChapterService : IChapterService
                 chapter.WordCount,
                 chapter.Content,
                 chapter.Index < getTotalChaptersResponse.TotalChapters,
-                chapter.Index > 1
+                chapter.Index > 1,
+                chapter.BookId
             ));
         
         return response;
@@ -93,7 +99,8 @@ public class ChapterService : IChapterService
                 x.WordCount,
                 x.Content,
                 x.Index < totalChapters,
-                x.Index > 1
+                x.Index > 1,
+                x.BookId
             ))
             .ToListAsync();
 
@@ -137,7 +144,8 @@ public class ChapterService : IChapterService
             chapter.WordCount,
             chapter.Content,
             chapter.Index < getTotalChaptersResponse.TotalChapters,
-            chapter.Index > 1);
+            chapter.Index > 1,
+            chapter.BookId);
 
         var response = new GetBookChapterByIndexResponse(chapterVm);
 
@@ -172,11 +180,14 @@ public class ChapterService : IChapterService
                 x.WordCount,
                 x.Content,
                 false,
-                false
+                false,
+                x.BookId
             ))
             .ToListAsync();
 
         var response = new GetLatestCreatedChaptersResponse(chapterVms);
         return response;
     }
+
+    // TODO: Add the method for updating the chapter here
 }

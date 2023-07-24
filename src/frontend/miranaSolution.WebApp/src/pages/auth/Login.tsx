@@ -1,12 +1,12 @@
 import {useId, useState} from "react";
 import {AiOutlineLock, AiOutlineUser} from "react-icons/ai";
 import {Link, useNavigate} from "react-router-dom";
-import {userApiHelper} from "../../helpers/apis/UserApiHelper";
 import {useSystemContext} from "../../contexts/SystemContext";
 import {useAccessToken} from "../../helpers/hooks/useAccessToken";
 import {ToastVariant} from "../../components/Toast";
 import {AuthenticateUserResponse} from "../../helpers/models/auth/AuthenticateUserResponse";
-import {ValidationFailedMessages} from "../../helpers/models/common/ValidationFailedMessages";
+import {ValidationFailureMessages} from "../../helpers/models/common/ValidationFailureMessages";
+import {authApiHelper} from "../../helpers/apis/AuthApiHelper";
 
 const Login = (): JSX.Element => {
     const userNameId = useId();
@@ -21,92 +21,65 @@ const Login = (): JSX.Element => {
     const [password, setPassword] = useState<string>("");
     const [userNameErrors, setUserNameErrors] = useState<Array<string>>([]);
     const [passwordErrors, setPasswordErrors] = useState<Array<string>>([]);
-    const [ableToSubmit, setAbleToSubmit] = useState<boolean>(false);
 
-    const validateUserName = (userName: string) => {
-        var errors: Array<string> = [];
-
-        setAbleToSubmit(true);
-
-        if (userName.trim().length < 8) {
-            errors.push("User name must contain at least 8 characters");
-            setAbleToSubmit(false);
+    const IsValidForm = (): boolean => {
+        if (userName.trim().length == 0) {
+            setUserNameErrors(["Tài khoản không được trống."]);
+            return false;
         }
 
-        setUserNameErrors(errors);
-    };
-
-    const validatePassword = (password: string) => {
-        let errors: Array<string> = [];
-
-        setAbleToSubmit(true);
-        const regex = new RegExp(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/);
-
-        if (!password.trim().match(regex)) {
-            errors.push(
-                "Password must contain Minimum eight characters, at least one uppercase letter, one lowercase letter, one number and one special character!"
-            );
-            setAbleToSubmit(false);
+        if (password.trim().length == 0) {
+            setPasswordErrors(["Mật khẩu không được trống."]);
+            return false;
         }
 
-        setPasswordErrors(errors);
-    };
+        return true;
+    }
 
     const handleChangeUserName = (event: React.ChangeEvent<HTMLInputElement>) => {
         const _userName = event.target.value;
+
+        if (_userName.trim().length == 0) {
+            setUserNameErrors(["Tài khoản không được trống."]);
+        }
+
         setUserName(_userName);
-        validateUserName(_userName);
     };
 
     const handleChangePassword = (event: React.ChangeEvent<HTMLInputElement>) => {
         const _password = event.target.value;
+
+        if (_password.trim().length == 0) {
+            setPasswordErrors(["Mật khẩu không được trống."]);
+        }
+
         setPassword(_password);
-        validatePassword(_password);
     };
 
     const handleSubmit = async (event: React.FormEvent<unknown>) => {
         event.preventDefault();
 
-        if (!ableToSubmit) {
-            validateUserName(userName);
-            validatePassword(password);
+        if (!IsValidForm()) {
             return;
         }
 
         try {
-            const response = await userApiHelper.authenticate({userName, password});
-            if ("token" in response) {
-                systemContext.dispatch({
-                    type: "addToast", payload: {
-                        title: "Đăng nhập thành công",
-                        variant: ToastVariant.Success
-                    }
-                });
-
-                // Save access token into the localStorage
-                let authData = response as AuthenticateUserResponse;
-                setAccessToken(authData.token);
-
-                setTimeout(() => {
-                    navigate("/");
-                }, 3000);
-
-                return;
-            }
-
-            const errors: any = response as ValidationFailedMessages<AuthenticateUserResponse>;
-            for (let key in errors) {
-                switch (key) {
-                    case "UserName":
-                        setUserNameErrors(errors[key]);
-                        break;
-                    case "Password":
-                        setPasswordErrors(errors[key]);
-                        break;
-                    default:
-                        break;
+            const response = await authApiHelper.authenticate({userName, password});
+            systemContext.dispatch({
+                type: "addToast", payload: {
+                    title: "Đăng nhập thành công",
+                    variant: ToastVariant.Success
                 }
-            }
+            });
+
+            // Save access token into the localStorage
+            let authData = response as AuthenticateUserResponse;
+            setAccessToken(authData.token);
+
+            setTimeout(() => {
+                navigate("/");
+            }, 3000);
+
         } catch (error: any) {
             systemContext.dispatch({
                 type: "addToast", payload: {

@@ -10,4 +10,5 @@ public record ChapterVm(
     int WordCount,
     string Content,
     bool HasNextChapter,
-    bool HasPreviousChapter);
+    bool HasPreviousChapter,
+    int BookId);

@@ -1,7 +1,9 @@
 import {Section} from "../components";
 import {FaLock, FaUserAlt} from "react-icons/fa";
 import clsx from "clsx";
-import {NavLink, Outlet} from "react-router-dom";
+import {NavLink, Outlet, useNavigate} from "react-router-dom";
+import {useAuthenticationContext} from "../contexts/AuthenticationContext";
+import {useEffect} from "react";
 
 type SideNavButtonProps = {
     title: string,
@@ -23,6 +25,15 @@ const SideNavButton = (props: SideNavButtonProps): JSX.Element => {
 };
 
 const UserLayout = (): JSX.Element => {
+    const authContext = useAuthenticationContext();
+    const navigate = useNavigate();
+
+    useEffect(() => {
+        if (!authContext.state.isLoggedIn) {
+            navigate("/");
+        }
+    }, [authContext.state.isLoggedIn]);
+
     return <Section className="text-deepKoamaru">
         <div className="flex w-full flex-row items-stretch">
             <div className="sm:w-1/4 bg-oldRose p-3 md:p-6 rounded shrink-0 shadow-deepKoamaru shadow-sm">
@@ -33,7 +44,7 @@ const UserLayout = (): JSX.Element => {
                 </div>
             </div>
 
-            <div className="bg-[rgba(255,255,255,0.8)] grow w-full p-3 md:p-6 rounded-r-md min-h-[800px]">
+            <div className="bg-[rgba(255,255,255,0.8)] grow w-full p-3 md:p-6 rounded-r-md min-h-[850px]">
                 <Outlet/>
             </div>
         </div>

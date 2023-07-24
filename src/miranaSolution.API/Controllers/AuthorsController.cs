@@ -1,10 +1,10 @@
+using FluentValidation;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using miranaSolution.API.Extensions;
 using miranaSolution.API.ViewModels.Authors;
 using miranaSolution.API.ViewModels.Common;
-using miranaSolution.DTOs.Common;
 using miranaSolution.DTOs.Core.Authors;
-using miranaSolution.DTOs.Core.Genres;
 using miranaSolution.Services.Core.Authors;
 using miranaSolution.Services.Exceptions;
 using miranaSolution.Utilities.Constants;
@@ -28,14 +28,17 @@ public class AuthorsController : ControllerBase
     public async Task<IActionResult> GetAllAuthors()
     {
         var getAllAuthorsResponse = await _authorService.GetAllAuthorsAsync();
-        return Ok(new ApiSuccessResult<List<AuthorVm>>(getAllAuthorsResponse.AuthorVms));
+        var response = new ApiGetAllAuthorsResponse(getAllAuthorsResponse.AuthorVms);
+        
+        return Ok(new ApiSuccessResult<ApiGetAllAuthorsResponse>(response));
     }
 
     [HttpPost]
     public async Task<IActionResult> CreateAuthor([FromBody] ApiCreateAuthorRequest request)
     {
         var createAuthorResponse = await _authorService.CreateAuthorAsync(
-            new CreateAuthorRequest(request.Name));
+                new CreateAuthorRequest(request.Name));
+
         return Ok(new ApiSuccessResult<AuthorVm>(createAuthorResponse.AuthorVm));
     }
     

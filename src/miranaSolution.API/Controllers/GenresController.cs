@@ -26,7 +26,9 @@ public class GenresController : ControllerBase
     public async Task<IActionResult> GetAllGenres()
     {
         var getAllGenresResponse = await _genreService.GetAllGenresAsync();
-        return Ok(new ApiSuccessResult<List<GenreVm>>(getAllGenresResponse.GenreVms));
+        var response = new ApiGetAllGenreResponse(getAllGenresResponse.GenreVms);
+        
+        return Ok(new ApiSuccessResult<ApiGetAllGenreResponse>(response));
     }
 
     [HttpGet("{genreId:int}")]

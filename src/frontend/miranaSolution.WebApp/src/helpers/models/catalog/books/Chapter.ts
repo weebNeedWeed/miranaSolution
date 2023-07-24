@@ -9,4 +9,5 @@ export interface Chapter {
     content: string;
     hasNextChapter: boolean;
     hasPreviousChapter: boolean;
+    bookId: number;
 }

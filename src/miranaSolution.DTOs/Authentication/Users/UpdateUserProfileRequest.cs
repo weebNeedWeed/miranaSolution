@@ -1,6 +1,6 @@
 ﻿namespace miranaSolution.DTOs.Authentication.Users;
 
-public record UpdateUserInformationRequest(
+public record UpdateUserProfileRequest(
     string UserName,
     string FirstName,
     string LastName,

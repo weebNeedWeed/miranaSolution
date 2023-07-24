@@ -60,7 +60,7 @@ const Pager = (props: PagerProps): JSX.Element => {
             queryString.append(entry[0], entry[1]);
         }
 
-        if (doesPreviousButtonExist) {
+        if (doesNextButtonExist) {
             queryString.append("pageIndex", totalPages.toString());
         }
 
@@ -79,9 +79,7 @@ const Pager = (props: PagerProps): JSX.Element => {
                 queryString.append(entry[0], entry[1]);
             }
 
-            if (doesPreviousButtonExist) {
-                queryString.append("pageIndex", pageNumber.toString());
-            }
+            queryString.append("pageIndex", pageNumber.toString());
 
             navigate(location.pathname + "?" + queryString.toString());
         }
@@ -91,7 +89,8 @@ const Pager = (props: PagerProps): JSX.Element => {
 
     const numberButtons: JSX.Element[] = [];
     for (let page = startPageNumber; page <= endPageNumber; ++page) {
-        numberButtons.push(<PagerButton isActive={page === pageIndex}
+        numberButtons.push(<PagerButton key={page}
+                                        isActive={page === pageIndex}
                                         onClick={handleGoToSpecificPageFnFactory(page)}>{page}</PagerButton>);
     }
 

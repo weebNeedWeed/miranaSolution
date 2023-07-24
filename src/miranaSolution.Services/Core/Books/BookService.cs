@@ -5,6 +5,7 @@ using miranaSolution.DTOs.Common;
 using miranaSolution.DTOs.Core.Books;
 using miranaSolution.Services.Exceptions;
 using miranaSolution.Services.Systems.Images;
+using miranaSolution.Services.Validations;
 
 namespace miranaSolution.Services.Core.Books;
 
@@ -12,11 +13,13 @@ public class BookService : IBookService
 {
     private readonly MiranaDbContext _context;
     private readonly IImageSaver _imageSaver;
+    private readonly IValidatorProvider _validatorProvider;
     
-    public BookService(MiranaDbContext context, IImageSaver imageSaver)
+    public BookService(MiranaDbContext context, IImageSaver imageSaver, IValidatorProvider validatorProvider)
     {
         _context = context;
         _imageSaver = imageSaver;
+        _validatorProvider = validatorProvider;
     }
 
     public async Task<GetBookByIdResponse> GetBookByIdAsync(GetBookByIdRequest request)
@@ -57,6 +60,13 @@ public class BookService : IBookService
     /// </exception>
     public async Task<CreateBookResponse> CreateBookAsync(CreateBookRequest request)
     {
+        _validatorProvider.Validate(request);
+
+        if (!await _context.Authors.AnyAsync(x => x.Id == request.AuthorId))
+        {
+            throw new AuthorNotFoundException("The author with given Id does not exist.");
+        }
+
         var book = await _context.Books.FirstOrDefaultAsync(x => x.Slug.Equals(request.Slug));
         if (book is not null)
         {
@@ -91,6 +101,8 @@ public class BookService : IBookService
     /// </exception>
     public async Task<UpdateBookResponse> UpdateBookAsync(UpdateBookRequest request)
     {
+        _validatorProvider.Validate(request);
+        
         var book = await _context.Books.FindAsync(request.BookId);
         if (book is null)
         {
@@ -231,6 +243,19 @@ public class BookService : IBookService
             pagerResponse);
         
         return response;
+    }
+
+    public async Task<GetMostReadingBooksResponse> GetMostReadingBooks(GetMostReadingBooksRequest request)
+    {
+        var books = await _context.Books
+            .OrderByDescending(x => x.UpdatedAt)
+            .Take(request.NumberOfBooks)
+            .ToListAsync();
+
+        var bookVms = books.Select(MapBookIntoBookVm)
+            .ToList();
+
+        return new GetMostReadingBooksResponse(bookVms);
     }
 
     private BookVm MapBookIntoBookVm(Book book)

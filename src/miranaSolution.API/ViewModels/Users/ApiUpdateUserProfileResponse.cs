@@ -1,6 +1,6 @@
 ﻿namespace miranaSolution.API.ViewModels.Users;
 
-public record ApiUpdateUserInformationResponse(
+public record ApiUpdateUserProfileResponse(
     Guid Id,
     string FirstName,
     string LastName,

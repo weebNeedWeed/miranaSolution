@@ -3,16 +3,19 @@ using miranaSolution.Data.Entities;
 using miranaSolution.Data.Main;
 using miranaSolution.DTOs.Core.Genres;
 using miranaSolution.Services.Exceptions;
+using miranaSolution.Services.Validations;
 
 namespace miranaSolution.Services.Core.Genres;
 
 public class GenreService : IGenreService
 {
     private readonly MiranaDbContext _context;
+    private readonly IValidatorProvider _validatorProvider;
 
-    public GenreService(MiranaDbContext context)
+    public GenreService(MiranaDbContext context, IValidatorProvider validatorProvider)
     {
         _context = context;
+        _validatorProvider = validatorProvider;
     }
     
     public async Task<GetAllGenresResponse> GetAllGenresAsync()
@@ -44,6 +47,8 @@ public class GenreService : IGenreService
 
     public async Task<CreateGenreResponse> CreateGenreAsync(CreateGenreRequest request)
     {
+        _validatorProvider.Validate(request);
+        
         var genre = new Genre
         {
             Name = request.Name
@@ -74,6 +79,8 @@ public class GenreService : IGenreService
 
     public async Task<UpdateGenreResponse> UpdateGenreAsync(UpdateGenreRequest request)
     {
+        _validatorProvider.Validate(request);
+        
         var genre = await _context.Genres.FindAsync(request.GenreId);
         if (genre is null)
         {

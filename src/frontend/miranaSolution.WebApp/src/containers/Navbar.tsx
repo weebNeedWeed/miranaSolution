@@ -10,16 +10,17 @@ import {useAuthenticationContext} from "../contexts/AuthenticationContext";
 import {BiUser} from "react-icons/bi";
 import {useAccessToken} from "../helpers/hooks/useAccessToken";
 import {useSystemContext} from "../contexts/SystemContext";
-import {ToastVariant} from "./Toast";
-import {Avatar} from "./Avatar";
+import {ToastVariant} from "../components/Toast";
+import {Avatar, Dialog} from "../components";
 import {useBaseUrl} from "../helpers/hooks/useBaseUrl";
-import {Section} from "./Section";
+import {Section} from "../components";
+import {useMediaQuery} from "../helpers/hooks/useMediaQuery";
+import {User} from "../helpers/models/catalog/user/User";
 
 type GenresBoxProps = {};
 const GenresBox = (props: GenresBoxProps): JSX.Element => {
-    const {isLoading, data, error} = useQuery("genres", () => genreApiHelper.getAll(), {
-        staleTime: Infinity
-    });
+    const {isLoading, data, error} = useQuery("genres",
+        () => genreApiHelper.getAllGenres());
 
     if (isLoading || error || !data) {
         return <></>;
@@ -52,8 +53,9 @@ const GenresBox = (props: GenresBoxProps): JSX.Element => {
 
 type MenuProps = {
     className?: string;
+    handleOpenGenresBox?: () => void
 };
-const Menu = ({className}: MenuProps): JSX.Element => {
+const Menu = ({className, handleOpenGenresBox}: MenuProps): JSX.Element => {
     const pClass = clsx(
         "font-sansPro text-deepKoamaru font-semibold",
         className && className
@@ -68,7 +70,7 @@ const Menu = ({className}: MenuProps): JSX.Element => {
                 <NavLink to="/books">Tìm kiếm</NavLink>
             </div>
             <div className={clsx(pClass, "group relative")}>
-                <button>Thể loại</button>
+                <button onClick={handleOpenGenresBox}>Thể loại</button>
 
                 <div
                     className="shadow-md shadow-oldRose md:group-hover:block left-[50%] absolute hidden bg-oldRose top-full opacity-80 w-56 h-auto translate-x-[-50%] rounded-sm">
@@ -100,27 +102,14 @@ const Navbar = (): JSX.Element => {
     const [openUserMenu, setOpenUserMenu] = useState<boolean>(false);
     const [accessToken, setAccessToken] = useAccessToken();
     const navigate = useNavigate();
+    const [openGenresBox, setOpenGenresBox] = useState<boolean>(false);
+    const matches = useMediaQuery("(max-width: 768px)");
 
-    const isLoggedIn = typeof authenticationState.user.id !== "undefined";
+    const isLoggedIn = authenticationState.isLoggedIn;
 
-    const handleLogout = () => {
-        setAccessToken("");
-        systemDispatch({
-            type: "addToast", payload: {
-                title: "Đăng xuất thành công",
-                variant: ToastVariant.Success
-            }
-        });
+    const {isLoading, data: genresData, error} = useQuery("genres",
+        () => genreApiHelper.getAllGenres());
 
-        // Reload after 2 seconds
-        setTimeout(() => {
-            navigate(0);
-        }, 2000);
-    }
-
-    const handleToggleMenu = (event: MouseEvent<HTMLButtonElement>) => {
-        setToggleMenu((prev) => !prev);
-    };
 
     useEffect(() => {
         if (toggleMenu) {
@@ -131,6 +120,34 @@ const Navbar = (): JSX.Element => {
         }
     }, [toggleMenu]);
 
+    const handleOpenGenresBox = () => {
+        if (matches) {
+            setOpenGenresBox(!openGenresBox);
+        }
+    }
+
+    const handleLogout = () => {
+        setAccessToken("");
+        systemDispatch({
+            type: "addToast", payload: {
+                title: "Đăng xuất thành công",
+                variant: ToastVariant.Success
+            }
+        });
+        authenticationDispatch({
+            type: "resetState"
+        });
+        
+        // Reload after 2 seconds
+        setTimeout(() => {
+            navigate(0);
+        }, 2000);
+    }
+
+    const handleToggleMenu = (event: MouseEvent<HTMLButtonElement>) => {
+        setToggleMenu((prev) => !prev);
+    };
+
     const renderMobileMenu = toggleMenu && (
         <>
             <div className="absolute z-10 top-0 left-full bg-[rgba(0,0,0,0.4)] w-full h-full animate-slideLeft"></div>
@@ -139,18 +156,13 @@ const Navbar = (): JSX.Element => {
                 <div className="w-full flex flex-col pt-28 px-8 items-end text-2xl">
                     {isLoggedIn &&
                         <Link to={"/user/profile"}
-                              className="flex flex-col justify-end items-end cursor-pointer relative mb-4">
-                            <AutoUpdatedAvatar className="w-14 h-14"/>
-
-                            <span className="text-deepKoamaru text-xl">
-                                Hello, <span
-                                className="font-semibold">{authenticationState.user.firstName} {authenticationState.user.lastName}</span>
-                            </span>
+                              className="font-sansPro text-deepKoamaru font-semibold mb-4">
+                            Hồ sơ
                         </Link>}
 
-                    <Menu className="flex mb-4"/>
+                    <Menu className="flex mb-4" handleOpenGenresBox={handleOpenGenresBox}/>
 
-                    {isLoggedIn ? <div className="sm:hidden flex flex-col items-end">
+                    {isLoggedIn ? <div className="md:hidden flex flex-col items-end">
                         <button
                             onClick={handleLogout}
                             className="text-red-600 font-semibold text-deepKoamaru text-2xl font-sansPro mb-8"
@@ -175,25 +187,25 @@ const Navbar = (): JSX.Element => {
 
     return (
         <Section>
-            <nav className="w-full bg-gradient flex flex-row">
+            <nav className="w-full bg-gradient flex flex-row justify-between">
                 <div className="flex flex-row items-center justify-start">
-                    <div className="mr-16 h-[48px] flex items-center">
+                    <div className="mr-12 lg:mr-16 h-[48px] flex items-center">
                         <Link to="/">
                             <img src={logo} alt="logo" className="h-[20px]"/>
                         </Link>
                     </div>
 
                     <div className="hidden md:flex flex-row items-center">
-                        <Menu className="mt-1 mr-10 text-lg flex items-center"/>
+                        <Menu className="mt-1 mr-6 lg:mr-10 text-lg flex items-center"/>
                     </div>
                 </div>
 
-                <div className="grow hidden sm:flex flex-row justify-end items-center mt-1">
+                <div className="grow hidden md:flex flex-row justify-end items-center mt-1">
                     {isLoggedIn ? <div className="flex flex-row justify-end items-center cursor-pointer relative"
                                        onClick={() => setOpenUserMenu(!openUserMenu)}>
-                    <span className="text-deepKoamaru text-lg">
+                    <span className="text-deepKoamaru text-lg flex justify-center gap-x-2">
                         Hello, <span
-                        className="font-semibold">{authenticationState.user.firstName} {authenticationState.user.lastName}</span>
+                        className="font-semibold w-24 inline-block line-clamp-1">{authenticationState.user.firstName} {authenticationState.user.lastName}</span>
                     </span>
 
                         <AutoUpdatedAvatar className="ml-1 w-9 h-9"/>
@@ -230,6 +242,16 @@ const Navbar = (): JSX.Element => {
                     {renderMobileMenu}
                 </div>
             </nav>
+
+            <Dialog open={openGenresBox} width={"400px"} handleClose={() => setOpenGenresBox(false)}>
+                <div className="flex flex-row flex-wrap w-full">
+                    {genresData && genresData.map((genre, index) => <Link
+                        key={index}
+                        to={"/"} className="w-1/3 font-semibold">
+                        {genre.name}
+                    </Link>)}
+                </div>
+            </Dialog>
         </Section>
     );
 };

@@ -62,32 +62,23 @@ const PasswordChangingForm = (): JSX.Element => {
             return;
         }
         try {
-            const result: any = await userApiHelper.updateUserPassword(accessToken, {
+            const result = await userApiHelper.updateUserPassword(accessToken, {
                 currentPassword,
                 newPassword,
                 newPasswordConfirmation
             });
 
-            if (typeof result.userName === "string") {
-                systemDispatch({
-                    type: "addToast", payload: {
-                        title: "Cập nhật mật khẩu thành công.",
-                        variant: ToastVariant.Success
-                    }
-                })
+            systemDispatch({
+                type: "addToast", payload: {
+                    title: "Cập nhật mật khẩu thành công.",
+                    variant: ToastVariant.Success
+                }
+            })
 
-                // Reload after 2 secs
-                setTimeout(() => {
-                    navigate(0);
-                }, 2000);
-            } else {
-                systemDispatch({
-                    type: "addToast", payload: {
-                        title: "Có lỗi xảy ra! Vui lòng thử lại.",
-                        variant: ToastVariant.Error
-                    }
-                });
-            }
+            // Reload after 2 secs
+            setTimeout(() => {
+                navigate(0);
+            }, 2000);
         } catch (error: any) {
             systemDispatch({
                 type: "addToast", payload: {

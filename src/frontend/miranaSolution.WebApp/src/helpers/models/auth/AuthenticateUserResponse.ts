@@ -1,9 +1,6 @@
+import {User} from "../catalog/user/User";
+
 export interface AuthenticateUserResponse {
-    id: string;
-    firstName: string;
-    lastName: string;
-    userName: string;
-    email: string;
-    avatar: string;
+    user: User;
     token: string;
 }

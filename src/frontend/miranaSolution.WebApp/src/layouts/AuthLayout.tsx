@@ -11,8 +11,8 @@ const AuthLayout = (): JSX.Element => {
     useEffect(() => {
         (async () => {
             if (accessToken && accessToken !== "") {
-                const user = await getUserByAccessToken(accessToken);
-                if (user === null) {
+                const result = await getUserByAccessToken(accessToken);
+                if (result === null) {
                     setAccessToken("");
                     return;
                 }

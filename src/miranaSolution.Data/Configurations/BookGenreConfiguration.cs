@@ -14,10 +14,12 @@ public class BookGenreConfiguration : IEntityTypeConfiguration<BookGenre>
 
         builder.HasOne(x => x.Genre)
             .WithMany(x => x.BookGenres)
-            .HasForeignKey(x => x.GenreId);
+            .HasForeignKey(x => x.GenreId)
+            .OnDelete(DeleteBehavior.Cascade);
 
         builder.HasOne(x => x.Book)
             .WithMany(x => x.BookGenres)
-            .HasForeignKey(x => x.BookId);
+            .HasForeignKey(x => x.BookId)
+            .OnDelete(DeleteBehavior.Cascade);
     }
 }

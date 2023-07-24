@@ -1,10 +1,23 @@
 import {createContext, useContext, useReducer} from "react";
-import {User} from "../helpers/models/auth/User";
+import {User} from "../helpers/models/catalog/user/User";
 
 type State = {
+    isLoggedIn: boolean,
     user: User
 };
-type Action = { type: "setUserData", payload: User };
+type Action = {
+    type: "setUserData",
+    payload: {
+        user: User,
+    }
+} | {
+    type: "setLoginStatus",
+    payload: {
+        status: boolean
+    }
+} | {
+    type: "resetState"
+}
 type Dispatch = (action: Action) => void
 
 type AuthenticationContextProps = {
@@ -13,21 +26,32 @@ type AuthenticationContextProps = {
 }
 const AuthenticationContext = createContext<AuthenticationContextProps>({} as AuthenticationContextProps);
 
+const initializeValues: State = {
+    isLoggedIn: false,
+    user: {} as User
+};
+
 const authenticationReducer = (state: State, action: Action): State => {
+    let cloned: State;
     switch (action.type) {
         case "setUserData":
-            const cloned = {...state};
-            cloned.user = action.payload;
+            cloned = {...state};
+            cloned.user = action.payload.user;
 
             return cloned;
+
+        case "setLoginStatus":
+            cloned = {...state};
+            cloned.isLoggedIn = action.payload.status;
+
+            return cloned;
+        case "resetState":
+            return {...initializeValues};
         default:
             return {...state};
     }
 }
 
-const initializeValues: State = {
-    user: {} as User
-};
 export const AuthenticationContextProvider = (props: { children: React.ReactNode }): JSX.Element => {
     const {children} = props;
     const [state, dispatch] = useReducer(authenticationReducer, initializeValues);
