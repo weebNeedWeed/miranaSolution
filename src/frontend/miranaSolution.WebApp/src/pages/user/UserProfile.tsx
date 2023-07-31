@@ -126,11 +126,12 @@ const InfoChangingForm = (): JSX.Element => {
             >
                 Ảnh đại diện
             </label>
-            {authenticationState.user.avatar !== "" ?
-                (typeof avatar !== "undefined" ?
-                    <Avatar imageUrl={URL.createObjectURL(avatar)} className="w-16 h-16 mb-2"/> :
-                    <Avatar imageUrl={baseUrl + authenticationState.user.avatar} className="w-16 h-16 mb-2"/>)
-                : <Avatar className="w-16 h-16 mb-2"/>}
+            {typeof avatar !== "undefined" ?
+                <Avatar imageUrl={URL.createObjectURL(avatar)} className="w-16 h-16 mb-2"/> :
+                (authenticationState.user.avatar !== "" ?
+                    <Avatar imageUrl={baseUrl + authenticationState.user.avatar} className="w-16 h-16 mb-2"/> :
+                    <Avatar className="w-16 h-16 mb-2"/>)
+            }
             <input type="file" onChange={handleFileChange}/>
         </div>
 
@@ -249,6 +250,13 @@ const UserProfile = (): JSX.Element => {
                 <span className="w-4 h-4 bg-oldRose block shrink-0 self-start mt-1"></span>
                 <span className="font-semibold">
                     Đã thích: <span className="text-oldRose">{data.totalReactions}</span>
+                </span>
+            </li>
+
+            <li className="flex flex-row gap-x-2 items-center">
+                <span className="w-4 h-4 bg-oldRose block shrink-0 self-start mt-1"></span>
+                <span className="font-semibold">
+                    Đã đánh giá: <span className="text-oldRose">{data.totalRatings}</span>
                 </span>
             </li>
         </ul>

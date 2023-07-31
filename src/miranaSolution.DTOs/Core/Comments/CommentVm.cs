@@ -6,4 +6,5 @@ public record CommentVm(
     int? ParentId,
     DateTime CreatedAt,
     DateTime UpdatedAt,
-    Guid? UserId);
+    Guid? UserId,
+    int BookId);

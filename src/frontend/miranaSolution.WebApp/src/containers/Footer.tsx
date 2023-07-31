@@ -1,6 +1,6 @@
 import {Link} from "react-router-dom";
 import logo from "../assets/logo.svg";
-import {BsFacebook, BsTwitter, BsReddit, BsTelegram} from "react-icons/bs";
+import {BsFacebook, BsReddit, BsTelegram, BsTwitter} from "react-icons/bs";
 import {Section} from "../components/Section";
 
 const Footer = (): JSX.Element => {

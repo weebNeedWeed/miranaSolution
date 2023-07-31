@@ -1,10 +1,10 @@
-import {BookCard, Divider, Pager, Section} from "../../components";
+import {BookCard, Pager, Section} from "../../components";
 import {FaSwatchbook} from "react-icons/fa";
-import {AiOutlinePlus, AiFillCheckCircle, AiOutlineClose} from "react-icons/ai";
+import {AiFillCheckCircle, AiOutlineClose, AiOutlinePlus} from "react-icons/ai";
 import {CgTimelapse} from "react-icons/cg";
 import {useQuery} from "react-query";
 import {genreApiHelper} from "../../helpers/apis/GenreApiHelper";
-import {useNavigate, useLocation, useSearchParams} from "react-router-dom";
+import {useLocation, useNavigate, useSearchParams} from "react-router-dom";
 import clsx from "clsx";
 import {bookApiHelper} from "../../helpers/apis/BookApiHelper";
 import {useEffect, useMemo, useState} from "react";

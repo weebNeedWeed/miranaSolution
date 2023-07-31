@@ -1,6 +1,5 @@
 import jwtDecode, {JwtPayload} from "jwt-decode";
 import {userApiHelper} from "../apis/UserApiHelper";
-import {User} from "../models/catalog/user/User";
 import {GetUserProfileRequest} from "../models/catalog/user/GetUserProfileRequest";
 
 export const getUserByAccessToken = async (accessToken: string): Promise<GetUserProfileRequest | null> => {

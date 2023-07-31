@@ -88,4 +88,12 @@ public class CommentReactionService : ICommentReactionService
 
         return new CountCommentReactionByUserIdResponse(totalReactions);
     }
+
+    public async Task<CheckUserIsReactedResponse> CheckUserIsReactedAsync(CheckUserIsReactedRequest request)
+    {
+        var userAlreadyReacts = await _context.CommentReactions.AnyAsync(
+            x => x.CommentId == request.CommentId && x.UserId == request.UserId);
+
+        return new CheckUserIsReactedResponse(userAlreadyReacts);
+    }
 }

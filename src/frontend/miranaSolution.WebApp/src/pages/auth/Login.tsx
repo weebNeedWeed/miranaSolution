@@ -5,7 +5,6 @@ import {useSystemContext} from "../../contexts/SystemContext";
 import {useAccessToken} from "../../helpers/hooks/useAccessToken";
 import {ToastVariant} from "../../components/Toast";
 import {AuthenticateUserResponse} from "../../helpers/models/auth/AuthenticateUserResponse";
-import {ValidationFailureMessages} from "../../helpers/models/common/ValidationFailureMessages";
 import {authApiHelper} from "../../helpers/apis/AuthApiHelper";
 
 const Login = (): JSX.Element => {

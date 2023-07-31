@@ -27,4 +27,6 @@ public class Book
     public List<BookUpvote> BookUpvotes { get; set; } = new();
     
     public List<Bookmark> Bookmarks { get; set; } = new();
+    
+    public List<BookRating> BookRatings { get; set; } = new();
 }

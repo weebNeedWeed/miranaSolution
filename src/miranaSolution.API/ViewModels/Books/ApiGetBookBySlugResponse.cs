@@ -4,4 +4,5 @@ namespace miranaSolution.API.ViewModels.Books;
 
 public record ApiGetBookBySlugResponse(
     BookVm Book,
-    int TotalUpvotes);
+    int TotalUpvotes,
+    int TotalBookmarks);

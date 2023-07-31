@@ -18,4 +18,6 @@ public class AppUser : IdentityUser<Guid>
     public List<CommentReaction> CommentReactions { get; set; } = new();
     
     public List<BookUpvote> BookUpvotes { get; set; } = new();
+    
+    public List<BookRating> BookRatings { get; set; } = new();
 }

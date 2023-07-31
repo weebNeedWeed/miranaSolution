@@ -12,4 +12,5 @@ public record BookVm(
     string Slug, 
     string AuthorName, 
     List<string> Genres, 
-    bool IsDone);
+    bool IsDone,
+    int AuthorId);

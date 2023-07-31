@@ -5,6 +5,7 @@ using miranaSolution.DTOs.Core.Books;
 using miranaSolution.Services.Authentication.Users;
 using miranaSolution.Services.Core.Authors;
 using miranaSolution.Services.Core.Bookmarks;
+using miranaSolution.Services.Core.BookRatings;
 using miranaSolution.Services.Core.Books;
 using miranaSolution.Services.Core.BookUpvotes;
 using miranaSolution.Services.Core.Chapters;
@@ -44,6 +45,7 @@ public static class DependencyInjection
         services.AddTransient<ICommentReactionService, CommentReactionService>();
         services.AddTransient<IBookUpvoteService, BookUpvoteService>();
         services.AddTransient<IBookmarkService, BookmarkService>();
+        services.AddTransient<IBookRatingService, BookRatingService>();
         
         // Add validators from this assembly
         var assembly = typeof(DependencyInjection).Assembly;

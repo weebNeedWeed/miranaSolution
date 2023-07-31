@@ -292,7 +292,8 @@ public class BookService : IBookService
             book.Slug,
             authorName,
             genres,
-            book.IsDone);
+            book.IsDone,
+            book.AuthorId);
 
         return bookVm;
     }

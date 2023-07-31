@@ -1,4 +1,4 @@
-import {Link, useLoaderData, useParams} from "react-router-dom";
+import {Link, useParams} from "react-router-dom";
 import {Book} from "../../helpers/models/catalog/books/Book";
 import {Chapter} from "../../helpers/models/catalog/books/Chapter";
 import {IoIosArrowBack, IoIosArrowForward} from "react-icons/io";
@@ -6,9 +6,9 @@ import {VscBook} from "react-icons/vsc";
 import {AiFillEye} from "react-icons/ai";
 import {MdOutlineUpdate} from "react-icons/md";
 import {BiText} from "react-icons/bi";
-import {useQuery} from "react-query";
 import {bookApiHelper} from "../../helpers/apis/BookApiHelper";
 import {useEffect, useState} from "react";
+import {CommentsSection} from "../../containers";
 
 type ChapterHeaderProps = {
     book: Book;
@@ -128,6 +128,11 @@ const BooksChapter = (): JSX.Element => {
 
         <div className="my-2">
             <PagerSection chapter={chapter} book={book}/>
+        </div>
+
+        <div
+            className="my-2 bg-[rgba(255,255,255,0.8)] border-[1px] border-solid border-slate-400 px-2 py-2 sm:px-8 sm:py-4">
+            <CommentsSection size={5} bookId={book.id}/>
         </div>
     </div>;
 };

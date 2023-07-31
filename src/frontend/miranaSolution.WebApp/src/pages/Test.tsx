@@ -1,6 +1,4 @@
 import React, {useState} from "react";
-import {motion, AnimatePresence} from "framer-motion";
-import {useSystemContext} from "../contexts/SystemContext";
 import {Rating} from "../components";
 
 const Test = (): JSX.Element => {

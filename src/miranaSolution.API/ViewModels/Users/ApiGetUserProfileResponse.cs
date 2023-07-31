@@ -7,4 +7,5 @@ public record ApiGetUserProfileResponse(
     int TotalComments,
     int TotalReactions,
     int TotalBookmarks,
-    int TotalUpvotes);
+    int TotalUpvotes,
+    int TotalRatings);

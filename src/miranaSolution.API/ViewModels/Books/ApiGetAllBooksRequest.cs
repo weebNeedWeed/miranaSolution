@@ -4,5 +4,5 @@ public record ApiGetAllBooksRequest(
     string? Keyword,
     string? GenreIds,
     bool? IsDone,
-    int PageIndex,
-    int PageSize);
+    int PageIndex = 1,
+    int PageSize = 10);

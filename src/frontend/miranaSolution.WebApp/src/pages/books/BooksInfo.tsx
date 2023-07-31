@@ -1,23 +1,62 @@
 import {Avatar, Pager, Rating, Section} from "../../components";
 import {Link, useNavigate, useParams, useSearchParams} from "react-router-dom";
-import {useEffect, useState} from "react";
+import React, {useEffect, useMemo, useState} from "react";
 import {bookApiHelper} from "../../helpers/apis/BookApiHelper";
 import {Book} from "../../helpers/models/catalog/books/Book";
 import clsx from "clsx";
 import {GetAllChaptersResponse} from "../../helpers/models/catalog/books/GetAllChaptersResponse";
-import {AiFillLike, AiFillRead, AiFillStar} from "react-icons/ai";
-import {BsFillBookmarkCheckFill, BsFillBookmarkFill, BsFillReplyFill} from "react-icons/bs";
+import {AiFillRead, AiFillStar} from "react-icons/ai";
+import {BsFillBookmarkCheckFill, BsFillBookmarkFill} from "react-icons/bs";
 import {BiTime, BiUpArrowAlt} from "react-icons/bi";
 import {GetBookBySlugRequest} from "../../helpers/models/catalog/books/GetBookBySlugRequest";
 import authorIcon from "./../../assets/author.jpg";
-import {timeSince} from "../../helpers/utilityFns/timeSince";
-import {IoMdArrowDropdown} from "react-icons/io";
 import {Bookmark} from "../../helpers/models/catalog/bookmark/Bookmark";
 import {bookmarkApiHelper} from "../../helpers/apis/BookmarkApiHelper";
 import {useAccessToken} from "../../helpers/hooks/useAccessToken";
 import {useSystemContext} from "../../contexts/SystemContext";
 import {useAuthenticationContext} from "../../contexts/AuthenticationContext";
 import {ToastVariant} from "../../components/Toast";
+import {CommentsSection, RatingDialog, RatingsSection} from "../../containers";
+import {useQuery} from "react-query";
+import {authorApiHelper} from "../../helpers/apis/AuthorApiHelper";
+import {BookRating} from "../../helpers/models/catalog/books/BookRating";
+import {BookUpvote} from "../../helpers/models/catalog/books/BookUpvote";
+import {bookUpvoteApiHelper} from "../../helpers/apis/BookUpvoteApiHelper";
+import {timeSince} from "../../helpers/utilityFns/timeSince";
+
+type AuthorBooks = {
+    authorId: number;
+    authorName: string;
+};
+const AuthorBooks = ({authorId, authorName}: AuthorBooks): JSX.Element => {
+    const {data: booksData} = useQuery(
+        ["author", authorId],
+        () => authorApiHelper.getAllBooksByAuthorId(authorId)
+    );
+
+    return <div
+        className="flex flex-col bg-oldRose rounded-md py-6 min-w-[300px] min-h-[500px] h-full justify-start items-start">
+        <div className="flex flex-row w-full justify-center">
+            <Avatar className="w-24 h-24" imageUrl={authorIcon}/>
+        </div>
+        <div
+            className="text-center w-full text-base font-semibold mt-3 border-[rgba(0,0,0,0.2)] border-solid border-b-[1px]">{authorName}</div>
+
+        <span className="text-center w-full text-base font-semibold mt-4">Cùng tác giả</span>
+
+        {booksData && <div
+            className="flex flex-col w-full justify-center items-center text-base font-normal mt-1">
+            {booksData
+                .filter(book => book.id !== authorId)
+                .map(book => <Link
+                    key={book.id}
+                    to={`/books/${book.slug}`}
+                    className="w-full text-center line-clamp-1 border-b-[1px] border-[rgba(0,0,0,0.2)] border-solid mb-2">
+                    {book.name}
+                </Link>)}
+        </div>}
+    </div>
+}
 
 type ChapterListProps = {
     [T in keyof GetAllChaptersResponse]: GetAllChaptersResponse[T]
@@ -62,7 +101,7 @@ type TabsSectionProps = {
     book: Book,
 };
 const TabsSection = ({getChaptersResponse, book}: TabsSectionProps): JSX.Element => {
-    const [tabIndex, setTabIndex] = useState<1 | 2>(1);
+    const [tabIndex, setTabIndex] = useState<1 | 2 | 3>(1);
 
     const isTabIndexActive = (index: number) => {
         return index === tabIndex;
@@ -83,6 +122,11 @@ const TabsSection = ({getChaptersResponse, book}: TabsSectionProps): JSX.Element
                     className={getActiveTabButtonClassName(2)}>
                 Danh sách chương ({getChaptersResponse.totalChapters} chương)
             </button>
+
+            <button onClick={() => setTabIndex(3)}
+                    className={getActiveTabButtonClassName(3)}>
+                Đánh giá
+            </button>
         </div>
 
         <div className="w-full min-h-[650px] px-8 py-8 flex flex-col h-full">
@@ -91,30 +135,8 @@ const TabsSection = ({getChaptersResponse, book}: TabsSectionProps): JSX.Element
                     <div className="mr-4 w-full flex flex-col">
                         {book.longDescription}
                     </div>
-                    <div
-                        className="flex flex-col bg-oldRose rounded-md py-6 min-w-[300px] min-h-[500px] h-full justify-start items-start">
-                        <div className="flex flex-row w-full justify-center">
-                            <Avatar className="w-24 h-24" imageUrl={authorIcon}/>
-                        </div>
-                        <div
-                            className="text-center w-full text-base font-semibold mt-3 border-[rgba(0,0,0,0.2)] border-solid border-b-[1px]">{book.authorName}</div>
 
-                        <span className="text-center w-full text-base font-semibold mt-4">Cùng tác giả</span>
-
-                        <div
-                            className="flex flex-col w-full justify-center items-center text-base font-normal mt-1">
-                            <Link
-                                to={"/"}
-                                className="w-full text-center line-clamp-1 border-b-[1px] border-[rgba(0,0,0,0.2)] border-solid mb-2">
-                                A
-                            </Link>
-                            <Link
-                                to={"/"}
-                                className="w-full text-center line-clamp-1 border-b-[1px] border-[rgba(0,0,0,0.2)] border-solid mb-2">
-                                A
-                            </Link>
-                        </div>
-                    </div>
+                    <AuthorBooks authorId={book.authorId} authorName={book.authorName}/>
                 </div>
             </div>
 
@@ -124,6 +146,10 @@ const TabsSection = ({getChaptersResponse, book}: TabsSectionProps): JSX.Element
                              pageSize={getChaptersResponse.pageSize}
                              totalPages={getChaptersResponse.totalPages}
                              totalChapters={getChaptersResponse.totalChapters}/>
+            </div>
+
+            <div className={clsx(isTabIndexActive(3) ? "block" : "hidden", "w-full")}>
+                <RatingsSection/>
             </div>
         </div>
     </div>;
@@ -139,6 +165,10 @@ const BooksInfo = (): JSX.Element => {
     const [accessToken, setAccessToken] = useAccessToken();
     const systemContext = useSystemContext();
     const authContext = useAuthenticationContext();
+    const [ratings, setRatings] = useState<BookRating[]>();
+    const [upvote, setUpvote] = useState<BookUpvote>();
+
+    const [openRatingDialog, setOpenRatingDialog] = useState(false);
 
     const pageIndex = parseInt(searchParams.get("pageIndex") ?? "1", 10);
     const pageSize = parseInt(searchParams.get("pageSize") ?? "30", 10);
@@ -148,6 +178,9 @@ const BooksInfo = (): JSX.Element => {
             try {
                 const result = await bookApiHelper.getBookBySlug(slug!);
                 setBookResponse(result);
+
+                let response = await bookApiHelper.getAllRatings(result.book.id);
+                setRatings(response.bookRatings);
 
                 const chaptersResult = await bookApiHelper.getAllChapters({
                     bookId: result.book.id,
@@ -160,13 +193,29 @@ const BooksInfo = (): JSX.Element => {
                 if (authContext.state.isLoggedIn) {
                     const bookmarks = await bookmarkApiHelper.getAllBookmark(accessToken, result.book.id);
                     setBookmark(bookmarks[0]);
+
+                    let upvotes = await bookUpvoteApiHelper.getAllUpvotes(result.book.id, authContext.state.user.id);
+                    setUpvote(upvotes[0]);
                 }
             } catch (error: any) {
                 // TODO: Navigate the user to not found page
                 navigate("/404");
             }
         })();
-    }, [slug, pageIndex, pageSize]);
+    }, [pageIndex, pageSize, authContext.state.isLoggedIn]);
+
+    let avgStar = useMemo(() => {
+        let _ = 0;
+        ratings?.forEach(x => {
+            _ += x.star;
+        });
+
+        if ((ratings?.length ?? 0) === 0) {
+            return 0;
+        }
+
+        return Math.round(_ / ratings!.length);
+    }, [ratings]);
 
     if (!getBookResponse) {
         return <></>;
@@ -220,6 +269,49 @@ const BooksInfo = (): JSX.Element => {
         setBookmark(_bookmark);
     }
 
+    const handleCreateUpvote = async () => {
+        if (!authContext.state.isLoggedIn) {
+            systemContext.dispatch(
+                {
+                    type: "addToast",
+                    payload: {
+                        variant: ToastVariant.Warning,
+                        title: "Vui lòng đăng nhập để đề cử."
+                    }
+                }
+            );
+            return;
+        }
+
+        const bookId = book.id;
+        if (upvote) {
+            await bookUpvoteApiHelper.deleteUpvote(accessToken, bookId);
+            systemContext.dispatch(
+                {
+                    type: "addToast",
+                    payload: {
+                        variant: ToastVariant.Success,
+                        title: "Huỷ đề cử thành công."
+                    }
+                }
+            );
+            setUpvote(undefined);
+            return;
+        }
+
+        const _upvote = await bookUpvoteApiHelper.createUpvote(accessToken, bookId);
+        systemContext.dispatch(
+            {
+                type: "addToast",
+                payload: {
+                    variant: ToastVariant.Success,
+                    title: "Đề cử thành công."
+                }
+            }
+        );
+        setUpvote(_upvote);
+    }
+
     return <Section className="text-deepKoamaru">
         <div
             className="w-full bg-[rgba(255,255,255,0.8)] rounded-md shadow-sm shadow-slate-500 flex flex-col">
@@ -242,6 +334,7 @@ const BooksInfo = (): JSX.Element => {
                         </span>
 
                         {book.genres.map((genre, index) => <span
+                            key={index}
                             className="text-xs py-1 px-3 rounded-3xl bg-darkVanilla text-white">
                             {genre}
                         </span>)}
@@ -270,7 +363,7 @@ const BooksInfo = (): JSX.Element => {
 
                         <div className="flex flex-col items-start">
                             <span className="font-semibold text-xl">
-                                0
+                                {getBookResponse.totalBookmarks}
                             </span>
 
                             <span className="font-normal text-base">
@@ -290,10 +383,10 @@ const BooksInfo = (): JSX.Element => {
                     </div>
 
                     <div className="mt-2 w-full flex flex-row gap-x-1">
-                        <Rating value={5}/>
+                        <Rating value={avgStar}/>
                         <span className="text-base text-deepKoamaru">
-                            <span className="font-semibold">4</span>
-                            <span>/5 (5 đánh giá)</span>
+                            <span className="font-semibold">{avgStar}</span>
+                            <span>/5 ({ratings?.length ?? 0} đánh giá)</span>
                         </span>
                     </div>
 
@@ -305,6 +398,7 @@ const BooksInfo = (): JSX.Element => {
                         </Link>
 
                         <button
+                            onClick={() => setOpenRatingDialog(!openRatingDialog)}
                             className="item rounded bg-transparent py-1.5 px-3 mt-4 text-deepKoamaru font-semibold flex justify-center items-center gap-x-2 text-sm border-deepKoamaru border-2"
                         >
                             <AiFillStar/> Đánh giá
@@ -323,11 +417,17 @@ const BooksInfo = (): JSX.Element => {
                         </button>}
 
 
-                        <button
+                        {!upvote ? <button
+                            onClick={handleCreateUpvote}
                             className="item rounded bg-transparent py-1.5 px-3 mt-4 text-deepKoamaru font-semibold flex justify-center items-center gap-x-2 text-sm border-deepKoamaru border-2"
                         >
                             <BiUpArrowAlt/> Đề cử
-                        </button>
+                        </button> : <button
+                            onClick={handleCreateUpvote}
+                            className="item rounded bg-deepKoamaru py-1.5 px-3 mt-4 text-white font-semibold flex justify-center items-center gap-x-2 text-sm border-deepKoamaru border-2"
+                        >
+                            <BiUpArrowAlt/> Đã đề cử
+                        </button>}
                     </div>
                 </div>
             </div>
@@ -336,82 +436,11 @@ const BooksInfo = (): JSX.Element => {
                 {getAllChaptersResponse && <TabsSection book={book} getChaptersResponse={getAllChaptersResponse}/>}
             </div>
 
-            <div className="text-deepKoamaru p-6">
-                <div className="font-semibold text-xl">
-                    Bình luận (122)
-                </div>
-                <form className="flex flex-row w-full gap-x-4 mt-3 flex-wrap">
-                    <Avatar className="w-12 h-12"/>
-                    <textarea
-                        className="rounded-2xl grow resize-none px-3 py-1 border-oldRose border-2 border-solid outline-none"></textarea>
-
-                    <div className="w-full flex justify-end pt-2">
-                        <button className="text-base rounded-xl px-2 py-1 bg-oldRose">
-                            Bình luận
-                        </button>
-                    </div>
-                </form>
-
-                <div className="flex flex-col w-full mt-3">
-                    <div className="w-full flex flex-row gap-x-2 border-t-[2px] pt-2">
-                        <Avatar className="w-12 h-12 shrink-0"/>
-                        <div className="flex flex-col">
-                            <span className="font-semibold text-base">Meomeo</span>
-                            <span className="flex flex-row items-center gap-x-1 font-normal text-xs">
-                                <BiTime/>
-                                {timeSince(new Date(Date.now()))}
-                            </span>
-
-                            <span className="mt-2">
-                                đoạn đầu là nhân vật chính trả thù + tác giả tận lực miêu tả con người biến chất trong tận thế để cho truyện dark một xíu thôi, về sau từ lúc hắn đổi căn cứ thì quay trở lại chính tuyến là phát triển thế lực, khai thác dị năng, v.v. đạo hữu thấy đoạn đầu cấn quá thì nhảy sang chương 170 trở đi mà xem
-                            </span>
-
-                            <span className="mt-2 flex flex-row justify-between items-center font-semibold">
-                                <button className="flex flex-row items-center">
-                                    Xem 2 câu trả lời
-                                    <IoMdArrowDropdown className="text-xl"/>
-                                </button>
-                                <div className="flex flex-row gap-x-6">
-                                    <button
-                                        className="flex flex-row items-center gap-x-0.5 text-oldRose">
-                                        <AiFillLike className="text-base"/>
-                                        0
-                                    </button>
-
-                                    <button className="flex flex-row items-center">
-                                        <BsFillReplyFill className="text-lg"/>
-                                        Trả lời
-                                    </button>
-                                </div>
-                            </span>
-
-                            <div className="w-full flex flex-row gap-x-2 border-t-[2px] pt-2 mt-2">
-                                <Avatar className="w-12 h-12 shrink-0"/>
-                                <div className="flex flex-col">
-                                    <span className="font-semibold text-base">Meomeo</span>
-                                    <span className="mt-0.5">
-                                                Thiếu chương rồi ad ơi. 2414-2417 . Nhảy cóc quá
-                                            </span>
-
-                                    <div className="flex flex-row gap-x-6">
-                                        <button
-                                            className="flex flex-row items-center gap-x-0.5 text-oldRose">
-                                            <AiFillLike className="text-base"/>
-                                            0
-                                        </button>
-
-                                        <span
-                                            className="flex flex-row items-center gap-x-1 font-normal text-xs">
-                                                    <BiTime/>
-                                            {timeSince(new Date(Date.now()))}
-                                                </span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+            <div className="p-6">
+                <CommentsSection size={7} bookId={book.id}/>
             </div>
+
+            <RatingDialog book={book} handleClose={() => setOpenRatingDialog(false)} open={openRatingDialog}/>
         </div>
     </Section>;
 };

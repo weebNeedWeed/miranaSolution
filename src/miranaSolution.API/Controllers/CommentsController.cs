@@ -21,7 +21,7 @@ public class CommentsController : ControllerBase
         _commentReactionService = commentReactionService;
     }
     
-    [HttpPost("{commendId:int}/reaction")]
+    [HttpPost("{commentId:int}/reaction")]
     public async Task<IActionResult> CreateCommentReaction([FromRoute] int commentId)
     {
         var userId = GetUserIdFromClaim();
@@ -38,7 +38,7 @@ public class CommentsController : ControllerBase
         }
     }
     
-    [HttpDelete("{commendId:int}/reaction")]
+    [HttpDelete("{commentId:int}/reaction")]
     public async Task<IActionResult> DeleteCommentReaction([FromRoute] int commentId)
     {
         var userId = GetUserIdFromClaim();
@@ -55,7 +55,8 @@ public class CommentsController : ControllerBase
         }
     }
 
-    [HttpGet("{commendId:int}/reaction/counting")]
+    [HttpGet("{commentId:int}/reaction/counting")]
+    [AllowAnonymous]
     public async Task<IActionResult> CountReactionByCommentId([FromRoute] int commentId)
     {
         try
@@ -74,6 +75,27 @@ public class CommentsController : ControllerBase
         }
     }
 
+    [HttpGet("{commentId:int}/reaction")]
+    public async Task<IActionResult> CheckUserIsReacted([FromRoute] int commentId)
+    {
+        var userId = GetUserIdFromClaim();
+        
+        try
+        {
+            var checkUserIsReactedResponse = await _commentReactionService.CheckUserIsReactedAsync(
+                new CheckUserIsReactedRequest(
+                    userId, commentId));
+            var isReacted = checkUserIsReactedResponse.IsReacted;
+            var response = new ApiCheckUserIsReactedResponse(isReacted);
+
+            return Ok(new ApiSuccessResult<ApiCheckUserIsReactedResponse>(response));
+        }
+        catch (CommentNotFoundException ex)
+        {
+            return Ok(new ApiErrorResult(ex.Message));
+        }
+    }
+    
     private Guid GetUserIdFromClaim()
     {
         string userId = User.Claims.First(x => x.Type == JwtRegisteredClaimNames.Sid).Value;

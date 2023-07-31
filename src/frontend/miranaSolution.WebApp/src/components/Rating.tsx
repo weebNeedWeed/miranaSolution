@@ -23,7 +23,7 @@ const Star = (props: StarProps): JSX.Element => {
         onChange(value);
     }
 
-    return <button style={style} className="text-[#faaf00]" disabled={readonly} onClick={handleClick}>
+    return <button type="button" style={style} className="text-[#faaf00]" disabled={readonly} onClick={handleClick}>
         {active ? <AiFillStar/> : <AiOutlineStar/>}
     </button>
 }

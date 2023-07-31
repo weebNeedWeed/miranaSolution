@@ -1,5 +1,3 @@
-import {AiOutlineUser} from "react-icons/ai";
-import {useId} from "react";
 import clsx from "clsx";
 
 type TextInputProps = {

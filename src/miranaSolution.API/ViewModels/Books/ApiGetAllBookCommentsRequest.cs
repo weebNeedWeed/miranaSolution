@@ -1,5 +1,7 @@
 ﻿namespace miranaSolution.API.ViewModels.Books;
 
 public record ApiGetAllBookCommentsRequest(
-    int PageIndex,
-    int PageSize);
+    int? ParentId,
+    bool? Asc,
+    int PageIndex = 1,
+    int PageSize = 10);

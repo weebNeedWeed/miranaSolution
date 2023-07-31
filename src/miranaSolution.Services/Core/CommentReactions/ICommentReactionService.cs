@@ -11,4 +11,6 @@ public interface ICommentReactionService
     Task<CountCommentReactionByCommentIdResponse> CountCommentReactionByCommentIdAsync(CountCommentReactionByCommentIdRequest request);
     
     Task<CountCommentReactionByUserIdResponse> CountCommentReactionByUserIdAsync(CountCommentReactionByUserIdRequest request);
+
+    Task<CheckUserIsReactedResponse> CheckUserIsReactedAsync(CheckUserIsReactedRequest request);
 }

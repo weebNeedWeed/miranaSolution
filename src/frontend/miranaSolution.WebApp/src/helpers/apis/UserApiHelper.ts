@@ -66,6 +66,17 @@ class UserApiHelper extends BaseApiHelper {
 
         return response.data.data as User;
     }
+
+    async getUserProfileById(userId: string): Promise<User> {
+        const response = await this.init()
+            .get<ApiResult<User>>(`/users/${userId}/profile`);
+
+        if (response.data.status === "error") {
+            throw new Error(response.data.message);
+        }
+
+        return response.data.data;
+    }
 }
 
 export const userApiHelper = new UserApiHelper();

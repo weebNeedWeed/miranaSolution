@@ -1,6 +1,9 @@
-export { LoadingScreen } from "./LoadingScreen";
-export { CurrentlyReading } from "./CurrentlyReading";
-export { EditorRecommendation } from "./EditorRecommendation";
-export { NewestChapters } from "./NewestChapters";
-export { MostReading } from "./MostReading";
-export { ToastContainer } from "./ToastContainer";
+export {LoadingScreen} from "./LoadingScreen";
+export {CurrentlyReading} from "./CurrentlyReading";
+export {EditorRecommendation} from "./EditorRecommendation";
+export {NewestChapters} from "./NewestChapters";
+export {MostReading} from "./MostReading";
+export {ToastContainer} from "./ToastContainer";
+export {CommentsSection} from "./CommentsSection";
+export {RatingDialog} from "./RatingDialog";
+export {RatingsSection} from "./RatingsSection";

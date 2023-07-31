@@ -21,12 +21,21 @@ type PagerProps = {
     pageIndex: number;
     pageSize: number;
     totalPages: number;
+    pageSizeKey?: string;
+    pageIndexKey?: string;
 };
 const Pager = (props: PagerProps): JSX.Element => {
     const {pageIndex, pageSize, totalPages} = props;
     const [searchParams] = useSearchParams();
     const location = useLocation();
     const navigate = useNavigate();
+
+    const pageSizeKey = props.pageSizeKey ?? "pageSize";
+    const pageIndexKey = props.pageIndexKey ?? "pageIndex";
+
+    if (totalPages === 0) {
+        return <></>;
+    }
 
     const doesPreviousButtonExist = pageIndex !== 1;
     const doesNextButtonExist = pageIndex !== totalPages;
@@ -35,7 +44,7 @@ const Pager = (props: PagerProps): JSX.Element => {
         const queryString = new URLSearchParams();
 
         for (let entry of searchParams.entries()) {
-            if (entry[0] === "pageIndex") {
+            if (entry[0] === pageIndexKey) {
                 continue;
             }
 
@@ -43,7 +52,7 @@ const Pager = (props: PagerProps): JSX.Element => {
         }
 
         if (doesPreviousButtonExist) {
-            queryString.append("pageIndex", "1");
+            queryString.append(pageIndexKey, "1");
         }
 
         navigate(location.pathname + "?" + queryString.toString());
@@ -53,7 +62,7 @@ const Pager = (props: PagerProps): JSX.Element => {
         const queryString = new URLSearchParams();
 
         for (let entry of searchParams.entries()) {
-            if (entry[0] === "pageIndex") {
+            if (entry[0] === pageIndexKey) {
                 continue;
             }
 
@@ -61,7 +70,7 @@ const Pager = (props: PagerProps): JSX.Element => {
         }
 
         if (doesNextButtonExist) {
-            queryString.append("pageIndex", totalPages.toString());
+            queryString.append(pageIndexKey, totalPages.toString());
         }
 
         navigate(location.pathname + "?" + queryString.toString());
@@ -72,14 +81,14 @@ const Pager = (props: PagerProps): JSX.Element => {
             const queryString = new URLSearchParams();
 
             for (let entry of searchParams.entries()) {
-                if (entry[0] === "pageIndex") {
+                if (entry[0] === pageIndexKey) {
                     continue;
                 }
 
                 queryString.append(entry[0], entry[1]);
             }
 
-            queryString.append("pageIndex", pageNumber.toString());
+            queryString.append(pageIndexKey, pageNumber.toString());
 
             navigate(location.pathname + "?" + queryString.toString());
         }

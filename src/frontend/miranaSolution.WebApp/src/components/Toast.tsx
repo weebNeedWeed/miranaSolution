@@ -1,8 +1,7 @@
 import {MdOutlineClose} from "react-icons/md";
 import {clsx} from "clsx";
-import {AiOutlineCheckCircle} from "react-icons/ai";
+import {AiOutlineCheckCircle, AiOutlineWarning} from "react-icons/ai";
 import {BiErrorCircle} from "react-icons/bi";
-import {AiOutlineWarning} from "react-icons/ai";
 import {BsInfoCircle} from "react-icons/bs";
 import {motion} from "framer-motion";
 import {useEffect} from "react";
@@ -65,7 +64,8 @@ const Toast = (props: ToastProps): JSX.Element => {
         exit: {marginLeft: "120%"}
     };
 
-    return <motion.div variants={animationVariants} initial="initial"
+    return <motion.div variants={animationVariants}
+                       initial="initial"
                        animate="animate"
                        exit="exit" className={finalClassName}>
         <div className="flex flex-row items-center text-lg">

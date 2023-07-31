@@ -74,4 +74,24 @@ public class AuthorsController : ControllerBase
             return Ok(new ApiErrorResult(ex.Message));
         }
     }
+
+    [HttpGet("{authorId:int}/books")]
+    [AllowAnonymous]
+    public async Task<IActionResult> GetAllBooksByAuthorId([FromRoute] int authorId, [FromQuery] int numberOfBooks = 10)
+    {
+        try
+        {
+            var getAllBookByAuthorIdResponse = await _authorService
+                .GetAllBookByAuthorIdAsync(new GetAllBooksByAuthorIdRequest(authorId, numberOfBooks));
+
+            var response = new ApiGetAllBooksByAuthorIdResponse(
+                getAllBookByAuthorIdResponse.BookVms);
+
+            return Ok(new ApiSuccessResult<ApiGetAllBooksByAuthorIdResponse>(response));
+        }
+        catch (AuthorNotFoundException ex)
+        {
+            return Ok(new ApiErrorResult(ex.Message));
+        }
+    }
 }

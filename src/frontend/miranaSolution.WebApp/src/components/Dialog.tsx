@@ -1,4 +1,3 @@
-import {useEffect} from "react";
 import {GrClose} from "react-icons/gr";
 import clsx from "clsx";
 

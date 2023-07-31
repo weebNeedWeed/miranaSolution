@@ -16,6 +16,10 @@ using miranaSolution.Services.Core.Comments;
 using miranaSolution.Services.Exceptions;
 using miranaSolution.Utilities.Constants;
 using miranaSolution.API.Extensions;
+using miranaSolution.DTOs.Core.Bookmarks;
+using miranaSolution.DTOs.Core.BookRatings;
+using miranaSolution.Services.Core.Bookmarks;
+using miranaSolution.Services.Core.BookRatings;
 
 namespace miranaSolution.API.Controllers;
 
@@ -25,17 +29,21 @@ namespace miranaSolution.API.Controllers;
 public class BooksController : ControllerBase
 {
     private readonly IBookService _bookService;
+    private readonly IBookmarkService _bookmarkService;
     private readonly IChapterService _chapterService;
     private readonly ICommentService _commentService;
     private readonly IBookUpvoteService _bookUpvoteService;
+    private readonly IBookRatingService _bookRatingService;
 
     public BooksController(IBookService bookService, IChapterService chapterService, ICommentService commentService,
-        IBookUpvoteService bookUpvoteService)
+        IBookUpvoteService bookUpvoteService, IBookRatingService bookRatingService, IBookmarkService bookmarkService)
     {
         _bookService = bookService;
         _chapterService = chapterService;
         _commentService = commentService;
         _bookUpvoteService = bookUpvoteService;
+        _bookRatingService = bookRatingService;
+        _bookmarkService = bookmarkService;
     }
 
     // GET /api/books
@@ -125,7 +133,7 @@ public class BooksController : ControllerBase
         var getRecommendedBooksResponse = await _bookService.GetRecommendedBooksAsync();
         var response = new ApiGetRecommendedBooksResponse(
             getRecommendedBooksResponse.BookVms);
-        
+
         return Ok(new ApiSuccessResult<ApiGetRecommendedBooksResponse>(response));
     }
 
@@ -227,11 +235,15 @@ public class BooksController : ControllerBase
 
         var countBookUpvoteResponse = await _bookUpvoteService.CountBookUpvoteByBookIdAsync(
             new CountBookUpvoteByBookIdRequest(getBookBySlugResponse.BookVm.Id));
-        
+
+        var getAllBookmarksByBookIdResponse = await _bookmarkService.GetAllBookmarksByBookIdAsync(
+            new GetAllBookmarksByBookIdRequest(getBookBySlugResponse.BookVm.Id));
+
         var response = new ApiGetBookBySlugResponse(
             getBookBySlugResponse.BookVm,
-            countBookUpvoteResponse.TotalUpvotes);
-        
+            countBookUpvoteResponse.TotalUpvotes,
+            getAllBookmarksByBookIdResponse.BookmarkVms.Count);
+
         return Ok(new ApiSuccessResult<ApiGetBookBySlugResponse>(response));
     }
 
@@ -354,7 +366,7 @@ public class BooksController : ControllerBase
     }
 
     [HttpGet("{bookId:int}/comments")]
-    [Authorize]
+    [AllowAnonymous]
     public async Task<IActionResult> GetAllBookComments([FromRoute] int bookId,
         [FromQuery] ApiGetAllBookCommentsRequest request)
     {
@@ -363,13 +375,18 @@ public class BooksController : ControllerBase
             var getAllBookCommentsResponse = await _commentService.GetAllBookCommentsAsync(
                 new GetAllBookCommentsRequest(
                     bookId,
+                    request.ParentId,
+                    request.Asc,
                     new PagerRequest(request.PageIndex, request.PageSize)));
 
-            return Ok(new ApiGetAllBookCommentsResponse(
+            var response = new ApiGetAllBookCommentsResponse(
                 getAllBookCommentsResponse.CommentVms,
                 request.PageIndex,
                 request.PageSize,
-                getAllBookCommentsResponse.PagerResponse.TotalPages));
+                getAllBookCommentsResponse.PagerResponse.TotalPages,
+                getAllBookCommentsResponse.PagerResponse.TotalRecords);
+
+            return Ok(new ApiSuccessResult<ApiGetAllBookCommentsResponse>(response));
         }
         catch (BookNotFoundException ex)
         {
@@ -423,6 +440,26 @@ public class BooksController : ControllerBase
         }
     }
 
+    [HttpGet("{bookId:int}/upvotes")]
+    [AllowAnonymous]
+    public async Task<IActionResult> GetAllBookUpvotes([FromRoute] int bookId, [FromQuery] Guid? userId)
+    {
+        try
+        {
+            var getAllBookUpvotesResponse = await _bookUpvoteService.GetAllBookUpvotesAsync(
+                new GetAllBookUpvotesRequest(
+                    bookId, userId));
+
+            var response = new ApiGetAllBookUpvotesResponse(getAllBookUpvotesResponse.BookUpvoteVms);
+
+            return Ok(new ApiSuccessResult<ApiGetAllBookUpvotesResponse>(response));
+        }
+        catch (BookNotFoundException ex)
+        {
+            return Ok(new ApiErrorResult(ex.Message));
+        }
+    }
+
     [HttpGet("most_reading")]
     [AllowAnonymous]
     public async Task<IActionResult> GetMostReadingBooks([FromQuery] int numberOfBooks)
@@ -433,6 +470,106 @@ public class BooksController : ControllerBase
         var response = new ApiGetMostReadingBooksResponse(getMostReadingBooksResponse.BookVms);
 
         return Ok(new ApiSuccessResult<ApiGetMostReadingBooksResponse>(response));
+    }
+
+    [HttpPost("{bookId:int}/ratings")]
+    [Authorize]
+    public async Task<IActionResult> CreateBookRating([FromRoute] int bookId, [FromBody] ApiCreateBookRatingRequest request)
+    {
+        var userId = GetUserIdFromClaim();
+
+        try
+        {
+            var createRatingResponse = await _bookRatingService.CreateBookRatingAsync(
+                new CreateBookRatingRequest(
+                    userId,
+                    bookId,
+                    request.Content,
+                    request.Star));
+
+            return Ok(new ApiSuccessResult<BookRatingVm>(createRatingResponse.BookRatingVm));
+        }
+        catch (UserNotFoundException ex)
+        {
+            return Ok(new ApiErrorResult(ex.Message));
+        }
+        catch (BookNotFoundException ex)
+        {
+            return Ok(new ApiErrorResult(ex.Message));
+        }
+    }
+
+    [HttpDelete("{bookId:int}/ratings")]
+    [Authorize]
+    public async Task<IActionResult> DeleteBookRating([FromRoute] int bookId)
+    {
+        var userId = GetUserIdFromClaim();
+
+        try
+        {
+            await _bookRatingService.DeleteBookRatingAsync(
+                new DeleteBookRatingRequest(
+                    userId,
+                    bookId));
+
+            return Ok(new ApiSuccessResult<object>());
+        }
+        catch (BookRatingNotFoundException ex)
+        {
+            return Ok(new ApiErrorResult(ex.Message));
+        }
+    }
+
+    [HttpPut("{bookId:int}/ratings")]
+    [Authorize]
+    public async Task<IActionResult> UpdateBookRating([FromRoute] int bookId, [FromBody] ApiUpdateBookRatingRequest request)
+    {
+        var userId = GetUserIdFromClaim();
+
+        try
+        {
+            var updateBookRatingResponse =  await _bookRatingService.UpdateBookRatingAsync(
+                new UpdateBookRatingRequest(
+                    userId,
+                    bookId,
+                    request.Content,
+                    request.Star));
+
+            return Ok(new ApiSuccessResult<BookRatingVm>(updateBookRatingResponse.BookRatingVm));
+        }
+        catch (BookRatingNotFoundException ex)
+        {
+            return Ok(new ApiErrorResult(ex.Message));
+        }
+    }
+    
+    [HttpGet("{bookId:int}/ratings")]
+    [AllowAnonymous]
+    public async Task<IActionResult> GetAllBookRatings([FromRoute] int bookId, [FromQuery] ApiGetAllBookRatingsRequest request)
+    {
+        try
+        {
+            var getAllRatingsResponse =  await _bookRatingService.GetAllBookRatingsByBookIdAsync(
+                new GetAllBookRatingsByBookIdRequest(
+                    bookId,
+                    request.UserId,
+                    new PagerRequest(request.PageIndex, request.PageSize)));
+
+            var pagerResponse = getAllRatingsResponse.PagerResponse;
+
+            var response = new ApiGetAllBookRatingsResponse(
+                getAllRatingsResponse.BookRatingVms,
+                pagerResponse.PageIndex,
+                pagerResponse.PageSize,
+                pagerResponse.TotalPages,
+                pagerResponse.TotalRecords);
+            
+            return Ok(new ApiSuccessResult<ApiGetAllBookRatingsResponse>(response));
+        }
+        catch (BookNotFoundException ex)
+        {
+            return Ok(new ApiErrorResult(ex.Message));
+        }
     }
 
     private Guid GetUserIdFromClaim()

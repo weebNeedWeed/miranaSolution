@@ -11,4 +11,6 @@ public interface IBookUpvoteService
     Task<CountBookUpvoteByBookIdResponse> CountBookUpvoteByBookIdAsync(CountBookUpvoteByBookIdRequest request);
     
     Task<CountBookUpvoteByUserIdResponse> CountBookUpvoteByUserIdAsync(CountBookUpvoteByUserIdRequest request);
+
+    Task<GetAllBookUpvotesResponse> GetAllBookUpvotesAsync(GetAllBookUpvotesRequest request);
 }

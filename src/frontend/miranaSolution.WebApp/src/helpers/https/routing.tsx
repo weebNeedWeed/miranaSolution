@@ -1,11 +1,10 @@
 import {Router} from "@remix-run/router";
-import {Navigate, createBrowserRouter} from "react-router-dom";
+import {createBrowserRouter, Navigate} from "react-router-dom";
 import {RouteObject} from "react-router/dist/lib/context";
 
 import {Home} from "../../pages";
-import {DefaultLayout, UserLayout} from "../../layouts";
+import {AuthLayout, DefaultLayout, UserLayout} from "../../layouts";
 import {Test} from "../../pages/Test";
-import {AuthLayout} from "../../layouts";
 import {BooksChapter, BooksIndex, BooksInfo} from "../../pages/books";
 import React from "react";
 import {UserPassword, UserProfile} from "../../pages/user";

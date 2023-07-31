@@ -14,7 +14,7 @@ public class CreateBookCommentRequestValidator : AbstractValidator<CreateBookCom
         RuleFor(x => x.Content)
             .NotEmpty()
             .WithMessage("Content không được để trống.")
-            .Length(min: 8, max: 256)
-            .WithMessage("Content phải có độ dài từ 8 tới 256 ký tự.");
+            .Length(min: 1, max: 256)
+            .WithMessage("Content phải có độ dài từ 1 tới 256 ký tự.");
     }
 }

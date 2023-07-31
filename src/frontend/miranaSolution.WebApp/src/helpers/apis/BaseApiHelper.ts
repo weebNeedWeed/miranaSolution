@@ -1,10 +1,4 @@
-import axios from "axios";
-import {
-    AxiosInstance,
-    AxiosHeaders,
-    RawAxiosRequestHeaders,
-    HeadersDefaults,
-} from "axios";
+import axios, {AxiosInstance, RawAxiosRequestHeaders} from "axios";
 
 export class BaseApiHelper {
 

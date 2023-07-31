@@ -6,4 +6,5 @@ public record ApiGetAllBookCommentsResponse(
     List<CommentVm> Comments,
     int PageIndex,
     int PageSize,
-    int TotalPages);
+    int TotalPages,
+    int TotalComments);

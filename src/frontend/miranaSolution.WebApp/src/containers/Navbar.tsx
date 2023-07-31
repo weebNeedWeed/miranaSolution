@@ -7,15 +7,12 @@ import {Genre} from "../helpers/models/catalog/books/Genre";
 import {useQuery} from "react-query";
 import {genreApiHelper} from "../helpers/apis/GenreApiHelper";
 import {useAuthenticationContext} from "../contexts/AuthenticationContext";
-import {BiUser} from "react-icons/bi";
 import {useAccessToken} from "../helpers/hooks/useAccessToken";
 import {useSystemContext} from "../contexts/SystemContext";
 import {ToastVariant} from "../components/Toast";
-import {Avatar, Dialog} from "../components";
+import {Avatar, Dialog, Section} from "../components";
 import {useBaseUrl} from "../helpers/hooks/useBaseUrl";
-import {Section} from "../components";
 import {useMediaQuery} from "../helpers/hooks/useMediaQuery";
-import {User} from "../helpers/models/catalog/user/User";
 
 type GenresBoxProps = {};
 const GenresBox = (props: GenresBoxProps): JSX.Element => {
@@ -137,7 +134,7 @@ const Navbar = (): JSX.Element => {
         authenticationDispatch({
             type: "resetState"
         });
-        
+
         // Reload after 2 seconds
         setTimeout(() => {
             navigate(0);

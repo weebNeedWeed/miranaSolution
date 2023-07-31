@@ -11,4 +11,6 @@ public interface IAuthorService
     Task DeleteAuthorAsync(DeleteAuthorRequest request);
 
     Task<UpdateAuthorResponse> UpdateAuthorAsync(UpdateAuthorRequest request);
+
+    Task<GetAllBooksByAuthorIdResponse> GetAllBookByAuthorIdAsync(GetAllBooksByAuthorIdRequest request);
 }

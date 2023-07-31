@@ -48,7 +48,10 @@ public class BookmarkService : IBookmarkService
         }
         
         // Check if the bookmark with the request's UserId and BookId already exists, then deleting it before adding a new one
-        var bookmarkWithChapterIndexAlreadyExist = await _context.Bookmarks.AnyAsync(x => x.ChapterIndex == request.ChapterIndex);
+        var bookmarkWithChapterIndexAlreadyExist = await _context.Bookmarks.AnyAsync(
+            x => x.ChapterIndex == request.ChapterIndex 
+                 && x.BookId == request.BookId
+                 && x.UserId == request.UserId);
         if (bookmarkWithChapterIndexAlreadyExist)
         {
             await DeleteBookmarkAsync(
@@ -139,5 +142,22 @@ public class BookmarkService : IBookmarkService
             )).ToList();
 
         return new GetAllBookmarksByUserIdResponse(bookmarkVms);
+    }
+
+    public async Task<GetAllBookmarksByBookIdResponse> GetAllBookmarksByBookIdAsync(GetAllBookmarksByBookIdRequest request)
+    {
+        if (!await _context.Books.AnyAsync(x => x.Id == request.BookId))
+        {
+            throw new BookNotFoundException("The book with given Id does not exist.");
+        }
+
+        var bookmarks = await _context.Bookmarks
+            .Where(x => x.BookId == request.BookId).ToListAsync();
+
+        var bookmarkVms = bookmarks
+            .Select(x => new BookmarkVm(x.UserId, x.BookId, x.ChapterIndex, x.CreatedAt, x.UpdatedAt))
+            .ToList();
+
+        return new GetAllBookmarksByBookIdResponse(bookmarkVms);
     }
 }

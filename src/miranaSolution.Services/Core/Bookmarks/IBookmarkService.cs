@@ -10,4 +10,6 @@ public interface IBookmarkService
     Task DeleteBookmarkAsync(DeleteBookmarkRequest request);
 
     Task<GetAllBookmarksByUserIdResponse> GetAllBookmarksByUserIdAsync(GetAllBookmarksByUserIdRequest request);
+
+    Task<GetAllBookmarksByBookIdResponse> GetAllBookmarksByBookIdAsync(GetAllBookmarksByBookIdRequest request);
 }

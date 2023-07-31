@@ -5,11 +5,13 @@ using miranaSolution.API.ViewModels.Common;
 using miranaSolution.API.ViewModels.Users;
 using miranaSolution.DTOs.Authentication.Users;
 using miranaSolution.DTOs.Core.Bookmarks;
+using miranaSolution.DTOs.Core.BookRatings;
 using miranaSolution.DTOs.Core.BookUpvotes;
 using miranaSolution.DTOs.Core.CommentReactions;
 using miranaSolution.DTOs.Core.Comments;
 using miranaSolution.Services.Authentication.Users;
 using miranaSolution.Services.Core.Bookmarks;
+using miranaSolution.Services.Core.BookRatings;
 using miranaSolution.Services.Core.BookUpvotes;
 using miranaSolution.Services.Core.CommentReactions;
 using miranaSolution.Services.Core.Comments;
@@ -28,14 +30,16 @@ public class UsersController : ControllerBase
     private readonly ICommentReactionService _commentReactionService;
     private readonly IBookmarkService _bookmarkService;
     private readonly IBookUpvoteService _bookUpvoteService;
+    private readonly IBookRatingService _bookRatingService;
 
-    public UsersController(IUserService userService, ICommentService commentService, ICommentReactionService commentReactionService, IBookmarkService bookmarkService, IBookUpvoteService bookUpvoteService)
+    public UsersController(IUserService userService, ICommentService commentService, ICommentReactionService commentReactionService, IBookmarkService bookmarkService, IBookUpvoteService bookUpvoteService, IBookRatingService bookRatingService)
     {
         _userService = userService;
         _commentService = commentService;
         _commentReactionService = commentReactionService;
         _bookmarkService = bookmarkService;
         _bookUpvoteService = bookUpvoteService;
+        _bookRatingService = bookRatingService;
     }
     
     [HttpGet("profile")]
@@ -66,21 +70,45 @@ public class UsersController : ControllerBase
         // Calculate the summation of bookmarks that user has marked
         var getAllBookmarkByUserIdResponse = await _bookmarkService.GetAllBookmarksByUserIdAsync(
             new GetAllBookmarksByUserIdRequest(userVm.Id, null));
-        var totalBookmarks = getAllBookmarkByUserIdResponse.BookmarkVms.Count();
+        var totalBookmarks = getAllBookmarkByUserIdResponse.BookmarkVms.Count;
         
         // Calculate the summation of upvotes that user has done
         var countBookUpvoteByUserIdResponse = await _bookUpvoteService.CountBookUpvoteByUserIdAsync(
             new CountBookUpvoteByUserIdRequest(userVm.Id));
         var totalUpvotes = countBookUpvoteByUserIdResponse.TotalUpvotes;
+
+        var getAllBookRatingsByUserIdResponse = await _bookRatingService.GetAllBookRatingsByUserIdAsync(
+            new GetAllBookRatingsByUserIdRequest(userVm.Id));
+        var totalRatings = getAllBookRatingsByUserIdResponse.BookRatingVms.Count;
         
         var response = new ApiGetUserProfileResponse(
             userVm,
             totalComments,
             totalReactions,
             totalBookmarks,
-            totalUpvotes);
+            totalUpvotes,
+            totalRatings);
         
         return Ok(new ApiSuccessResult<ApiGetUserProfileResponse>(response));
+    }
+
+    [HttpGet("{userId}/profile")]
+    [AllowAnonymous]
+    public async Task<IActionResult> GetUserProfileById([FromRoute] string userId)
+    {
+        var getUserByIdResponse = await _userService.GetUserByIdAsync(new GetUserByIdRequest(
+            new Guid(userId)));
+        if (getUserByIdResponse.UserVm is null)
+        {
+            return Ok(new ApiErrorResult("The user with given Id does not exist."));
+        }
+
+        var editedUserVm = getUserByIdResponse.UserVm with
+        {
+            Email = "",
+        };
+
+        return Ok(new ApiSuccessResult<UserVm>(editedUserVm));
     }
     
     [HttpPost("profile")]

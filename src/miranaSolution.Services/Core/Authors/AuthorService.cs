@@ -2,6 +2,7 @@ using Microsoft.EntityFrameworkCore;
 using miranaSolution.Data.Entities;
 using miranaSolution.Data.Main;
 using miranaSolution.DTOs.Core.Authors;
+using miranaSolution.DTOs.Core.Books;
 using miranaSolution.Services.Exceptions;
 using miranaSolution.Services.Validations;
 
@@ -81,5 +82,36 @@ public class AuthorService : IAuthorService
             author.Name);
 
         return new UpdateAuthorResponse(authorVm);
+    }
+
+    public async Task<GetAllBooksByAuthorIdResponse> GetAllBookByAuthorIdAsync(GetAllBooksByAuthorIdRequest request)
+    {
+        if (await _context.Authors.FindAsync(request.AuthorId) is null)
+        {
+            throw new AuthorNotFoundException("The author with given Id does not exist.");
+        }
+
+        var books = await _context.Books
+            .Where(x => x.AuthorId == request.AuthorId)
+            .OrderByDescending(x => x.UpdatedAt)
+            .Take(request.NumberOfBooks)
+            .ToListAsync();
+
+        var bookVms = books.Select(x => new BookVm(
+            x.Id,
+            x.Name,
+            x.ShortDescription,
+            x.LongDescription,
+            x.CreatedAt,
+            x.UpdatedAt,
+            x.ThumbnailImage,
+            x.IsRecommended,
+            x.Slug,
+            "",
+            new List<string>(),
+            x.IsDone,
+            request.AuthorId)).ToList();
+
+        return new GetAllBooksByAuthorIdResponse(bookVms);
     }
 }

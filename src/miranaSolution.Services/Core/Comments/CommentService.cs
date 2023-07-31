@@ -138,15 +138,25 @@ public class CommentService : ICommentService
         {
             throw new BookNotFoundException("The book with given Id does not exist.");
         }
+        
+        var query = _context.Comments
+            .Where(x => x.BookId == request.BookId && x.ParentId == request.ParentId);
 
-        var query = _context.Comments.Where(x => x.BookId == request.BookId);
-
+        if (request.Asc ?? false)
+        {
+            query = query.OrderBy(x => x.CreatedAt);
+        }
+        else
+        {
+            query = query.OrderByDescending(x => x.CreatedAt);
+        }
+        
         var totalRecords = await query.CountAsync();
         
         var pageIndex = request.PagerRequest.PageIndex;
         var pageSize = request.PagerRequest.PageSize;
 
-        query = query.Skip(pageIndex - 1)
+        query = query.Skip((pageIndex - 1) * pageSize)
             .Take(pageSize);
 
         var comments = await query.ToListAsync();
@@ -167,7 +177,8 @@ public class CommentService : ICommentService
             comment.ParentId,
             comment.CreatedAt,
             comment.UpdatedAt,
-            comment.UserId);
+            comment.UserId,
+            comment.BookId);
 
         return commentVm;
     }
