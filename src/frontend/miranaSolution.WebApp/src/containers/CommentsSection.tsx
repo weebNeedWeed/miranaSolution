@@ -45,6 +45,8 @@ const DeleteButton = React.memo((props: DeleteButtonProps): JSX.Element => {
                 commentId: comment.id
             });
 
+            await refetch();
+
             systemContext.dispatch({
                 type: "addToast",
                 payload: {
@@ -52,16 +54,14 @@ const DeleteButton = React.memo((props: DeleteButtonProps): JSX.Element => {
                     title: "Xoá bình luận thành công."
                 }
             });
-
-            await refetch();
         } catch (error: any) {
         }
     }
 
     return <button
         onClick={handleDeleteComment}
-        className="flex flex-row items-center gap-x-1 hover:text-oldRose transition-all">
-        <FaTrash className="text-sm"/>
+        className="flex flex-row items-center gap-x-1 hover:text-oldRose transition-all text-sm md:text-base">
+        <FaTrash className="text-xs md:text-sm"/>
         {!onlyIcon && "Xoá"}
     </button>
 });
@@ -116,8 +116,8 @@ const ReactionButton = ({commentId}: ReactionButtonProps): JSX.Element => {
 
     return <button
         onClick={handleReact}
-        className={clsx("hover:text-oldRose font-semibold flex flex-row items-center gap-x-0.5 transition-all", isReacted ? "text-oldRose" : "text-deepKoamaru")}>
-        <AiFillLike className="text-base"/>
+        className={clsx("hover:text-oldRose font-semibold flex flex-row items-center gap-x-0.5 transition-all text-sm md:text-base", isReacted ? "text-oldRose" : "text-deepKoamaru")}>
+        <AiFillLike className="text-sm md:text-base"/>
         {countReactionResponse?.totalReactions ?? 0}
     </button>;
 }
@@ -189,10 +189,10 @@ const CommentForm = (props: CommentFormProps): JSX.Element => {
         }
     }
 
-    return <form onSubmit={handleSubmitForm} className="flex flex-row w-full gap-x-4 mt-3 flex-wrap">
+    return <form onSubmit={handleSubmitForm} className="flex flex-row w-full gap-x-2 md:gap-x-4 mt-3 flex-wrap">
         {authContext.state.isLoggedIn && authContext.state.user.avatar !== "" ?
-            <Avatar imageUrl={baseUrl + authContext.state.user.avatar} className="w-12 h-12"/> :
-            <Avatar className="w-12 h-12"/>}
+            <Avatar imageUrl={baseUrl + authContext.state.user.avatar} className="w-9 h-9 md:w-12 md:h-12"/> :
+            <Avatar className="w-9 h-9 md:w-12 md:h-12"/>}
 
         <textarea
             ref={ref}
@@ -205,7 +205,7 @@ const CommentForm = (props: CommentFormProps): JSX.Element => {
 
         <div className="w-full flex justify-end pt-2">
             <button type="submit"
-                    className="text-base rounded-xl px-2 py-1 bg-oldRose flex flex-row items-center gap-x-1">
+                    className="text-sm md:text-base rounded-xl px-2 py-1 bg-oldRose flex flex-row items-center md:gap-x-1">
                 <IoIosSend/>
                 Bình luận
             </button>
@@ -230,16 +230,16 @@ const Reply = ({reply, parentRefetch}: ReplyProps): JSX.Element => {
 
     return <div className="w-full flex flex-row gap-x-2 border-t-[2px] pt-2 mt-2">
         {userData.avatar !== "" ?
-            <Avatar imageUrl={baseUrl + userData.avatar} className="w-12 h-12 shrink-0"/> :
-            <Avatar className="w-12 h-12 shrink-0"/>}
+            <Avatar imageUrl={baseUrl + userData.avatar} className="w-9 h-9 md:w-12 md:h-12 shrink-0"/> :
+            <Avatar className="w-9 h-9 md:w-12 md:h-12 shrink-0"/>}
         <div className="flex flex-col w-full">
             <span className="font-semibold text-base max-w-2xl line-clamp-1">{userData.userName}</span>
-            <span className="mt-0.5">
+            <span className="md:mt-0.5">
                 {reply.content}
             </span>
 
-            <div className="flex flex-row items-center justify-between w-full">
-                <div className="flex flex-row gap-x-6">
+            <div className="flex flex-row items-center justify-between w-full mt-2">
+                <div className="flex flex-row gap-x-3 md:gap-x-6">
                     <ReactionButton commentId={reply.id}/>
 
                     <span
@@ -337,14 +337,24 @@ const MainComment = ({comment, parentRefetch}: MainCommentProps): JSX.Element =>
         }
     }
 
+    const deleteRefetch = () => {
+        if (index === 1) {
+            setRetry(!retry);
+            return;
+        }
+
+        setReplies([]);
+        setIndex(1);
+    }
+
     const handleLoadMore = () => {
         setIndex(index + 1);
     }
 
     return <div className="w-full flex flex-row gap-x-2 border-t-[2px] py-2">
         {userData.avatar !== "" ?
-            <Avatar imageUrl={baseUrl + userData.avatar} className="w-12 h-12 shrink-0"/> :
-            <Avatar className="w-12 h-12 shrink-0"/>}
+            <Avatar imageUrl={baseUrl + userData.avatar} className="w-9 h-9 md:w-12 md:h-12 shrink-0"/> :
+            <Avatar className="w-9 h-9 md:w-12 md:h-12 shrink-0"/>}
 
         <div className="flex flex-col w-full">
             <span className="font-semibold text-base max-w-2xl line-clamp-1">{userData.userName}</span>
@@ -353,22 +363,29 @@ const MainComment = ({comment, parentRefetch}: MainCommentProps): JSX.Element =>
                 {timeSince(comment.createdAt)}
             </span>
 
-            <span className="mt-2">
+            <span className="md:mt-2">
                 {comment.content}
             </span>
 
             <span className="mt-2 flex flex-row justify-between items-center font-semibold w-full">
                 {(totalReplies > 0 && !loadReply) &&
-                    <button onClick={handleLoadReply} className="flex flex-row items-center">
+                    <button onClick={handleLoadReply} className="flex-row items-center text-base hidden md:flex">
                         Xem {totalReplies} câu trả lời
                         <IoMdArrowDropdown className="text-xl"/>
                     </button>}
+
+                {(totalReplies > 0 && !loadReply) &&
+                    <button onClick={handleLoadReply} className="flex flex-row items-center text-sm md:hidden">
+                        {totalReplies} trả lời
+                        <IoMdArrowDropdown className="text-lg"/>
+                    </button>}
+
                 <div className="flex flex-row gap-x-6 ml-auto">
                     <ReactionButton commentId={comment.id}/>
 
                     <button onClick={handleLoadReply}
-                            className="flex flex-row items-center hover:text-oldRose transition-all">
-                        <BsFillReplyFill className="text-lg"/>
+                            className="flex flex-row items-center hover:text-oldRose transition-all text-sm md:text-base">
+                        <BsFillReplyFill className="text-base md:text-lg"/>
                         Trả lời
                     </button>
 
@@ -379,10 +396,11 @@ const MainComment = ({comment, parentRefetch}: MainCommentProps): JSX.Element =>
 
             {loadReply && <div className="flex flex-col w-full">
                 {replies && replies.map((arr) => {
-                    return arr.map(comment => <Reply parentRefetch={refetch} reply={comment} key={uuidv4()}/>)
+                    return arr.map(comment => <Reply parentRefetch={deleteRefetch} reply={comment} key={uuidv4()}/>)
                 })}
 
-                {loadMore && <button onClick={handleLoadMore} className="flex flex-row items-center font-semibold pt-2">
+                {loadMore && <button onClick={handleLoadMore}
+                                     className="flex flex-row items-center font-semibold text-sm md:text-base pt-2">
                     Xem thêm trả lời
                     <IoMdArrowDropdown className="text-xl"/>
                 </button>}

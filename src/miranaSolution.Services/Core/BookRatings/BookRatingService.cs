@@ -152,6 +152,35 @@ public class BookRatingService : IBookRatingService
         return new CheckUserIsRatedResponse(isRated);
     }
 
+    public async Task<GetOverviewResponse> GetOverviewAsync(GetOverviewRequest request)
+    {
+        if (await _context.Books.FindAsync(request.BookId) is null)
+        {
+            throw new BookNotFoundException("The book with given Id does not exist.");
+        }
+
+        var ratingsByStar = new Dictionary<int, int>
+        {
+            { 1, 0 },
+            { 2, 0 },
+            { 3, 0 },
+            { 4, 0 },
+            { 5, 0 }
+        };
+
+        var ratings = await _context.BookRatings
+            .Where(x => x.BookId == request.BookId)
+            .ToListAsync();
+
+        foreach (var rating in ratings)
+        {
+            ratingsByStar[rating.Star]++;
+        }
+
+        var response = new GetOverviewResponse(ratingsByStar);
+        return response;
+    }
+
     private BookRatingVm MapBookRatingIntoBookRatingVm(BookRating bookRating)
     {
         var ratingVm = new BookRatingVm(

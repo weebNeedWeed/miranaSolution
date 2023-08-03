@@ -399,7 +399,7 @@ const BookCardList = (props: BookCardListProps): JSX.Element => {
 }
 
 const BooksIndex = (): JSX.Element => {
-    return <Section className="text-deepKoamaru">
+    return <Section className="text-deepKoamaru pt-0 md:pt-8">
         <div className="flex flex-col md:flex-row items-stretch shadow-sm shadow-slate-500 rounded-md">
             <FilterSection/>
 

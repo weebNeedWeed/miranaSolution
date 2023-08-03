@@ -16,4 +16,6 @@ public interface IBookRatingService
     Task<GetAllBookRatingsByBookIdResponse> GetAllBookRatingsByBookIdAsync(GetAllBookRatingsByBookIdRequest request);
 
     Task<CheckUserIsRatedResponse> CheckUserIsRatedAsync(CheckUserIsRatedRequest request);
+
+    Task<GetOverviewResponse> GetOverviewAsync(GetOverviewRequest request);
 }

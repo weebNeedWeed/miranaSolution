@@ -22,6 +22,7 @@ import {GetAllRatingsResponse} from "../models/catalog/books/GetAllRatingsRespon
 import {UpdateRatingRequest} from "../models/catalog/books/UpdateRatingRequest";
 import {BookUpvote} from "../models/catalog/books/BookUpvote";
 import {GetAllUpvotesResponse} from "../models/catalog/books/GetAllUpvotesResponse";
+import {GetRatingsOverviewResponse} from "../models/catalog/books/GetRatingsOverviewResponse";
 
 class BookApiHelper extends BaseApiHelper {
     async getAllBooks(request: GetAllBooksRequest): Promise<GetAllBooksResponse> {
@@ -247,6 +248,17 @@ class BookApiHelper extends BaseApiHelper {
         const url = `/books/${bookId}/ratings`;
         const response = await this.init(headers)
             .put<ApiResult<BookRating>>(url, request);
+        if (response.data.status === "error") {
+            throw new Error(response.data.message);
+        }
+
+        return response.data.data;
+    }
+
+    async getRatingsOverview(bookId: number): Promise<GetRatingsOverviewResponse> {
+        const url = `/books/${bookId}/ratings/overview`;
+        const response = await this.init()
+            .get<ApiResult<GetRatingsOverviewResponse>>(url);
         if (response.data.status === "error") {
             throw new Error(response.data.message);
         }

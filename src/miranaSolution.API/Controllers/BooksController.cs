@@ -572,6 +572,26 @@ public class BooksController : ControllerBase
         }
     }
 
+    [HttpGet("{bookId:int}/ratings/overview")]
+    [AllowAnonymous]
+    public async Task<IActionResult> GetBookRatingsOverview([FromRoute] int bookId)
+    {
+        try
+        {
+            var getOverviewResponse =  await _bookRatingService.GetOverviewAsync(
+                new GetOverviewRequest(
+                    bookId));
+
+            var response = new ApiGetBookRatingsOverviewResponse(getOverviewResponse.RatingsByStar); 
+            
+            return Ok(new ApiSuccessResult<ApiGetBookRatingsOverviewResponse>(response));
+        }
+        catch (BookNotFoundException ex)
+        {
+            return Ok(new ApiErrorResult(ex.Message));
+        }
+    }
+    
     private Guid GetUserIdFromClaim()
     {
         string userId = User.Claims.First(

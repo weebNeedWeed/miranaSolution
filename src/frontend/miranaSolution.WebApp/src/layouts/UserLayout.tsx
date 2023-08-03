@@ -34,7 +34,7 @@ const UserLayout = (): JSX.Element => {
         }
     }, [authContext.state.isLoggedIn]);
 
-    return <Section className="text-deepKoamaru">
+    return <Section className="text-deepKoamaru pt-0 md:pt-8">
         <div className="flex w-full flex-row items-stretch">
             <div className="sm:w-1/4 bg-oldRose p-3 md:p-6 rounded shrink-0 shadow-deepKoamaru shadow-sm">
                 <div className="flex flex-col justify-start items-start gap-y-3">

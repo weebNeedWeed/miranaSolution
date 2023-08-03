@@ -22,17 +22,119 @@ import {authorApiHelper} from "../../helpers/apis/AuthorApiHelper";
 import {BookRating} from "../../helpers/models/catalog/books/BookRating";
 import {BookUpvote} from "../../helpers/models/catalog/books/BookUpvote";
 import {bookUpvoteApiHelper} from "../../helpers/apis/BookUpvoteApiHelper";
-import {timeSince} from "../../helpers/utilityFns/timeSince";
+import {IoIosArrowForward} from "react-icons/io";
+import {MobileChapterList} from "../../containers/MobileChapterList";
+
+type MobileTabsSectionProps = {
+    getChaptersResponse: GetAllChaptersResponse;
+    book: Book,
+}
+const MobileTabSection = (props: MobileTabsSectionProps) => {
+    const {getChaptersResponse, book} = props;
+    const [open, setOpen] = useState(false);
+
+    const {data: ratingsOverview} = useQuery(
+        ["ratingsOverview", book.id],
+        () => bookApiHelper.getRatingsOverview(props.book.id)
+    );
+
+    return <>
+        <button onClick={() => setOpen(!open)}
+                className="text-base font-semibold bg-oldRose px-6 flex-row flex justify-between items-center py-1">
+            Danh sách chương ({getChaptersResponse.totalChapters} chương)
+            <span className="text-base">
+                    <IoIosArrowForward/>
+                </span>
+        </button>
+
+        <div className="flex flex-col w-full mt-7">
+            <h4 className="text-base font-semibold bg-oldRose px-6 py-1">
+                Giới thiệu
+            </h4>
+
+            <div className="px-6 pt-1">
+                {book.longDescription}
+            </div>
+        </div>
+
+        <div className="flex flex-col w-full mt-6">
+            <h4 className="text-base font-semibold bg-oldRose px-6 py-1">
+                Tác giả
+            </h4>
+
+            <div className="px-4 py-2">
+                <AuthorBooks isMobile authorId={book.authorId} authorName={book.authorName}/>
+            </div>
+        </div>
+
+        <div className="flex flex-col w-full mt-6">
+            <h4 className="text-base font-semibold bg-oldRose px-6 py-1">
+                Đánh giá
+            </h4>
+
+            <div className="pl-14 pb-2 pt-1">
+                {ratingsOverview && <div className="flex flex-col mt-1 w-full">
+                    {Array.from(new Array(5)).map((_, index) => <div
+                        key={index}
+                        className="flex flex-row gap-x-2 items-center text-base font-normal">
+                        <Rating value={5 - index} width={16} spacing={2}/>
+
+                        <span className="text-sm">
+                            {ratingsOverview.ratingsByStar[5 - index]} đánh giá
+                        </span>
+                    </div>)}
+                </div>}
+            </div>
+        </div>
+
+        <MobileChapterList book={book} open={open} handleClose={() => setOpen(false)}/>
+    </>
+}
 
 type AuthorBooks = {
     authorId: number;
     authorName: string;
+    isMobile?: boolean;
 };
-const AuthorBooks = ({authorId, authorName}: AuthorBooks): JSX.Element => {
+const AuthorBooks = (props: AuthorBooks): JSX.Element => {
+    const {authorId, authorName} = props;
     const {data: booksData} = useQuery(
         ["author", authorId],
         () => authorApiHelper.getAllBooksByAuthorId(authorId)
     );
+
+    const isMobile = props.isMobile ?? false;
+
+    if (isMobile) {
+        return <div className="flex flex-row bg-transparent w-full">
+            <div className="flex flex-col items-center grow-0 w-1/4">
+                <Avatar className="w-10 h-10" imageUrl={authorIcon}/>
+                <span
+                    className="text-center w-full text-sm font-semibold mt-1 break-words">{authorName}</span>
+            </div>
+
+            <div className="flex flex-col grow">
+                <span className="text-sm font-semibold">
+                    Truyện cùng tác giả:
+                </span>
+
+                <ul className="list-disc ml-5">
+                    {booksData && <div
+                        className="flex flex-col w-full justify-center items-center text-base font-normal mt-1">
+                        {booksData
+                            .filter(book => book.id !== authorId)
+                            .map(book => <li key={book.id}>
+                                <Link
+                                    to={`/books/${book.slug}`}
+                                    className="w-full line-clamp-1 text-left border-b-[2px]">
+                                    {book.name}
+                                </Link>
+                            </li>)}
+                    </div>}
+                </ul>
+            </div>
+        </div>
+    }
 
     return <div
         className="flex flex-col bg-oldRose rounded-md py-6 min-w-[300px] min-h-[500px] h-full justify-start items-start">
@@ -42,7 +144,7 @@ const AuthorBooks = ({authorId, authorName}: AuthorBooks): JSX.Element => {
         <div
             className="text-center w-full text-base font-semibold mt-3 border-[rgba(0,0,0,0.2)] border-solid border-b-[1px]">{authorName}</div>
 
-        <span className="text-center w-full text-base font-semibold mt-4">Cùng tác giả</span>
+        <span className="text-center w-full text-base font-semibold mt-4">Truyện cùng tác giả</span>
 
         {booksData && <div
             className="flex flex-col w-full justify-center items-center text-base font-normal mt-1">
@@ -149,7 +251,7 @@ const TabsSection = ({getChaptersResponse, book}: TabsSectionProps): JSX.Element
             </div>
 
             <div className={clsx(isTabIndexActive(3) ? "block" : "hidden", "w-full")}>
-                <RatingsSection/>
+                <RatingsSection book={book}/>
             </div>
         </div>
     </div>;
@@ -312,19 +414,19 @@ const BooksInfo = (): JSX.Element => {
         setUpvote(_upvote);
     }
 
-    return <Section className="text-deepKoamaru">
+    return <Section className="text-deepKoamaru pt-0 md:pt-8">
         <div
             className="w-full bg-[rgba(255,255,255,0.8)] rounded-md shadow-sm shadow-slate-500 flex flex-col">
-            <div className="w-full flex flex-row items-stretch p-6">
+            <div className="w-full flex flex-row items-stretch px-6 pt-6 pb-0 md:pb-6">
                 <span
-                    className="w-40 aspect-[3/4] shrink-0 block rounded-md bg-cover bg-center bg-no-repeat drop-shadow-md"
+                    className="w-24 h-auto md:w-40 aspect-[3/4] shrink-0 block rounded-md bg-cover bg-center bg-no-repeat drop-shadow-md"
                     style={{backgroundImage: `url('${book.thumbnailImage}')`}}>
                 </span>
 
-                <div className="ml-4 grow w-full flex flex-col">
-                    <span className="text-2xl font-extrabold capitalize">{book.name}</span>
+                <div className="ml-2 md:ml-4 grow w-full flex flex-col">
+                    <span className="text-lg font-extrabold capitalize w-full line-clamp-1">{book.name}</span>
 
-                    <div className="flex flex-row mt-2 gap-x-2">
+                    <div className="flex flex-row mt-1 md:mt-2 gap-x-1 md:gap-x-2 flex-wrap gap-y-1">
                         <span className="text-xs py-1 px-3 rounded-3xl bg-oldRose text-white">
                             {book.authorName}
                         </span>
@@ -333,14 +435,16 @@ const BooksInfo = (): JSX.Element => {
                             {book.isDone ? "Hoàn thành" : "Chưa hoàn thành"}
                         </span>
 
-                        {book.genres.map((genre, index) => <span
-                            key={index}
-                            className="text-xs py-1 px-3 rounded-3xl bg-darkVanilla text-white">
+                        <div className="md:flex flex-row gap-x-2 hidden">
+                            {book.genres.map((genre, index) => <span
+                                key={index}
+                                className="text-xs py-1 px-3 rounded-3xl bg-darkVanilla text-white">
                             {genre}
                         </span>)}
+                        </div>
                     </div>
 
-                    <div className="flex flex-row justify-start items-center mt-2 gap-x-8">
+                    <div className="md:flex hidden flex-row justify-start items-center mt-2 gap-x-8">
                         <div className="flex flex-col items-start">
                             <span className="font-semibold text-xl">
                                 {getAllChaptersResponse?.totalPages}
@@ -382,15 +486,15 @@ const BooksInfo = (): JSX.Element => {
                         </div>
                     </div>
 
-                    <div className="mt-2 w-full flex flex-row gap-x-1">
+                    <div className="mt-1 md:mt-2 w-full flex flex-row gap-x-1">
                         <Rating value={avgStar}/>
                         <span className="text-base text-deepKoamaru">
                             <span className="font-semibold">{avgStar}</span>
-                            <span>/5 ({ratings?.length ?? 0} đánh giá)</span>
+                            <span className="md:inline-block hidden">/5 ({ratings?.length ?? 0} đánh giá)</span>
                         </span>
                     </div>
 
-                    <div className="mt-auto flex flex-row gap-x-4">
+                    <div className="mt-auto hidden flex-row gap-x-4 md:flex">
                         <Link
                             to={`/books/${book.slug}/chapters/1`}
                             className="item rounded bg-deepKoamaru py-1.5 px-3 mt-4 text-white font-semibold flex justify-center items-center gap-x-2 text-sm">
@@ -432,8 +536,100 @@ const BooksInfo = (): JSX.Element => {
                 </div>
             </div>
 
-            <div className="w-full mt-6 flex flex-col">
+            <div className="w-full px-6 md:hidden flex flex-col mt-2 gap-y-2">
+                <div className="md:hidden flex flex-row justify-around items-center">
+                    <div className="flex flex-col items-start">
+                            <span className="font-semibold text-lg">
+                                {getAllChaptersResponse?.totalPages}
+                            </span>
+
+                        <span className="font-normal text-sm">
+                                Chương
+                            </span>
+                    </div>
+
+                    <div className="flex flex-col items-start">
+                            <span className="font-semibold text-lg">
+                                0
+                            </span>
+
+                        <span className="font-normal text-sm">
+                                Lượt đọc
+                            </span>
+                    </div>
+
+                    <div className="flex flex-col items-start">
+                            <span className="font-semibold text-lg">
+                                {getBookResponse.totalBookmarks}
+                            </span>
+
+                        <span className="font-normal text-sm">
+                                Cất giữ
+                            </span>
+                    </div>
+
+                    <div className="flex flex-col items-start">
+                            <span className="font-semibold text-lg">
+                                {getBookResponse.totalUpvotes}
+                            </span>
+
+                        <span className="font-normal text-sm">
+                                Đề cử
+                            </span>
+                    </div>
+                </div>
+
+                <div className="mt-auto flex flex-row gap-y-2 w-full flex-wrap">
+                    <div className="flex flex-row gap-x-2 w-full">
+                        <Link
+                            to={`/books/${book.slug}/chapters/1`}
+                            className="item rounded bg-deepKoamaru py-1.5 px-2 text-white font-semibold flex justify-center items-center gap-x-1 text-sm w-1/2">
+                            <AiFillRead/> Đọc truyện
+                        </Link>
+
+                        <button
+                            onClick={() => setOpenRatingDialog(!openRatingDialog)}
+                            className="item rounded bg-transparent py-1.5 px-2 text-deepKoamaru font-semibold flex justify-center items-center gap-x-2 text-sm border-deepKoamaru border-2 w-1/2"
+                        >
+                            <AiFillStar/> Đánh giá
+                        </button>
+                    </div>
+
+                    <div className="flex flex-row gap-x-2 w-full">
+                        {!bookmark ? <button
+                            onClick={handleCreateBookmark}
+                            className="item rounded bg-transparent py-1.5 px-2 text-deepKoamaru font-semibold flex justify-center items-center gap-x-2 text-sm border-deepKoamaru border-2 w-1/2"
+                        >
+                            <BsFillBookmarkFill/> Đánh dấu
+                        </button> : <button
+                            onClick={handleCreateBookmark}
+                            className="item rounded bg-deepKoamaru py-1.5 px-2 text-white font-semibold flex justify-center items-center gap-x-2 text-sm w-1/2"
+                        >
+                            <BsFillBookmarkCheckFill/> Đã đánh dấu
+                        </button>}
+
+
+                        {!upvote ? <button
+                            onClick={handleCreateUpvote}
+                            className="item rounded bg-transparent py-1.5 px-2 text-deepKoamaru font-semibold flex justify-center items-center gap-x-2 text-sm border-deepKoamaru border-2 w-1/2"
+                        >
+                            <BiUpArrowAlt/> Đề cử
+                        </button> : <button
+                            onClick={handleCreateUpvote}
+                            className="item rounded bg-deepKoamaru py-1.5 px-2 text-white font-semibold flex justify-center items-center gap-x-2 text-sm border-deepKoamaru border-2 w-1/2"
+                        >
+                            <BiUpArrowAlt/> Đã đề cử
+                        </button>}
+                    </div>
+                </div>
+            </div>
+
+            <div className="w-full mt-6 hidden flex-col md:flex">
                 {getAllChaptersResponse && <TabsSection book={book} getChaptersResponse={getAllChaptersResponse}/>}
+            </div>
+
+            <div className="w-full mt-6 flex flex-col md:hidden">
+                {getAllChaptersResponse && <MobileTabSection book={book} getChaptersResponse={getAllChaptersResponse}/>}
             </div>
 
             <div className="p-6">

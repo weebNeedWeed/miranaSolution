@@ -38,7 +38,8 @@ const GenresBox = (props: GenresBoxProps): JSX.Element => {
     const mappedGenreTupleList = genreTupleList.map((tuple, tIndex) => {
         return <div className="flex flex-row ml-[-10px]" key={tIndex}>
             {tuple.map((genre, gIndex) =>
-                <Link to={""} className="w-[calc(calc(100%/2)-10px)] ml-[10px] text-base font-normal"
+                <Link to={`/books/?genres=${genre.id}`}
+                      className="w-[calc(calc(100%/2)-10px)] ml-[10px] text-base font-normal"
                       key={gIndex}>{genre.name}</Link>)}
         </div>;
     });
@@ -244,7 +245,7 @@ const Navbar = (): JSX.Element => {
                 <div className="flex flex-row flex-wrap w-full">
                     {genresData && genresData.map((genre, index) => <Link
                         key={index}
-                        to={"/"} className="w-1/3 font-semibold">
+                        to={`/books/?genres=${genre.id}`} className="w-1/2 font-semibold">
                         {genre.name}
                     </Link>)}
                 </div>
