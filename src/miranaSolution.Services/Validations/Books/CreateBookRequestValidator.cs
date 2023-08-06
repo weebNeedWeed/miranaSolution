@@ -10,7 +10,7 @@ public class CreateBookRequestValidator : AbstractValidator<CreateBookRequest>
         RuleFor(x => x.Name)
             .NotEmpty()
             .WithMessage("Name không được để trống.")
-            .Length(min: 8, max: 128)
+            .Length(8, 128)
             .WithMessage("Name phải có độ dài từ 8 tới 128 ký tự.");
 
         RuleFor(x => x.IsRecommended)
@@ -20,13 +20,13 @@ public class CreateBookRequestValidator : AbstractValidator<CreateBookRequest>
         RuleFor(x => x.ShortDescription)
             .NotNull()
             .WithMessage("ShortDescription không được để trống.")
-            .Length(min:0, max: 256)
+            .Length(0, 256)
             .WithMessage("ShortDescription phải có độ dài từ 0 tới 256 ký tự.");
-        
+
         RuleFor(x => x.LongDescription)
             .NotNull()
             .WithMessage("LongDescription không được để trống.")
-            .Length(min:0, max: 512)
+            .Length(0, 512)
             .WithMessage("LongDescription phải có độ dài từ 0 tới 512 ký tự.");
 
         RuleFor(x => x.IsDone)
@@ -36,13 +36,13 @@ public class CreateBookRequestValidator : AbstractValidator<CreateBookRequest>
         RuleFor(x => x.Slug)
             .NotEmpty()
             .WithMessage("Slug không được để trống.")
-            .Length(min: 8, max: 128)
+            .Length(8, 128)
             .WithMessage("Slug phải có độ dài từ 8 tới 128 ký tự.");
 
         RuleFor(x => x.AuthorId)
             .NotNull()
             .WithMessage("AuthorId không được để trống.");
-        
+
         RuleFor(x => x.ThumbnailImage)
             .NotNull()
             .WithMessage("ThumbnailImage không được để trống.");

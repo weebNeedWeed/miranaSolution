@@ -15,12 +15,12 @@ namespace miranaSolution.API.Controllers;
 public class CommentsController : ControllerBase
 {
     private readonly ICommentReactionService _commentReactionService;
-    
+
     public CommentsController(ICommentReactionService commentReactionService)
     {
         _commentReactionService = commentReactionService;
     }
-    
+
     [HttpPost("{commentId:int}/reaction")]
     public async Task<IActionResult> CreateCommentReaction([FromRoute] int commentId)
     {
@@ -37,7 +37,7 @@ public class CommentsController : ControllerBase
             return Ok(new ApiErrorResult(ex.Message));
         }
     }
-    
+
     [HttpDelete("{commentId:int}/reaction")]
     public async Task<IActionResult> DeleteCommentReaction([FromRoute] int commentId)
     {
@@ -79,7 +79,7 @@ public class CommentsController : ControllerBase
     public async Task<IActionResult> CheckUserIsReacted([FromRoute] int commentId)
     {
         var userId = GetUserIdFromClaim();
-        
+
         try
         {
             var checkUserIsReactedResponse = await _commentReactionService.CheckUserIsReactedAsync(
@@ -95,10 +95,10 @@ public class CommentsController : ControllerBase
             return Ok(new ApiErrorResult(ex.Message));
         }
     }
-    
+
     private Guid GetUserIdFromClaim()
     {
-        string userId = User.Claims.First(x => x.Type == JwtRegisteredClaimNames.Sid).Value;
+        var userId = User.Claims.First(x => x.Type == JwtRegisteredClaimNames.Sid).Value;
         return new Guid(userId);
     }
 }

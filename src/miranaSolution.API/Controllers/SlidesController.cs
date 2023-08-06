@@ -2,7 +2,6 @@
 using Microsoft.AspNetCore.Mvc;
 using miranaSolution.API.ViewModels.Common;
 using miranaSolution.API.ViewModels.Slides;
-using miranaSolution.DTOs.Common;
 using miranaSolution.DTOs.Core.Slides;
 using miranaSolution.Services.Core.Slides;
 using miranaSolution.Utilities.Constants;
@@ -35,7 +34,7 @@ public class SlidesController : ControllerBase
     {
         var getSlideByIdResponse = await _slideService.GetSlideByIdAsync(
             new GetSlideByIdRequest(slideId));
-        
+
         if (getSlideByIdResponse.SlideVm is null)
             return Ok(new ApiErrorResult("The slide with given Id does not exist."));
 
@@ -52,7 +51,7 @@ public class SlidesController : ControllerBase
                 request.ThumbnailImage,
                 request.Genres,
                 request.SortOrder));
-        
+
         return Ok(new ApiSuccessResult<SlideVm>(createSlideResponse.SlideVm));
     }
 }

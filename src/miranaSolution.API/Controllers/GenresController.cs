@@ -27,7 +27,7 @@ public class GenresController : ControllerBase
     {
         var getAllGenresResponse = await _genreService.GetAllGenresAsync();
         var response = new ApiGetAllGenreResponse(getAllGenresResponse.GenreVms);
-        
+
         return Ok(new ApiSuccessResult<ApiGetAllGenreResponse>(response));
     }
 
@@ -39,9 +39,7 @@ public class GenresController : ControllerBase
             new GetGenreByIdRequest(genreId));
 
         if (getGenreByIdResponse.GenreVm is null)
-        {
             return Ok(new ApiErrorResult("The genre with given Id does not exist."));
-        }
 
         return Ok(new ApiSuccessResult<GenreVm>(getGenreByIdResponse.GenreVm));
     }
@@ -50,8 +48,8 @@ public class GenresController : ControllerBase
     public async Task<IActionResult> CreateGenre([FromBody] ApiCreateGenreRequest request)
     {
         var createGenreResponse = await _genreService.CreateGenreAsync(
-                new CreateGenreRequest(
-                    request.Name));
+            new CreateGenreRequest(
+                request.Name));
         return Ok(new ApiSuccessResult<GenreVm>(createGenreResponse.GenreVm));
     }
 

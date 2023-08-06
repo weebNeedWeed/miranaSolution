@@ -220,8 +220,8 @@ const UserProfile = (): JSX.Element => {
             <li className="flex flex-row gap-x-2 items-center">
                 <span className="w-4 h-4 bg-oldRose block shrink-0 self-start mt-1"></span>
                 <span className="font-semibold">
-                    Đã đọc: <span className="text-oldRose">0</span> truyện, <span
-                    className="text-oldRose">0</span> chương
+                    Đã đọc: <span className="text-oldRose">{data.user.readBookCount}</span> truyện, <span
+                    className="text-oldRose">{data.user.readChapterCount}</span> chương
                         </span>
             </li>
 

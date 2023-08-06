@@ -2,7 +2,6 @@
 using System.Security.Claims;
 using System.Text;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using miranaSolution.Data.Entities;
@@ -22,7 +21,7 @@ public class JwtTokenGenerator : IJwtTokenGenerator
 
     public string GenerateToken(AppUser user)
     {
-        var claims = new List<Claim>()
+        var claims = new List<Claim>
         {
             new(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
             new(JwtRegisteredClaimNames.GivenName, user.FirstName),
@@ -33,20 +32,17 @@ public class JwtTokenGenerator : IJwtTokenGenerator
         };
 
         var roles = _roleManager.Roles.ToList();
-        roles.ForEach((role) =>
-        {
-            claims.Add(new Claim(ClaimTypes.Role, role.Name));
-        });
+        roles.ForEach(role => { claims.Add(new Claim(ClaimTypes.Role, role.Name)); });
 
         var signingCredentials = new SigningCredentials(
-            key: new SymmetricSecurityKey(
+            new SymmetricSecurityKey(
                 Encoding.UTF8.GetBytes(_jwtOptions.Secret)),
-            algorithm: SecurityAlgorithms.HmacSha256);
+            SecurityAlgorithms.HmacSha256);
 
         var token = new JwtSecurityToken(
-            issuer: _jwtOptions.Issuer,
-            audience: _jwtOptions.Audience,
-            claims: claims,
+            _jwtOptions.Issuer,
+            _jwtOptions.Audience,
+            claims,
             expires: DateTime.UtcNow.AddMinutes(_jwtOptions.ExpiryMinutes),
             signingCredentials: signingCredentials);
 

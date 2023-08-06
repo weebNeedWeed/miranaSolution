@@ -5,8 +5,8 @@ namespace miranaSolution.Data;
 
 public class DatabaseOptionsSetup : IConfigureOptions<DatabaseOptions>
 {
-    private readonly IConfiguration _configuration;
     private const string ConfigurationSectionName = "DatabaseOptions";
+    private readonly IConfiguration _configuration;
 
     public DatabaseOptionsSetup(IConfiguration configuration)
     {

@@ -6,4 +6,5 @@ public record GetAllBooksRequest(
     string? Keyword,
     string? GenreIds,
     bool? IsDone,
+    int? AuthorId,
     PagerRequest PagerRequest);

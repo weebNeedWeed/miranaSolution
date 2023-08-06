@@ -12,6 +12,21 @@ public class MiranaDbContext : IdentityDbContext<AppUser, AppRole, Guid>
     {
     }
 
+    public DbSet<Author> Authors { get; set; }
+    public DbSet<Book> Books { get; set; }
+    public DbSet<Genre> Genres { get; set; }
+    public DbSet<BookGenre> BookGenres { get; set; }
+    public DbSet<Chapter> Chapters { get; set; }
+    public DbSet<Rating> Ratings { get; set; }
+    public DbSet<Slide> Slides { get; set; }
+    public DbSet<Comment> Comments { get; set; }
+    public DbSet<Bookmark> Bookmarks { get; set; }
+    public DbSet<CommentReaction> CommentReactions { get; set; }
+    public DbSet<BookUpvote> BookUpvotes { get; set; }
+    public DbSet<BookRating> BookRatings { get; set; }
+    
+    public DbSet<CurrentlyReading> CurrentlyReadings { get; set; }
+
     protected override void OnModelCreating(ModelBuilder builder)
     {
         base.OnModelCreating(builder);
@@ -27,18 +42,4 @@ public class MiranaDbContext : IdentityDbContext<AppUser, AppRole, Guid>
 
         builder.Seed();
     }
-
-    public DbSet<Author> Authors { get; set; }
-    public DbSet<Book> Books { get; set; }
-    public DbSet<Genre> Genres { get; set; }
-    public DbSet<BookGenre> BookGenres { get; set; }
-    public DbSet<Chapter> Chapters { get; set; }
-    public DbSet<Rating> Ratings { get; set; }
-    public DbSet<Slide> Slides { get; set; }
-    public DbSet<Comment> Comments { get; set; }
-    public DbSet<Bookmark> Bookmarks { get; set; }
-    public DbSet<CommentReaction> CommentReactions { get; set; }
-    public DbSet<BookUpvote> BookUpvotes { get; set; }
-    
-    public DbSet<BookRating> BookRatings { get; set; }
 }

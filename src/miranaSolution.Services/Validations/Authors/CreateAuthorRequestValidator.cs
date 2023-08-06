@@ -10,7 +10,7 @@ public class CreateAuthorRequestValidator : AbstractValidator<CreateAuthorReques
         RuleFor(x => x.Name)
             .NotEmpty()
             .WithMessage("Name không được để trống.")
-            .Length(min: 4, max: 128)
+            .Length(4, 128)
             .WithMessage("Name phải có độ dài từ 4 tới 128 ký tự.");
     }
 }

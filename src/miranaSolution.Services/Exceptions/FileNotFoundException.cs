@@ -2,5 +2,7 @@
 
 public class FileNotFoundException : Exception
 {
-    public FileNotFoundException(string msg) : base(msg) {}
+    public FileNotFoundException(string msg) : base(msg)
+    {
+    }
 }

@@ -7,5 +7,5 @@ public record ApiCreateBookRequest(
     bool IsRecommended,
     bool IsDone,
     string Slug,
-    int AuthorId, 
+    int AuthorId,
     IFormFile ThumbnailImage);

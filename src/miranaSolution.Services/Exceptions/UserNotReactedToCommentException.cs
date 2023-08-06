@@ -2,5 +2,7 @@
 
 public class UserNotReactedToCommentException : Exception
 {
-    public UserNotReactedToCommentException(string msg) : base(msg){}
+    public UserNotReactedToCommentException(string msg) : base(msg)
+    {
+    }
 }

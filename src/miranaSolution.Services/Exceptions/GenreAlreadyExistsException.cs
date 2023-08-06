@@ -2,5 +2,7 @@
 
 public class GenreAlreadyExistsException : Exception
 {
-    public GenreAlreadyExistsException(string msg) : base(msg) {}
+    public GenreAlreadyExistsException(string msg) : base(msg)
+    {
+    }
 }

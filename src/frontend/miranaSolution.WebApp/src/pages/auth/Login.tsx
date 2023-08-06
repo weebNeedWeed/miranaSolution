@@ -6,6 +6,7 @@ import {useAccessToken} from "../../helpers/hooks/useAccessToken";
 import {ToastVariant} from "../../components/Toast";
 import {AuthenticateUserResponse} from "../../helpers/models/auth/AuthenticateUserResponse";
 import {authApiHelper} from "../../helpers/apis/AuthApiHelper";
+import {IoIosArrowBack} from "react-icons/io";
 
 const Login = (): JSX.Element => {
     const userNameId = useId();
@@ -40,6 +41,8 @@ const Login = (): JSX.Element => {
 
         if (_userName.trim().length == 0) {
             setUserNameErrors(["Tài khoản không được trống."]);
+        } else {
+            setUserNameErrors([]);
         }
 
         setUserName(_userName);
@@ -50,6 +53,8 @@ const Login = (): JSX.Element => {
 
         if (_password.trim().length == 0) {
             setPasswordErrors(["Mật khẩu không được trống."]);
+        } else {
+            setPasswordErrors([]);
         }
 
         setPassword(_password);
@@ -92,8 +97,14 @@ const Login = (): JSX.Element => {
     return (
         <form
             onSubmit={handleSubmit}
-            className="bg-white w-full p-8 sm:p-12 rounded-md shadow-md shadow-slate-500"
+            className="relative bg-white w-full p-8 sm:p-12 rounded-md shadow-md shadow-slate-500"
         >
+            <Link to={"/"}
+                  className="flex flex-row items-center gap-x-1 absolute top-3 left-3 text-sm font-normal text-slate-600">
+                <IoIosArrowBack/>
+                Về trang chủ
+            </Link>
+
             <h3 className="font-bold text-3xl text-center text-deepKoamaru">Login</h3>
 
             <div className="flex flex-col items-start justify-start mt-8">
@@ -153,7 +164,7 @@ const Login = (): JSX.Element => {
             </div>
 
             <p className="text-end">
-                <Link to="/" className="text-sm text-slate-600">
+                <Link to="/auth/password-recovery" className="text-sm text-slate-600">
                     Quên mật khẩu?
                 </Link>
             </p>

@@ -1,9 +1,9 @@
 import {Section} from "../components";
-import {FaLock, FaUserAlt} from "react-icons/fa";
+import {FaLock, FaUserAlt, FaBookOpen, FaBookmark} from "react-icons/fa";
 import clsx from "clsx";
 import {NavLink, Outlet, useNavigate} from "react-router-dom";
 import {useAuthenticationContext} from "../contexts/AuthenticationContext";
-import {useEffect} from "react";
+import {useEffect, useLayoutEffect} from "react";
 
 type SideNavButtonProps = {
     title: string,
@@ -28,7 +28,7 @@ const UserLayout = (): JSX.Element => {
     const authContext = useAuthenticationContext();
     const navigate = useNavigate();
 
-    useEffect(() => {
+    useLayoutEffect(() => {
         if (!authContext.state.isLoggedIn) {
             navigate("/");
         }
@@ -41,6 +41,10 @@ const UserLayout = (): JSX.Element => {
                     <SideNavButton to="/user/profile" icon={<FaUserAlt/>} title={"Tài khoản"}/>
 
                     <SideNavButton to="/user/password" icon={<FaLock/>} title={"Mật khẩu"}/>
+
+                    <SideNavButton to="/user/currently-readings" icon={<FaBookOpen/>} title={"Đang đọc"}/>
+
+                    <SideNavButton to="/user/bookmarks" icon={<FaBookmark/>} title={"Đánh dấu"}/>
                 </div>
             </div>
 

@@ -7,6 +7,6 @@ public record CreateBookRequest(
     bool IsRecommended,
     bool IsDone,
     string Slug,
-    int AuthorId, 
+    int AuthorId,
     Stream ThumbnailImage,
     string ThumbnailImageExtension);

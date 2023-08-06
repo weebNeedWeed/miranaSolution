@@ -42,6 +42,10 @@ class BookApiHelper extends BaseApiHelper {
             params.append("isDone", request.isDone ? "true" : "false");
         }
 
+        if (request.author != null) {
+            params.append("authorId", request.author!.toString());
+        }
+
         const response = await this.init()
             .get<ApiResult<GetAllBooksResponse>>("/books?" + params.toString());
 

@@ -20,7 +20,7 @@ public class BookUpvoteConfiguration : IEntityTypeConfiguration<BookUpvote>
             .WithMany(x => x.BookUpvotes)
             .HasForeignKey(x => x.BookId)
             .OnDelete(DeleteBehavior.Cascade);
-        
+
         builder.HasOne(x => x.User)
             .WithMany(x => x.BookUpvotes)
             .HasForeignKey(x => x.UserId)

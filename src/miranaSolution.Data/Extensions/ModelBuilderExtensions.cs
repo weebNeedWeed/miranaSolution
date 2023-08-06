@@ -43,17 +43,17 @@ public static class ModelBuilderExtensions
                 Genres = "Tiên Hiệp,Kiếm Hiệp",
                 SortOrder = 3
             });
-        
+
         builder.Entity<Author>().HasData(
             new Author
             {
                 Id = 1,
-                Name = "Trạch Trư",
+                Name = "Trạch Trư"
             },
             new Author
             {
                 Id = 2,
-                Name = "Phật Tiền Hiến Hoa",
+                Name = "Phật Tiền Hiến Hoa"
             });
 
         builder.Entity<Genre>().HasData(
@@ -161,7 +161,7 @@ public static class ModelBuilderExtensions
             Email = "admin@admin.com",
             SecurityStamp = Guid.NewGuid().ToString()
         });
-        
+
         builder.Entity<IdentityUserRole<Guid>>().HasData(new IdentityUserRole<Guid>
         {
             RoleId = adminRoleId,

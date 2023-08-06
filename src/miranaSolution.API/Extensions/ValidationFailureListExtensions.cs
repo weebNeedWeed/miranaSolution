@@ -10,9 +10,9 @@ public static class ValidationFailureListExtensions
         var dict = new Dictionary<string, string>();
         foreach (var error in errors)
         {
-            var firstLetterLowercasePropertyName = 
+            var firstLetterLowercasePropertyName =
                 $"{char.ToLower(error.PropertyName[0])}{error.PropertyName[1..]}";
-            
+
             dict[firstLetterLowercasePropertyName] = error.ErrorMessage;
         }
 

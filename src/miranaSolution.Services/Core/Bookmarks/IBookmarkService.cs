@@ -1,5 +1,4 @@
 ﻿using miranaSolution.DTOs.Core.Bookmarks;
-using miranaSolution.Services.Core.Books;
 
 namespace miranaSolution.Services.Core.Bookmarks;
 

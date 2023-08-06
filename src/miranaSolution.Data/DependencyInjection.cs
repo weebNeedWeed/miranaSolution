@@ -31,7 +31,7 @@ public static class DependencyInjection
             options.EnableDetailedErrors(databaseOptions.EnableDetailedErrors);
             options.EnableSensitiveDataLogging(databaseOptions.EnableSensitiveDataLogging);
         });
-        
+
         services.AddScoped<DbContext, MiranaDbContext>();
 
         return services;

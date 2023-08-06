@@ -1,4 +1,3 @@
-using System.Reflection;
 using System.Text;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
@@ -17,7 +16,7 @@ public static class ServiceCollectionExtensions
     {
         var serviceProvider = services.BuildServiceProvider();
         var jwtOptions = serviceProvider.GetService<IOptions<JwtOptions>>()!.Value;
-        
+
         services.AddIdentity<AppUser, AppRole>()
             .AddEntityFrameworkStores<MiranaDbContext>()
             .AddDefaultTokenProviders();
@@ -54,11 +53,16 @@ public static class ServiceCollectionExtensions
                 ValidateIssuerSigningKey = true,
                 ValidIssuer = jwtOptions.Issuer,
                 ValidAudience = jwtOptions.Audience,
-                IssuerSigningKey = 
+                IssuerSigningKey =
                     new SymmetricSecurityKey(
                         Encoding.UTF8.GetBytes(jwtOptions.Secret)),
-                RequireExpirationTime = true,
+                RequireExpirationTime = true
             };
+        });
+
+        services.Configure<DataProtectionTokenProviderOptions>(options =>
+        {
+            options.TokenLifespan = TimeSpan.FromHours(2);
         });
 
         return services;
@@ -87,7 +91,7 @@ public static class ServiceCollectionExtensions
                 Scheme = "Bearer"
             });
 
-            options.AddSecurityRequirement(new OpenApiSecurityRequirement()
+            options.AddSecurityRequirement(new OpenApiSecurityRequirement
             {
                 {
                     new OpenApiSecurityScheme

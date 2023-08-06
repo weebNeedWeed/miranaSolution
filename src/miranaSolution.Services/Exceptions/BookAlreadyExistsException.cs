@@ -2,5 +2,7 @@
 
 public class BookAlreadyExistsException : Exception
 {
-    public BookAlreadyExistsException(string msg) : base(msg){}
+    public BookAlreadyExistsException(string msg) : base(msg)
+    {
+    }
 }

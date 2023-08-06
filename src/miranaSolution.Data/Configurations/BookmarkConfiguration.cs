@@ -10,11 +10,11 @@ public class BookmarkConfiguration : IEntityTypeConfiguration<Bookmark>
     {
         builder.ToTable("Bookmarks");
 
-        builder.HasKey(x => new 
-            { 
-                x.UserId,
-                x.BookId
-            });
+        builder.HasKey(x => new
+        {
+            x.UserId,
+            x.BookId
+        });
 
         builder.HasOne(x => x.Book)
             .WithMany(x => x.Bookmarks)
@@ -27,7 +27,7 @@ public class BookmarkConfiguration : IEntityTypeConfiguration<Bookmark>
         builder.Property(x => x.CreatedAt)
             .IsRequired()
             .HasDefaultValueSql("getdate()");
-        
+
         builder.Property(x => x.UpdatedAt)
             .IsRequired()
             .HasDefaultValueSql("getdate()");

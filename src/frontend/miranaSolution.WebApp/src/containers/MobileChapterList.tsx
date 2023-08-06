@@ -77,7 +77,7 @@ const MobileChapterList = (props: MobileChapterListProps): JSX.Element => {
                     </button>
                 </div>
 
-                <ul className="flex flex-col">
+                <ul className="flex flex-col p-4">
                     {renderArray.map((sub, index) =>
                         <li key={index}
                             className="py-3 flex flex-row border-b-[1px] border-[rgba(48,54,89,0.4)]">

@@ -10,7 +10,7 @@ public class UpdateGenreRequestValidator : AbstractValidator<UpdateGenreRequest>
         RuleFor(x => x.Name)
             .NotEmpty()
             .WithMessage("Name không được để trống.")
-            .Length(min: 8, max: 128)
+            .Length(8, 128)
             .WithMessage("Name phải có độ dài từ 8 tới 128 ký tự.");
     }
 }

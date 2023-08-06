@@ -12,4 +12,5 @@ export interface Book {
     authorId: number;
     genres: string[];
     isDone: boolean;
+    viewCount: number;
 }

@@ -3,5 +3,5 @@
 public record CreateBookRatingRequest(
     Guid UserId,
     int BookId,
-    string Content, 
+    string Content,
     int Star);

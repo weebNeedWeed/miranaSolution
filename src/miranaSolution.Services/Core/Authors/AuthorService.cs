@@ -12,7 +12,7 @@ public class AuthorService : IAuthorService
 {
     private readonly MiranaDbContext _context;
     private readonly IValidatorProvider _validatorProvider;
-    
+
     public AuthorService(MiranaDbContext context, IValidatorProvider validatorProvider)
     {
         _context = context;
@@ -35,7 +35,7 @@ public class AuthorService : IAuthorService
     public async Task<CreateAuthorResponse> CreateAuthorAsync(CreateAuthorRequest request)
     {
         _validatorProvider.Validate(request);
-        
+
         var author = new Author
         {
             Name = request.Name
@@ -54,10 +54,7 @@ public class AuthorService : IAuthorService
     public async Task DeleteAuthorAsync(DeleteAuthorRequest request)
     {
         var author = await _context.Authors.FirstOrDefaultAsync(x => x.Id == request.AuthorId);
-        if (author is null)
-        {
-            throw new AuthorNotFoundException("The author with given Id does not exist.");
-        }
+        if (author is null) throw new AuthorNotFoundException("The author with given Id does not exist.");
 
         _context.Authors.Remove(author);
         await _context.SaveChangesAsync();
@@ -66,17 +63,14 @@ public class AuthorService : IAuthorService
     public async Task<UpdateAuthorResponse> UpdateAuthorAsync(UpdateAuthorRequest request)
     {
         _validatorProvider.Validate(request);
-        
+
         var author = await _context.Authors.FirstOrDefaultAsync(x => x.Id == request.AuthorId);
-        if (author is null)
-        {
-            throw new AuthorNotFoundException("The author with given Id does not exist.");
-        }
-        
+        if (author is null) throw new AuthorNotFoundException("The author with given Id does not exist.");
+
         author.Name = request.Name;
 
         await _context.SaveChangesAsync();
-        
+
         var authorVm = new AuthorVm(
             author.Id,
             author.Name);
@@ -87,9 +81,7 @@ public class AuthorService : IAuthorService
     public async Task<GetAllBooksByAuthorIdResponse> GetAllBookByAuthorIdAsync(GetAllBooksByAuthorIdRequest request)
     {
         if (await _context.Authors.FindAsync(request.AuthorId) is null)
-        {
             throw new AuthorNotFoundException("The author with given Id does not exist.");
-        }
 
         var books = await _context.Books
             .Where(x => x.AuthorId == request.AuthorId)
@@ -110,7 +102,8 @@ public class AuthorService : IAuthorService
             "",
             new List<string>(),
             x.IsDone,
-            request.AuthorId)).ToList();
+            request.AuthorId,
+            x.ViewCount)).ToList();
 
         return new GetAllBooksByAuthorIdResponse(bookVms);
     }

@@ -17,10 +17,7 @@ const EditorRecommendation = (): JSX.Element => {
                     data.map((elm, index) => (
                         <BookCard
                             key={elm.id}
-                            name={elm.name}
-                            shortDescription={elm.shortDescription}
-                            thumbnailImage={elm.thumbnailImage}
-                            slug={elm.slug}
+                            book={elm}
                         />
                     ))}
             </div>

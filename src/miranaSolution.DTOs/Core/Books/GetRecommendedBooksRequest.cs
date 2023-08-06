@@ -1,3 +1,3 @@
 ﻿namespace miranaSolution.DTOs.Core.Books;
 
-public record GetRecommendedBooksRequest();
+public record GetRecommendedBooksRequest;

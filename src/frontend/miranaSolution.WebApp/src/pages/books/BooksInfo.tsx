@@ -24,6 +24,7 @@ import {BookUpvote} from "../../helpers/models/catalog/books/BookUpvote";
 import {bookUpvoteApiHelper} from "../../helpers/apis/BookUpvoteApiHelper";
 import {IoIosArrowForward} from "react-icons/io";
 import {MobileChapterList} from "../../containers/MobileChapterList";
+import {currentlyReadingApiHelper} from "../../helpers/apis/CurrentlyReadingApiHelper";
 
 type MobileTabsSectionProps = {
     getChaptersResponse: GetAllChaptersResponse;
@@ -269,6 +270,7 @@ const BooksInfo = (): JSX.Element => {
     const authContext = useAuthenticationContext();
     const [ratings, setRatings] = useState<BookRating[]>();
     const [upvote, setUpvote] = useState<BookUpvote>();
+    const [startChapter, setStartChapter] = useState(1);
 
     const [openRatingDialog, setOpenRatingDialog] = useState(false);
 
@@ -298,6 +300,12 @@ const BooksInfo = (): JSX.Element => {
 
                     let upvotes = await bookUpvoteApiHelper.getAllUpvotes(result.book.id, authContext.state.user.id);
                     setUpvote(upvotes[0]);
+
+                    const getCurrReadingBooks = await currentlyReadingApiHelper
+                        .getCurrentlyReadingBooks(accessToken, result.book.id);
+                    if (getCurrReadingBooks.currentlyReadings.length > 0) {
+                        setStartChapter(getCurrReadingBooks.currentlyReadings[0].chapterIndex);
+                    }
                 }
             } catch (error: any) {
                 // TODO: Navigate the user to not found page
@@ -457,7 +465,7 @@ const BooksInfo = (): JSX.Element => {
 
                         <div className="flex flex-col items-start">
                             <span className="font-semibold text-xl">
-                                0
+                                {book.viewCount}
                             </span>
 
                             <span className="font-normal text-base">
@@ -496,7 +504,7 @@ const BooksInfo = (): JSX.Element => {
 
                     <div className="mt-auto hidden flex-row gap-x-4 md:flex">
                         <Link
-                            to={`/books/${book.slug}/chapters/1`}
+                            to={`/books/${book.slug}/chapters/${startChapter}`}
                             className="item rounded bg-deepKoamaru py-1.5 px-3 mt-4 text-white font-semibold flex justify-center items-center gap-x-2 text-sm">
                             <AiFillRead/> Đọc truyện
                         </Link>
@@ -550,7 +558,7 @@ const BooksInfo = (): JSX.Element => {
 
                     <div className="flex flex-col items-start">
                             <span className="font-semibold text-lg">
-                                0
+                                {book.viewCount}
                             </span>
 
                         <span className="font-normal text-sm">
@@ -582,7 +590,7 @@ const BooksInfo = (): JSX.Element => {
                 <div className="mt-auto flex flex-row gap-y-2 w-full flex-wrap">
                     <div className="flex flex-row gap-x-2 w-full">
                         <Link
-                            to={`/books/${book.slug}/chapters/1`}
+                            to={`/books/${book.slug}/chapters/${startChapter}`}
                             className="item rounded bg-deepKoamaru py-1.5 px-2 text-white font-semibold flex justify-center items-center gap-x-1 text-sm w-1/2">
                             <AiFillRead/> Đọc truyện
                         </Link>

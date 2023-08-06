@@ -7,9 +7,9 @@ public interface IBookService
     Task<GetBookByIdResponse> GetBookByIdAsync(GetBookByIdRequest request);
 
     Task<GetBookBySlugResponse> GetBookBySlugAsync(GetBookBySlugRequest request);
-    
+
     Task<CreateBookResponse> CreateBookAsync(CreateBookRequest request);
-    
+
     Task<UpdateBookResponse> UpdateBookAsync(UpdateBookRequest request);
 
     Task DeleteBookAsync(DeleteBookRequest request);

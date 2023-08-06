@@ -6,4 +6,6 @@ public record UserVm(
     string LastName,
     string UserName,
     string Email,
-    string? Avatar);
+    string? Avatar,
+    int ReadBookCount,
+    int ReadChapterCount);

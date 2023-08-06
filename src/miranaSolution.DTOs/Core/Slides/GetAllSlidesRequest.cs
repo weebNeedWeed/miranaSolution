@@ -1,3 +1,3 @@
 ﻿namespace miranaSolution.DTOs.Core.Slides;
 
-public record GetAllSlidesRequest();
+public record GetAllSlidesRequest;

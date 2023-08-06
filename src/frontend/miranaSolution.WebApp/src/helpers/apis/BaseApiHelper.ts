@@ -13,7 +13,7 @@ export class BaseApiHelper {
     init(headers: RawAxiosRequestHeaders = {}): AxiosInstance {
         this.client = axios.create({
             baseURL: this.baseUrl,
-            timeout: 1000,
+            timeout: 3000,
             headers,
         })
 

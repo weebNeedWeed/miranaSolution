@@ -3,7 +3,7 @@
 public record BookRatingVm(
     Guid UserId,
     int BookId,
-    string Content, 
+    string Content,
     int Star,
     DateTime CreatedAt,
     DateTime UpdatedAt);

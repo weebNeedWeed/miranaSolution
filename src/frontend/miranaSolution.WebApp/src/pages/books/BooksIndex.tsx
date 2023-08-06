@@ -1,5 +1,5 @@
 import {BookCard, Pager, Section} from "../../components";
-import {FaSwatchbook} from "react-icons/fa";
+import {FaSwatchbook, FaPen} from "react-icons/fa";
 import {AiFillCheckCircle, AiOutlineClose, AiOutlinePlus} from "react-icons/ai";
 import {CgTimelapse} from "react-icons/cg";
 import {useQuery} from "react-query";
@@ -11,6 +11,8 @@ import {useEffect, useMemo, useState} from "react";
 import {Genre} from "../../helpers/models/catalog/books/Genre";
 import {useMediaQuery} from "../../helpers/hooks/useMediaQuery";
 import {GetAllBooksRequest} from "../../helpers/models/catalog/books/GetAllBooksRequest";
+import {authorApiHelper} from "../../helpers/apis/AuthorApiHelper";
+import {Author} from "../../helpers/models/catalog/author/Author";
 
 type FilterButtonProps = {
     title: string;
@@ -25,27 +27,37 @@ const FilterButton = (props: FilterButtonProps): JSX.Element => {
         onClick={onClick}
         className={clsx("text-sm rounded-lg border-deepKoamaru border-solid border-[1px] p-1 flex flex-row items-center", isActive && activeClass)}>
         {isActive ? <AiOutlineClose/> : <AiOutlinePlus/>}
-        <p>{title}</p>
+        <p className="max-w-full line-clamp-1 text-left">{title}</p>
     </button>
 }
 
 type FilterSectionInnerProps = {
     genres: Array<Genre>,
+    authors: Array<Author>,
     isGenreWithIdActive: (id: number) => boolean,
     isStatusActive: (status: boolean) => boolean,
-    handleFilterByGenreFnFactory: (id: number) => (event: React.MouseEvent<HTMLButtonElement>) => void
-    handleFilterByStatusFnFactory: (status: boolean) => (event: React.MouseEvent<HTMLButtonElement>) => void
+    isAuthorWithIdActive: (id: number) => boolean,
+    handleFilterByGenreFnFactory: (id: number) => (event: React.MouseEvent<HTMLButtonElement>) => void,
+    handleFilterByStatusFnFactory: (status: boolean) => (event: React.MouseEvent<HTMLButtonElement>) => void,
+    handleFilterByAuthorFnFactory: (id: number) => (event: React.MouseEvent<HTMLButtonElement>) => void
 };
 const FilterSectionInner = (props: FilterSectionInnerProps) => {
     const {
         genres,
+        authors,
         isGenreWithIdActive,
         isStatusActive,
         handleFilterByGenreFnFactory,
-        handleFilterByStatusFnFactory
+        handleFilterByStatusFnFactory,
+        handleFilterByAuthorFnFactory,
+        isAuthorWithIdActive
     } = props;
     const isMobile = useMediaQuery("(max-width: 760px)");
     const [openFilterDialog, setOpenFilterDialog] = useState<boolean>(false);
+    const [searchParams] = useSearchParams();
+    const navigate = useNavigate();
+
+    const keyword = searchParams.get("keyword")?.trim() ?? "";
 
     useEffect(() => {
         if (openFilterDialog) {
@@ -56,20 +68,65 @@ const FilterSectionInner = (props: FilterSectionInnerProps) => {
         }
     }, [openFilterDialog]);
 
+    const handleMobileFilterByGenre = (id: number) => {
+        return (event: React.MouseEvent<HTMLButtonElement>) => {
+            setOpenFilterDialog(false);
+            handleFilterByGenreFnFactory(id)(event);
+        }
+    }
+
+    const handleMobileFilterByStatus = (status: boolean) => {
+        return (event: React.MouseEvent<HTMLButtonElement>) => {
+            setOpenFilterDialog(false);
+            handleFilterByStatusFnFactory(status)(event);
+        }
+    }
+
+    const handleMobileFilterByAuthor = (id: number) => {
+        return (event: React.MouseEvent<HTMLButtonElement>) => {
+            setOpenFilterDialog(false);
+            handleFilterByAuthorFnFactory(id)(event);
+        }
+    }
+
+    const handleClearKeyword = () => {
+        const queryString = new URLSearchParams();
+
+        for (let entry of searchParams.entries()) {
+            if (entry[0] === "keyword") {
+                continue;
+            }
+
+            queryString.append(entry[0], entry[1]);
+        }
+
+        const url = location.pathname + "?" + queryString;
+        navigate(url);
+    }
+
     const renderAllSelections = (): JSX.Element => {
         return <>
+            {keyword !== "" && <FilterButton isActive={true}
+                                             title={`Từ khoá: ${keyword}`}
+                                             onClick={handleClearKeyword}/>}
+
             {[true, false].map((status, index) =>
                 (isStatusActive(status) &&
                     <FilterButton isActive={true}
                                   key={index}
                                   title={status ? "Đã hoàn thành" : "Chưa hoàn thành"}
-                                  onClick={handleFilterByStatusFnFactory(status)}/>))}
+                                  onClick={handleMobileFilterByStatus(status)}/>))}
             {genres.map((genre) =>
                 (isGenreWithIdActive(genre.id) &&
                     <FilterButton isActive={true}
                                   key={genre.id}
                                   title={genre.name}
-                                  onClick={handleFilterByGenreFnFactory(genre.id)}/>))}
+                                  onClick={handleMobileFilterByGenre(genre.id)}/>))}
+
+            {authors.map(author =>
+                (isAuthorWithIdActive(author.id) &&
+                    <FilterButton isActive={true} key={author.id} title={author.name}
+                                  onClick={handleMobileFilterByAuthor(author.id)}/>))}
         </>
     };
 
@@ -116,7 +173,22 @@ const FilterSectionInner = (props: FilterSectionInnerProps) => {
                                     {genres.map(genre =>
                                         <FilterButton isActive={isGenreWithIdActive(genre.id)} key={genre.id}
                                                       title={genre.name}
-                                                      onClick={handleFilterByGenreFnFactory(genre.id)}/>)}
+                                                      onClick={handleMobileFilterByGenre(genre.id)}/>)}
+                                </div>
+                            </div>
+
+                            <hr className="border-deepKoamaru w-3/4 mx-auto my-5"/>
+
+                            <div>
+                                <span className="flex flex-row justify-start items-center gap-x-2">
+                                    <FaPen/>
+                                    <p className="text-lg font-bold">Tác giả</p>
+                                </span>
+                                <div className="flex flex-row flex-wrap mt-2 gap-2">
+                                    {authors.map(author =>
+                                        <FilterButton isActive={isAuthorWithIdActive(author.id)} key={author.id}
+                                                      title={author.name}
+                                                      onClick={handleMobileFilterByAuthor(author.id)}/>)}
                                 </div>
                             </div>
 
@@ -131,11 +203,11 @@ const FilterSectionInner = (props: FilterSectionInnerProps) => {
                                 <div className="flex flex-row flex-wrap mt-2 gap-2">
                                     <FilterButton isActive={isStatusActive(false)}
                                                   title={"Chưa hoàn thành"}
-                                                  onClick={handleFilterByStatusFnFactory(false)}/>
+                                                  onClick={handleMobileFilterByStatus(false)}/>
 
                                     <FilterButton isActive={isStatusActive(true)}
                                                   title={"Đã hoàn thành"}
-                                                  onClick={handleFilterByStatusFnFactory(true)}/>
+                                                  onClick={handleMobileFilterByStatus(true)}/>
                                 </div>
                             </div>
                         </div>
@@ -176,6 +248,21 @@ const FilterSectionInner = (props: FilterSectionInnerProps) => {
         <hr className="border-deepKoamaru w-3/4 mx-auto my-6"/>
 
         <div>
+            <span className="flex flex-row justify-start items-center gap-x-2">
+            <FaPen/>
+            <p className="text-lg font-bold">Tác giả</p>
+            </span>
+
+            <div className="flex flex-row flex-wrap mt-2 gap-2">
+                {authors.map(author =>
+                    <FilterButton isActive={isAuthorWithIdActive(author.id)} key={author.id} title={author.name}
+                                  onClick={handleFilterByAuthorFnFactory(author.id)}/>)}
+            </div>
+        </div>
+
+        <hr className="border-deepKoamaru w-3/4 mx-auto my-6"/>
+
+        <div>
           <span className="flex flex-row justify-start items-center gap-x-2">
             <CgTimelapse/>
             <p className="text-lg font-bold">Trạng thái</p>
@@ -199,10 +286,13 @@ const FilterSection = (props: FIltersSectionProps): JSX.Element => {
     const navigate = useNavigate();
     const location = useLocation();
     const [searchParams] = useSearchParams();
-    const {isLoading, error, data: genresData} = useQuery(
+    const {data: genresData} = useQuery(
         "genres",
         () => genreApiHelper.getAllGenres());
-    if (isLoading || error || !genresData) {
+    const {data: authorsData} = useQuery(
+        "authors",
+        () => authorApiHelper.getAllAuthors());
+    if (!genresData || !authorsData) {
         return <div></div>;
     }
 
@@ -276,10 +366,43 @@ const FilterSection = (props: FIltersSectionProps): JSX.Element => {
         }
     };
 
+    const isAuthorWithIdActive = (id: number): boolean => {
+        const activeAuthorId = searchParams.get("author");
+        if (activeAuthorId == null) {
+            return false;
+        }
+
+        return parseInt(activeAuthorId, 10) === id;
+    }
+    const handleFilterByAuthorFnFactory = (id: number) => {
+        return (event: React.MouseEvent<HTMLButtonElement>) => {
+            const queryString = new URLSearchParams();
+
+            if (isAuthorWithIdActive(id)) {
+            } else {
+                queryString.append("author", id.toString());
+            }
+
+            for (let entry of searchParams.entries()) {
+                if (entry[0] === "author") {
+                    continue;
+                }
+
+                queryString.append(entry[0], entry[1]);
+            }
+
+            const url = location.pathname + "?" + queryString;
+            navigate(url);
+        }
+    }
+
     return <FilterSectionInner genres={genresData}
+                               authors={authorsData}
                                isGenreWithIdActive={isGenreWithIdActive}
                                handleFilterByGenreFnFactory={handleFilterByGenreFnFactory}
                                isStatusActive={isStatusActive}
+                               handleFilterByAuthorFnFactory={handleFilterByAuthorFnFactory}
+                               isAuthorWithIdActive={isAuthorWithIdActive}
                                handleFilterByStatusFnFactory={handleFilterByStatusFnFactory}/>;
 }
 
@@ -343,7 +466,8 @@ const getBookGetPagingRequest = (
     _pageSize: number,
     _genreIds: string | null,
     _status: string | null,
-    _keyword: string | null): GetAllBooksRequest => {
+    _keyword: string | null,
+    _author: number | null): GetAllBooksRequest => {
 
     const _request: GetAllBooksRequest = {
         pageSize: _pageSize,
@@ -353,8 +477,13 @@ const getBookGetPagingRequest = (
     if (Boolean(_genreIds) && _genreIds !== "") {
         _request.genreIds = _genreIds!;
     }
+
     if (Boolean(_status) && _status !== "") {
         _request.isDone = _status === "true";
+    }
+
+    if (Boolean(_author)) {
+        _request.author = _author!;
     }
 
     if (Boolean(_keyword) && _keyword !== "") {
@@ -373,23 +502,22 @@ const BookCardList = (props: BookCardListProps): JSX.Element => {
     const genreIds = searchParams.get("genres");
     const status = searchParams.get("status");
     const keyword = searchParams.get("keyword");
+    const author = parseInt(searchParams.get("author") ?? "0", 10);
 
     let request = useMemo<GetAllBooksRequest>(
-        () => getBookGetPagingRequest(pageIndex, pageSize, genreIds, status, keyword),
-        [pageSize, pageIndex, genreIds, status, keyword]
+        () => getBookGetPagingRequest(pageIndex, pageSize, genreIds, status, keyword, author === 0 ? null : author),
+        [pageSize, pageIndex, genreIds, status, keyword, author]
     );
 
     const {isLoading, error, data} = useQuery(
-        ["books", request.pageIndex, request.pageSize, request.genreIds, request.isDone, request.keyword],
+        ["books", request.pageIndex, request.pageSize, request.genreIds, request.isDone, request.keyword, request.author],
         () => bookApiHelper.getAllBooks(request),
     );
 
     return <div className="w-full p-5 bg-[rgba(255,255,255,0.8)] h-full min-h-[850px] flex flex-col  rounded-br-md">
         <div className="flex flex-row flex-wrap md:mr-[-0.75rem]">
             {(isLoading || error || !data) && <>Loading...</>}
-            {data && data.books.map(book => <BookCard slug={book.slug} key={book.id} name={book.name}
-                                                      shortDescription={book.shortDescription}
-                                                      thumbnailImage={book.thumbnailImage}/>)}
+            {data && data.books.map(book => <BookCard key={book.id} book={book}/>)}
         </div>
 
         <div className="mt-auto">

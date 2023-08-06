@@ -1,7 +1,4 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Filters;
-using miranaSolution.API.ViewModels.Common;
-using miranaSolution.DTOs.Common;
+﻿using Microsoft.AspNetCore.Mvc.Filters;
 
 namespace miranaSolution.API.Filters;
 

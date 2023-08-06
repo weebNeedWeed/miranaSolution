@@ -58,7 +58,7 @@ public class BookmarksController : ControllerBase
         try
         {
             var getAllBookmarksByUserIdResponse = await _bookmarkService.GetAllBookmarksByUserIdAsync(
-                new GetAllBookmarksByUserIdRequest(userId,bookId));
+                new GetAllBookmarksByUserIdRequest(userId, bookId));
             var response = new ApiGetAllBookmarksResponse(getAllBookmarksByUserIdResponse.BookmarkVms);
 
             return Ok(new ApiSuccessResult<ApiGetAllBookmarksResponse>(response));
@@ -96,10 +96,10 @@ public class BookmarksController : ControllerBase
             return Ok(new ApiErrorResult(ex.Message));
         }
     }
-    
+
     private Guid GetUserIdFromClaim()
     {
-        string userId = User.Claims
+        var userId = User.Claims
             .First(x => x.Type == JwtRegisteredClaimNames.Sid).Value;
         return new Guid(userId);
     }

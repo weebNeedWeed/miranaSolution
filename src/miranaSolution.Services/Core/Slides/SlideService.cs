@@ -25,7 +25,7 @@ public class SlideService : ISlideService
             SortOrder = request.SortOrder,
             ThumbnailImage = request.ThumbnailImage
         };
-        
+
         await _context.Slides.AddAsync(slide);
         await _context.SaveChangesAsync();
 
@@ -53,7 +53,7 @@ public class SlideService : ISlideService
                 x.Genres,
                 x.SortOrder))
             .ToListAsync();
-        
+
         var response = new GetAllSlidesResponse(slides);
 
         return response;
@@ -62,11 +62,8 @@ public class SlideService : ISlideService
     public async Task<GetSlideByIdResponse> GetSlideByIdAsync(GetSlideByIdRequest request)
     {
         var slide = await _context.Slides.FindAsync(request.SlideId);
-        if (slide is null)
-        {
-            return new GetSlideByIdResponse(null);
-        }
-        
+        if (slide is null) return new GetSlideByIdResponse(null);
+
         var response = new GetSlideByIdResponse(
             new SlideVm(
                 slide.Id,

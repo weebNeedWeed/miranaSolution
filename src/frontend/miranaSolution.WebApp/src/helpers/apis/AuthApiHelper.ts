@@ -5,6 +5,8 @@ import {ValidationFailureMessages} from "../models/common/ValidationFailureMessa
 import {ApiResult} from "../models/common/ApiResult";
 import {RegisterUserRequest} from "../models/catalog/user/RegisterUserRequest";
 import {User} from "../models/catalog/user/User";
+import {SendRecoveryEmailRequest} from "../models/auth/SendRecoveryEmailRequest";
+import {RedeemTokenRequest} from "../models/auth/RedeemTokenRequest";
 
 class AuthApiHelper extends BaseApiHelper {
     constructor() {
@@ -42,6 +44,34 @@ class AuthApiHelper extends BaseApiHelper {
         }
 
         return response.data.data as User;
+    }
+
+    async sendRecoveryEmail(request: SendRecoveryEmailRequest): Promise<void> {
+        const response = await this.init()
+            .post<ApiResult<undefined | ValidationFailureMessages<SendRecoveryEmailRequest>>>("/auth/reset-password", request);
+
+        if (response.data.status === "error") {
+            throw new Error(response.data.message);
+        }
+
+        if (response.data.status === "fail") {
+            const failureMessages = response.data.data as ValidationFailureMessages<SendRecoveryEmailRequest>;
+            throw new Error(Object.values(failureMessages)[0]);
+        }
+    }
+
+    async redeemToken(request: RedeemTokenRequest): Promise<void> {
+        const response = await this.init()
+            .post<ApiResult<undefined | ValidationFailureMessages<RedeemTokenRequest>>>("/auth/reset-password/redeem-token", request);
+
+        if (response.data.status === "error") {
+            throw new Error(response.data.message);
+        }
+
+        if (response.data.status === "fail") {
+            const failureMessages = response.data.data as ValidationFailureMessages<RedeemTokenRequest>;
+            throw new Error(Object.values(failureMessages)[0]);
+        }
     }
 }
 

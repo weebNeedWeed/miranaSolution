@@ -2,5 +2,7 @@
 
 public class AuthorNotFoundException : Exception
 {
-    public AuthorNotFoundException(string msg) : base(msg) {}
+    public AuthorNotFoundException(string msg) : base(msg)
+    {
+    }
 }

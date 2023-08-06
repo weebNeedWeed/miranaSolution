@@ -1,6 +1,4 @@
-﻿using miranaSolution.DTOs.Common;
-
-namespace miranaSolution.API.ViewModels.Common;
+﻿namespace miranaSolution.API.ViewModels.Common;
 
 public class ApiErrorResult : ApiResult<string>
 {

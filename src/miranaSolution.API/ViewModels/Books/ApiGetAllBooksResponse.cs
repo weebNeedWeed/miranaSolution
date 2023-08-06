@@ -1,5 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
-using miranaSolution.DTOs.Core.Books;
+﻿using miranaSolution.DTOs.Core.Books;
 
 namespace miranaSolution.API.ViewModels.Books;
 

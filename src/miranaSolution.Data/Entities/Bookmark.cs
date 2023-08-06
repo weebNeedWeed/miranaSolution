@@ -6,7 +6,7 @@ public class Bookmark
 
     public int BookId { get; set; }
     public Book? Book { get; set; }
-    
+
     public Guid UserId { get; set; }
     public AppUser? AppUser { get; set; }
 

@@ -14,16 +14,14 @@ public class ImageSaver : IImageSaver
     }
 
     /// <exception cref="InvalidImageExtensionException">
-    /// Thrown when the extension of thumbnail image is not allowed
+    ///     Thrown when the extension of thumbnail image is not allowed
     /// </exception>
     public async Task<string> SaveImageAsync(Stream imageStream, string imageExtension)
     {
         if (!IsValidExtension(imageExtension))
-        {
             throw new InvalidImageExtensionException(
                 "Invalid thumbnail image's extension. Only allow .jpg, .png and .jpeg.");
-        }
-        
+
         var newName = $"{Guid.NewGuid().ToString()}{imageExtension}";
         await _fileService.SaveFileAsync(imageStream, newName);
 
@@ -34,11 +32,8 @@ public class ImageSaver : IImageSaver
     {
         // Extracting the file name from a path having the format "<dir>/filename.ext"
         var split = imagePath.Split("/");
-        if (split.Length != 2)
-        {
-            return;
-        }
-        
+        if (split.Length != 2) return;
+
         try
         {
             var name = split[1];

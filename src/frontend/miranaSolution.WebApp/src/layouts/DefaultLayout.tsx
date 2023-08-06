@@ -1,5 +1,5 @@
 import {Footer, Navbar} from "../components";
-import {Outlet, useNavigate} from "react-router-dom";
+import {Outlet, useLocation, useNavigate} from "react-router-dom";
 import {LoadingScreen, ToastContainer} from "../containers";
 import {useAccessToken} from "../helpers/hooks/useAccessToken";
 import {getUserByAccessToken} from "../helpers/utilityFns/validateAccessToken";
@@ -14,11 +14,15 @@ import {useAuthenticationContext} from "../contexts/AuthenticationContext";
 const DefaultLayout = (): JSX.Element => {
     const [accessToken, setAccessToken] = useAccessToken();
     const navigate = useNavigate();
+    const location = useLocation();
     const {state: systemState, dispatch: systemDispatch} = useSystemContext();
     const {state: authenticationState, dispatch: authenticationDispatch} = useAuthenticationContext();
 
     useEffect(() => {
+        window.scrollTo({top: 0, left: 0, behavior: "auto"});
+    }, [location]);
 
+    useEffect(() => {
         (async () => {
             if (accessToken && accessToken !== "") {
                 const result = await getUserByAccessToken(accessToken);

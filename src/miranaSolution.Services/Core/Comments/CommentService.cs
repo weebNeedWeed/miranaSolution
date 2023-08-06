@@ -14,12 +14,13 @@ namespace miranaSolution.Services.Core.Comments;
 
 public class CommentService : ICommentService
 {
-    private readonly IUserService _userService;
     private readonly IBookService _bookService;
     private readonly MiranaDbContext _context;
+    private readonly IUserService _userService;
     private readonly IValidatorProvider _validatorProvider;
-    
-    public CommentService(IUserService userService, IBookService bookService, MiranaDbContext context, IValidatorProvider validatorProvider)
+
+    public CommentService(IUserService userService, IBookService bookService, MiranaDbContext context,
+        IValidatorProvider validatorProvider)
     {
         _userService = userService;
         _bookService = bookService;
@@ -30,20 +31,16 @@ public class CommentService : ICommentService
     public async Task<CreateBookCommentResponse> CreateBookCommentAsync(CreateBookCommentRequest request)
     {
         _validatorProvider.Validate(request);
-        
+
         var getUserByIdResponse = await _userService.GetUserByIdAsync(
             new GetUserByIdRequest(request.UserId));
         if (getUserByIdResponse.UserVm is null)
-        {
             throw new UserNotFoundException("The user with given Id does not exist.");
-        }
 
         var getBookByIdResponse = await _bookService.GetBookByIdAsync(
             new GetBookByIdRequest(request.BookId));
         if (getBookByIdResponse.BookVm is null)
-        {
             throw new BookNotFoundException("The book with given Id does not exist.");
-        }
 
         var comment = new Comment
         {
@@ -66,30 +63,21 @@ public class CommentService : ICommentService
         var getBookByIdResponse = await _bookService.GetBookByIdAsync(
             new GetBookByIdRequest(request.BookId));
         if (getBookByIdResponse.BookVm is null)
-        {
             throw new BookNotFoundException("The book with given Id does not exist.");
-        }
-        
+
         var comment = await _context.Comments.FirstOrDefaultAsync(
             x => x.Id == request.CommentId && x.BookId == getBookByIdResponse.BookVm.Id);
-        if (comment is null)
-        {
-            throw new CommentNotFoundException("The comment with given Id does not exist.");
-        }
+        if (comment is null) throw new CommentNotFoundException("The comment with given Id does not exist.");
 
         if (!request.ForceDelete)
         {
             var getUserByIdResponse = await _userService.GetUserByIdAsync(
                 new GetUserByIdRequest(request.UserId));
             if (getUserByIdResponse.UserVm is null)
-            {
                 throw new UserNotFoundException("The user with given Id does not exist.");
-            }
 
             if (!comment.UserId.Equals(getUserByIdResponse.UserVm.Id))
-            {
                 throw new CommentNotFoundException("The comment with given Id does not exist.");
-            }
         }
 
         _context.Comments.Remove(comment);
@@ -101,16 +89,11 @@ public class CommentService : ICommentService
         var getBookByIdResponse = await _bookService.GetBookByIdAsync(
             new GetBookByIdRequest(request.BookId));
         if (getBookByIdResponse.BookVm is null)
-        {
             throw new BookNotFoundException("The book with given Id does not exist.");
-        }
-        
+
         var comment = await _context.Comments.FirstOrDefaultAsync(
             x => x.Id == request.CommentId && x.BookId == getBookByIdResponse.BookVm.Id);
-        if (comment is null)
-        {
-            throw new CommentNotFoundException("The comment with given Id does not exist.");
-        }
+        if (comment is null) throw new CommentNotFoundException("The comment with given Id does not exist.");
 
         var commentVm = MapCommentIntoCommentVm(comment);
         return new GetBookCommentByIdResponse(commentVm);
@@ -121,9 +104,7 @@ public class CommentService : ICommentService
         var getUserByIdResponse = await _userService.GetUserByIdAsync(
             new GetUserByIdRequest(request.UserId));
         if (getUserByIdResponse.UserVm is null)
-        {
             throw new UserNotFoundException("The user with given Id does not exist.");
-        }
 
         var totalComments = await _context.Comments.Where(x => x.UserId == request.UserId).CountAsync();
 
@@ -135,24 +116,18 @@ public class CommentService : ICommentService
         var getBookByIdResponse = await _bookService.GetBookByIdAsync(
             new GetBookByIdRequest(request.BookId));
         if (getBookByIdResponse.BookVm is null)
-        {
             throw new BookNotFoundException("The book with given Id does not exist.");
-        }
-        
+
         var query = _context.Comments
             .Where(x => x.BookId == request.BookId && x.ParentId == request.ParentId);
 
         if (request.Asc ?? false)
-        {
             query = query.OrderBy(x => x.CreatedAt);
-        }
         else
-        {
             query = query.OrderByDescending(x => x.CreatedAt);
-        }
-        
+
         var totalRecords = await query.CountAsync();
-        
+
         var pageIndex = request.PagerRequest.PageIndex;
         var pageSize = request.PagerRequest.PageSize;
 

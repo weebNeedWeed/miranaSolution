@@ -25,6 +25,8 @@ public class BookConfiguration : IEntityTypeConfiguration<Book>
 
         builder.Property(x => x.Slug).IsUnicode().IsRequired();
 
+        builder.Property(x => x.ViewCount).IsRequired().HasDefaultValue(0);
+
         builder.HasIndex(x => x.Slug).IsUnique();
 
         builder.HasOne(x => x.Author)

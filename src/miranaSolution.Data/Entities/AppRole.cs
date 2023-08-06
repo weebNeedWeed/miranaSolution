@@ -4,5 +4,5 @@ namespace miranaSolution.Data.Entities;
 
 public class AppRole : IdentityRole<Guid>
 {
-    public string Description { get; set; } = String.Empty;
+    public string Description { get; set; } = string.Empty;
 }

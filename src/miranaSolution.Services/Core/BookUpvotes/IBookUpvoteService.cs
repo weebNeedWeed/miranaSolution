@@ -9,7 +9,7 @@ public interface IBookUpvoteService
     Task DeleteBookUpvoteAsync(DeleteBookUpvoteRequest request);
 
     Task<CountBookUpvoteByBookIdResponse> CountBookUpvoteByBookIdAsync(CountBookUpvoteByBookIdRequest request);
-    
+
     Task<CountBookUpvoteByUserIdResponse> CountBookUpvoteByUserIdAsync(CountBookUpvoteByUserIdRequest request);
 
     Task<GetAllBookUpvotesResponse> GetAllBookUpvotesAsync(GetAllBookUpvotesRequest request);

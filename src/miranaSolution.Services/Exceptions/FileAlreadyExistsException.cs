@@ -2,5 +2,7 @@
 
 public class FileAlreadyExistsException : Exception
 {
-    public FileAlreadyExistsException(string msg) : base(msg) {}
+    public FileAlreadyExistsException(string msg) : base(msg)
+    {
+    }
 }

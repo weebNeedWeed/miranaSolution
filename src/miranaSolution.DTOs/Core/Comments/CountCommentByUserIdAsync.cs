@@ -1,3 +1,3 @@
 ﻿namespace miranaSolution.DTOs.Core.Comments;
 
-public record CountCommentByUserIdAsync();
+public record CountCommentByUserIdAsync;

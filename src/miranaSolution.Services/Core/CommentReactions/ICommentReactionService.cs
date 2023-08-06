@@ -8,9 +8,11 @@ public interface ICommentReactionService
 
     Task DeleteCommentReactionAsync(DeleteCommentReactionRequest request);
 
-    Task<CountCommentReactionByCommentIdResponse> CountCommentReactionByCommentIdAsync(CountCommentReactionByCommentIdRequest request);
-    
-    Task<CountCommentReactionByUserIdResponse> CountCommentReactionByUserIdAsync(CountCommentReactionByUserIdRequest request);
+    Task<CountCommentReactionByCommentIdResponse> CountCommentReactionByCommentIdAsync(
+        CountCommentReactionByCommentIdRequest request);
+
+    Task<CountCommentReactionByUserIdResponse> CountCommentReactionByUserIdAsync(
+        CountCommentReactionByUserIdRequest request);
 
     Task<CheckUserIsReactedResponse> CheckUserIsReactedAsync(CheckUserIsReactedRequest request);
 }

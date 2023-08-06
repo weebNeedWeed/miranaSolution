@@ -1,7 +1,7 @@
 ﻿namespace miranaSolution.DTOs.Authentication.Users;
 
 public record UpdateUserPasswordRequest(
-    string UserName, 
+    string UserName,
     string CurrentPassword,
     string NewPassword,
     string NewPasswordConfirmation);

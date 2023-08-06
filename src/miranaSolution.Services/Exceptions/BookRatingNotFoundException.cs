@@ -2,5 +2,7 @@
 
 public class BookRatingNotFoundException : Exception
 {
-    public BookRatingNotFoundException(string msg) : base(msg) {}
+    public BookRatingNotFoundException(string msg) : base(msg)
+    {
+    }
 }

@@ -16,16 +16,16 @@ public class BookRatingConfiguration : IEntityTypeConfiguration<BookRating>
             .WithMany(x => x.BookRatings)
             .HasForeignKey(x => x.BookId)
             .OnDelete(DeleteBehavior.Cascade);
-        
+
         builder.HasOne(x => x.User)
             .WithMany(x => x.BookRatings)
             .HasForeignKey(x => x.UserId)
             .OnDelete(DeleteBehavior.Cascade);
-        
+
         builder.Property(x => x.CreatedAt)
             .IsRequired()
             .HasDefaultValueSql("getdate()");
-        
+
         builder.Property(x => x.UpdatedAt)
             .IsRequired()
             .HasDefaultValueSql("getdate()");

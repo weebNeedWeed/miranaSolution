@@ -2,5 +2,7 @@
 
 public class GenreNotFoundException : Exception
 {
-    public GenreNotFoundException(string msg) : base(msg) {}
+    public GenreNotFoundException(string msg) : base(msg)
+    {
+    }
 }

@@ -17,7 +17,7 @@ public class GenreService : IGenreService
         _context = context;
         _validatorProvider = validatorProvider;
     }
-    
+
     public async Task<GetAllGenresResponse> GetAllGenresAsync()
     {
         var genres = await _context.Genres
@@ -32,10 +32,7 @@ public class GenreService : IGenreService
     public async Task<GetGenreByIdResponse> GetGenreByIdAsync(GetGenreByIdRequest request)
     {
         var genre = await _context.Genres.FindAsync(request.GenreId);
-        if (genre is null)
-        {
-            return new GetGenreByIdResponse(null);
-        }
+        if (genre is null) return new GetGenreByIdResponse(null);
 
         var response = new GetGenreByIdResponse(
             new GenreVm(
@@ -48,7 +45,7 @@ public class GenreService : IGenreService
     public async Task<CreateGenreResponse> CreateGenreAsync(CreateGenreRequest request)
     {
         _validatorProvider.Validate(request);
-        
+
         var genre = new Genre
         {
             Name = request.Name
@@ -56,7 +53,7 @@ public class GenreService : IGenreService
 
         await _context.Genres.AddAsync(genre);
         await _context.SaveChangesAsync();
-        
+
         var response = new CreateGenreResponse(
             new GenreVm(
                 genre.Id,
@@ -68,10 +65,7 @@ public class GenreService : IGenreService
     public async Task DeleteGenreAsync(DeleteGenreRequest request)
     {
         var genre = await _context.Genres.FindAsync(request.GenreId);
-        if (genre is null)
-        {
-            throw new GenreNotFoundException("The genre with given Id does not exist.");
-        }
+        if (genre is null) throw new GenreNotFoundException("The genre with given Id does not exist.");
 
         _context.Genres.Remove(genre);
         await _context.SaveChangesAsync();
@@ -80,17 +74,14 @@ public class GenreService : IGenreService
     public async Task<UpdateGenreResponse> UpdateGenreAsync(UpdateGenreRequest request)
     {
         _validatorProvider.Validate(request);
-        
+
         var genre = await _context.Genres.FindAsync(request.GenreId);
-        if (genre is null)
-        {
-            throw new GenreNotFoundException("The genre with given Id does not exist.");
-        }
-        
+        if (genre is null) throw new GenreNotFoundException("The genre with given Id does not exist.");
+
         genre.Name = request.Name;
 
         await _context.SaveChangesAsync();
-        
+
         var response = new UpdateGenreResponse(
             new GenreVm(
                 genre.Id,

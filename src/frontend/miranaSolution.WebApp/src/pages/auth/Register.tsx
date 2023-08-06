@@ -5,6 +5,7 @@ import {useSystemContext} from "../../contexts/SystemContext";
 import {ToastVariant} from "../../components/Toast";
 import {RegisterUserRequest} from "../../helpers/models/catalog/user/RegisterUserRequest";
 import {authApiHelper} from "../../helpers/apis/AuthApiHelper";
+import {IoIosArrowBack} from "react-icons/io";
 
 const Register = (): JSX.Element => {
     const navigate = useNavigate();
@@ -117,6 +118,8 @@ const Register = (): JSX.Element => {
 
         if (_lastName.trim().length === 0) {
             setLastNameErrors(["Họ không được trống."]);
+        } else {
+            setLastNameErrors([]);
         }
 
         setLastName(_lastName);
@@ -126,6 +129,8 @@ const Register = (): JSX.Element => {
         const _firstName = event.target.value;
         if (_firstName.trim().length === 0) {
             setFirstNameErrors(["Tên không được trống."]);
+        } else {
+            setFirstNameErrors([]);
         }
 
         setFirstName(_firstName);
@@ -134,14 +139,13 @@ const Register = (): JSX.Element => {
     const handleEmailChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         const _email = event.target.value;
 
+        const pattern = new RegExp(/^[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,4}$/);
         if (_email.trim().length === 0) {
             setEmailErrors(["Email không được trống."]);
-        }
-
-        const pattern = new RegExp(/^[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,4}$/);
-
-        if (!pattern.test(_email)) {
+        } else if (!pattern.test(_email)) {
             setEmailErrors(["Phải là email."]);
+        } else {
+            setEmailErrors([]);
         }
 
         setEmail(_email);
@@ -151,6 +155,8 @@ const Register = (): JSX.Element => {
         const _userName = event.target.value;
         if (_userName.trim().length === 0) {
             setUserNameErrors(["Tài khoản không được trống."]);
+        } else {
+            setUserNameErrors([]);
         }
 
 
@@ -161,6 +167,8 @@ const Register = (): JSX.Element => {
         const _password = event.target.value;
         if (_password.trim().length === 0) {
             setPasswordErrors(["Mật khẩu không được trống."]);
+        } else {
+            setPasswordErrors([]);
         }
 
         setPassword(_password);
@@ -171,6 +179,8 @@ const Register = (): JSX.Element => {
 
         if (_confirmPassword.trim().length === 0) {
             setConfirmPasswordErrors(["Vui lòng nhập lại mật khẩu."]);
+        } else {
+            setConfirmPasswordErrors([]);
         }
 
         setConfirmPassword(_confirmPassword);
@@ -178,7 +188,13 @@ const Register = (): JSX.Element => {
 
     return (
         <form method="POST" onSubmit={handleSubmit}
-              className="bg-white w-full p-8 sm:p-12 rounded-md shadow-md shadow-slate-500">
+              className="relative bg-white w-full p-8 sm:p-12 rounded-md shadow-md shadow-slate-500">
+            <Link to={"/"}
+                  className="flex flex-row items-center gap-x-1 absolute top-3 left-3 text-sm font-normal text-slate-600">
+                <IoIosArrowBack/>
+                Về trang chủ
+            </Link>
+
             <h3 className="font-bold text-3xl text-center text-deepKoamaru">
                 Register
             </h3>

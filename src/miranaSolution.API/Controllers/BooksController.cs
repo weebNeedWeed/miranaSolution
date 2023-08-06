@@ -1,25 +1,23 @@
 ﻿using System.IdentityModel.Tokens.Jwt;
-using FluentValidation;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using miranaSolution.API.ViewModels.Books;
 using miranaSolution.API.ViewModels.Common;
 using miranaSolution.DTOs.Common;
+using miranaSolution.DTOs.Core.Bookmarks;
+using miranaSolution.DTOs.Core.BookRatings;
 using miranaSolution.DTOs.Core.Books;
 using miranaSolution.DTOs.Core.BookUpvotes;
 using miranaSolution.DTOs.Core.Chapters;
 using miranaSolution.DTOs.Core.Comments;
+using miranaSolution.Services.Core.Bookmarks;
+using miranaSolution.Services.Core.BookRatings;
 using miranaSolution.Services.Core.Books;
 using miranaSolution.Services.Core.BookUpvotes;
 using miranaSolution.Services.Core.Chapters;
 using miranaSolution.Services.Core.Comments;
 using miranaSolution.Services.Exceptions;
 using miranaSolution.Utilities.Constants;
-using miranaSolution.API.Extensions;
-using miranaSolution.DTOs.Core.Bookmarks;
-using miranaSolution.DTOs.Core.BookRatings;
-using miranaSolution.Services.Core.Bookmarks;
-using miranaSolution.Services.Core.BookRatings;
 
 namespace miranaSolution.API.Controllers;
 
@@ -28,12 +26,12 @@ namespace miranaSolution.API.Controllers;
 [Authorize(Roles = RolesConstant.Administrator)]
 public class BooksController : ControllerBase
 {
-    private readonly IBookService _bookService;
     private readonly IBookmarkService _bookmarkService;
+    private readonly IBookRatingService _bookRatingService;
+    private readonly IBookService _bookService;
+    private readonly IBookUpvoteService _bookUpvoteService;
     private readonly IChapterService _chapterService;
     private readonly ICommentService _commentService;
-    private readonly IBookUpvoteService _bookUpvoteService;
-    private readonly IBookRatingService _bookRatingService;
 
     public BooksController(IBookService bookService, IChapterService chapterService, ICommentService commentService,
         IBookUpvoteService bookUpvoteService, IBookRatingService bookRatingService, IBookmarkService bookmarkService)
@@ -60,6 +58,7 @@ public class BooksController : ControllerBase
                 request.Keyword,
                 request.GenreIds,
                 request.IsDone,
+                request.AuthorId,
                 pagerRequest));
 
         var apiGetAllBooksResponse = new ApiGetAllBooksResponse(
@@ -117,10 +116,7 @@ public class BooksController : ControllerBase
     {
         var getBookByIdResponse = await _bookService.GetBookByIdAsync(
             new GetBookByIdRequest(bookId));
-        if (getBookByIdResponse.BookVm is null)
-        {
-            return Ok(new ApiErrorResult("The book with given Id does not exist."));
-        }
+        if (getBookByIdResponse.BookVm is null) return Ok(new ApiErrorResult("The book with given Id does not exist."));
 
         return Ok(new ApiSuccessResult<BookVm>(getBookByIdResponse.BookVm));
     }
@@ -212,9 +208,7 @@ public class BooksController : ControllerBase
                 new GetBookChapterByIndexRequest(bookId, index));
 
             if (getBookChapterByIndexResponse.ChapterVm is null)
-            {
                 return Ok(new ApiErrorResult("The chapter with given Index does not exist."));
-            }
 
             return Ok(new ApiSuccessResult<ChapterVm>(getBookChapterByIndexResponse.ChapterVm));
         }
@@ -474,7 +468,8 @@ public class BooksController : ControllerBase
 
     [HttpPost("{bookId:int}/ratings")]
     [Authorize]
-    public async Task<IActionResult> CreateBookRating([FromRoute] int bookId, [FromBody] ApiCreateBookRatingRequest request)
+    public async Task<IActionResult> CreateBookRating([FromRoute] int bookId,
+        [FromBody] ApiCreateBookRatingRequest request)
     {
         var userId = GetUserIdFromClaim();
 
@@ -522,13 +517,14 @@ public class BooksController : ControllerBase
 
     [HttpPut("{bookId:int}/ratings")]
     [Authorize]
-    public async Task<IActionResult> UpdateBookRating([FromRoute] int bookId, [FromBody] ApiUpdateBookRatingRequest request)
+    public async Task<IActionResult> UpdateBookRating([FromRoute] int bookId,
+        [FromBody] ApiUpdateBookRatingRequest request)
     {
         var userId = GetUserIdFromClaim();
 
         try
         {
-            var updateBookRatingResponse =  await _bookRatingService.UpdateBookRatingAsync(
+            var updateBookRatingResponse = await _bookRatingService.UpdateBookRatingAsync(
                 new UpdateBookRatingRequest(
                     userId,
                     bookId,
@@ -542,14 +538,15 @@ public class BooksController : ControllerBase
             return Ok(new ApiErrorResult(ex.Message));
         }
     }
-    
+
     [HttpGet("{bookId:int}/ratings")]
     [AllowAnonymous]
-    public async Task<IActionResult> GetAllBookRatings([FromRoute] int bookId, [FromQuery] ApiGetAllBookRatingsRequest request)
+    public async Task<IActionResult> GetAllBookRatings([FromRoute] int bookId,
+        [FromQuery] ApiGetAllBookRatingsRequest request)
     {
         try
         {
-            var getAllRatingsResponse =  await _bookRatingService.GetAllBookRatingsByBookIdAsync(
+            var getAllRatingsResponse = await _bookRatingService.GetAllBookRatingsByBookIdAsync(
                 new GetAllBookRatingsByBookIdRequest(
                     bookId,
                     request.UserId,
@@ -563,7 +560,7 @@ public class BooksController : ControllerBase
                 pagerResponse.PageSize,
                 pagerResponse.TotalPages,
                 pagerResponse.TotalRecords);
-            
+
             return Ok(new ApiSuccessResult<ApiGetAllBookRatingsResponse>(response));
         }
         catch (BookNotFoundException ex)
@@ -578,12 +575,12 @@ public class BooksController : ControllerBase
     {
         try
         {
-            var getOverviewResponse =  await _bookRatingService.GetOverviewAsync(
+            var getOverviewResponse = await _bookRatingService.GetOverviewAsync(
                 new GetOverviewRequest(
                     bookId));
 
-            var response = new ApiGetBookRatingsOverviewResponse(getOverviewResponse.RatingsByStar); 
-            
+            var response = new ApiGetBookRatingsOverviewResponse(getOverviewResponse.RatingsByStar);
+
             return Ok(new ApiSuccessResult<ApiGetBookRatingsOverviewResponse>(response));
         }
         catch (BookNotFoundException ex)
@@ -591,10 +588,10 @@ public class BooksController : ControllerBase
             return Ok(new ApiErrorResult(ex.Message));
         }
     }
-    
+
     private Guid GetUserIdFromClaim()
     {
-        string userId = User.Claims.First(
+        var userId = User.Claims.First(
             x => x.Type == JwtRegisteredClaimNames.Sid).Value;
         return new Guid(userId);
     }

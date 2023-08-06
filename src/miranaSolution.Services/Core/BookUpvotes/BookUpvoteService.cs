@@ -13,34 +13,31 @@ namespace miranaSolution.Services.Core.BookUpvotes;
 
 public class BookUpvoteService : IBookUpvoteService
 {
-    private readonly IUserService _userService;
     private readonly IBookService _bookService;
-    private readonly UserManager<AppUser> _userManager;
     private readonly MiranaDbContext _context;
+    private readonly UserManager<AppUser> _userManager;
+    private readonly IUserService _userService;
 
-    public BookUpvoteService(IUserService userService, MiranaDbContext context, IBookService bookService, UserManager<AppUser> userManager)
+    public BookUpvoteService(IUserService userService, MiranaDbContext context, IBookService bookService,
+        UserManager<AppUser> userManager)
     {
         _userService = userService;
         _context = context;
         _bookService = bookService;
         _userManager = userManager;
     }
-    
+
     public async Task<CreateBookUpvoteResponse> CreateBookUpvoteAsync(CreateBookUpvoteRequest request)
     {
         var getUserByIdResponse = await _userService.GetUserByIdAsync(
             new GetUserByIdRequest(request.UserId));
         if (getUserByIdResponse.UserVm is null)
-        {
             throw new UserNotFoundException("The user with given Id does not exist.");
-        }
 
         var getBookByIdResponse = await _bookService.GetBookByIdAsync(
             new GetBookByIdRequest(request.BookId));
         if (getBookByIdResponse.BookVm is null)
-        {
             throw new BookNotFoundException("The book with given Id does not exist.");
-        }
 
         var bookUpvote = new BookUpvote
         {
@@ -61,16 +58,12 @@ public class BookUpvoteService : IBookUpvoteService
         var getUserByIdResponse = await _userService.GetUserByIdAsync(
             new GetUserByIdRequest(request.UserId));
         if (getUserByIdResponse.UserVm is null)
-        {
             throw new UserNotFoundException("The user with given Id does not exist.");
-        }
-        
+
         var getBookByIdResponse = await _bookService.GetBookByIdAsync(
             new GetBookByIdRequest(request.BookId));
         if (getBookByIdResponse.BookVm is null)
-        {
             throw new BookNotFoundException("The book with given Id does not exist.");
-        }
 
         var bookUpvote = new BookUpvote
         {
@@ -82,29 +75,27 @@ public class BookUpvoteService : IBookUpvoteService
         await _context.SaveChangesAsync();
     }
 
-    public async Task<CountBookUpvoteByBookIdResponse> CountBookUpvoteByBookIdAsync(CountBookUpvoteByBookIdRequest request)
+    public async Task<CountBookUpvoteByBookIdResponse> CountBookUpvoteByBookIdAsync(
+        CountBookUpvoteByBookIdRequest request)
     {
         var getBookByIdResponse = await _bookService.GetBookByIdAsync(
             new GetBookByIdRequest(request.BookId));
         if (getBookByIdResponse.BookVm is null)
-        {
             throw new BookNotFoundException("The book with given Id does not exist.");
-        }
 
         var totalUpvotes = await _context.BookUpvotes.CountAsync(x => x.BookId == request.BookId);
 
         return new CountBookUpvoteByBookIdResponse(totalUpvotes);
     }
 
-    public async Task<CountBookUpvoteByUserIdResponse> CountBookUpvoteByUserIdAsync(CountBookUpvoteByUserIdRequest request)
+    public async Task<CountBookUpvoteByUserIdResponse> CountBookUpvoteByUserIdAsync(
+        CountBookUpvoteByUserIdRequest request)
     {
         var getUserByIdResponse = await _userService.GetUserByIdAsync(
             new GetUserByIdRequest(request.UserId));
         if (getUserByIdResponse.UserVm is null)
-        {
             throw new UserNotFoundException("The user with given Id does not exist.");
-        }
-        
+
         var totalUpvotes = await _context.CommentReactions.CountAsync(x => x.UserId == request.UserId);
 
         return new CountBookUpvoteByUserIdResponse(totalUpvotes);
@@ -113,18 +104,14 @@ public class BookUpvoteService : IBookUpvoteService
     public async Task<GetAllBookUpvotesResponse> GetAllBookUpvotesAsync(GetAllBookUpvotesRequest request)
     {
         if (!await _context.Books.AnyAsync(x => x.Id == request.BookId))
-        {
             throw new BookNotFoundException("The book with given Id does not exist.");
-        }
 
         var query = _context.BookUpvotes
             .Where(x => x.BookId == request.BookId);
 
         if (request.UserId.HasValue)
-        {
             query = query
                 .Where(x => x.UserId.Equals(request.UserId));
-        }
 
         var upvotes = await query.ToListAsync();
 

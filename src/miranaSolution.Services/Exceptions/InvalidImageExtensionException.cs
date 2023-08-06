@@ -2,5 +2,7 @@
 
 public class InvalidImageExtensionException : Exception
 {
-    public InvalidImageExtensionException(string msg) : base(msg) {}
+    public InvalidImageExtensionException(string msg) : base(msg)
+    {
+    }
 }

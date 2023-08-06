@@ -2,5 +2,7 @@
 
 public class UserAlreadyReactsToCommentException : Exception
 {
-    public UserAlreadyReactsToCommentException(string msg) : base(msg) {}
+    public UserAlreadyReactsToCommentException(string msg) : base(msg)
+    {
+    }
 }

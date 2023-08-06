@@ -10,7 +10,7 @@ public class UpdateUserPasswordRequestValidator : AbstractValidator<UpdateUserPa
         RuleFor(p => p.NewPassword)
             .NotEmpty()
             .WithMessage("Mật khẩu không được trống.")
-            .Length(min: 8, max: 32)
+            .Length(8, 32)
             .WithMessage("Mật khẩu phải có độ dài từ 8 tới 32 ký tự.")
             .Matches(@"[A-Z]+").WithMessage("Mật khẩu phải gồm 1 ký tự hoa.")
             .Matches(@"[a-z]+").WithMessage("Mật khẩu phải gồm 1 ký tự thuờng.")

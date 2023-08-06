@@ -25,14 +25,16 @@ namespace miranaSolution.API.Controllers;
 [Authorize]
 public class UsersController : ControllerBase
 {
-    private readonly IUserService _userService;
-    private readonly ICommentService _commentService;
-    private readonly ICommentReactionService _commentReactionService;
     private readonly IBookmarkService _bookmarkService;
-    private readonly IBookUpvoteService _bookUpvoteService;
     private readonly IBookRatingService _bookRatingService;
+    private readonly IBookUpvoteService _bookUpvoteService;
+    private readonly ICommentReactionService _commentReactionService;
+    private readonly ICommentService _commentService;
+    private readonly IUserService _userService;
 
-    public UsersController(IUserService userService, ICommentService commentService, ICommentReactionService commentReactionService, IBookmarkService bookmarkService, IBookUpvoteService bookUpvoteService, IBookRatingService bookRatingService)
+    public UsersController(IUserService userService, ICommentService commentService,
+        ICommentReactionService commentReactionService, IBookmarkService bookmarkService,
+        IBookUpvoteService bookUpvoteService, IBookRatingService bookRatingService)
     {
         _userService = userService;
         _commentService = commentService;
@@ -41,37 +43,34 @@ public class UsersController : ControllerBase
         _bookUpvoteService = bookUpvoteService;
         _bookRatingService = bookRatingService;
     }
-    
+
     [HttpGet("profile")]
     public async Task<IActionResult> GetUserProfile()
     {
         var userName = GetUserNameFromClaims();
-        
+
         var getUserByUserNameResponse = await _userService.GetUserByUserNameAsync(
             new GetUserByUserNameRequest(userName));
 
-        if (getUserByUserNameResponse.UserVm is null)
-        {
-            return Ok(new ApiErrorResult("The user does not exist."));
-        }
+        if (getUserByUserNameResponse.UserVm is null) return Ok(new ApiErrorResult("The user does not exist."));
 
         var userVm = getUserByUserNameResponse.UserVm;
-        
+
         // Calculate the summation of comments that user has written
         var countCommentByUserIdResponse = await _commentService.CountCommentByUserIdAsync(
             new CountCommentByUserIdRequest(userVm.Id));
         var totalComments = countCommentByUserIdResponse.TotalComments;
-        
+
         // Calculate the summation of reactions that user has reacted
         var countReactionByUserIdResponse = await _commentReactionService.CountCommentReactionByUserIdAsync(
             new CountCommentReactionByUserIdRequest(userVm.Id));
         var totalReactions = countReactionByUserIdResponse.TotalReactions;
-        
+
         // Calculate the summation of bookmarks that user has marked
         var getAllBookmarkByUserIdResponse = await _bookmarkService.GetAllBookmarksByUserIdAsync(
             new GetAllBookmarksByUserIdRequest(userVm.Id, null));
         var totalBookmarks = getAllBookmarkByUserIdResponse.BookmarkVms.Count;
-        
+
         // Calculate the summation of upvotes that user has done
         var countBookUpvoteByUserIdResponse = await _bookUpvoteService.CountBookUpvoteByUserIdAsync(
             new CountBookUpvoteByUserIdRequest(userVm.Id));
@@ -80,7 +79,7 @@ public class UsersController : ControllerBase
         var getAllBookRatingsByUserIdResponse = await _bookRatingService.GetAllBookRatingsByUserIdAsync(
             new GetAllBookRatingsByUserIdRequest(userVm.Id));
         var totalRatings = getAllBookRatingsByUserIdResponse.BookRatingVms.Count;
-        
+
         var response = new ApiGetUserProfileResponse(
             userVm,
             totalComments,
@@ -88,7 +87,7 @@ public class UsersController : ControllerBase
             totalBookmarks,
             totalUpvotes,
             totalRatings);
-        
+
         return Ok(new ApiSuccessResult<ApiGetUserProfileResponse>(response));
     }
 
@@ -98,19 +97,16 @@ public class UsersController : ControllerBase
     {
         var getUserByIdResponse = await _userService.GetUserByIdAsync(new GetUserByIdRequest(
             new Guid(userId)));
-        if (getUserByIdResponse.UserVm is null)
-        {
-            return Ok(new ApiErrorResult("The user with given Id does not exist."));
-        }
+        if (getUserByIdResponse.UserVm is null) return Ok(new ApiErrorResult("The user with given Id does not exist."));
 
         var editedUserVm = getUserByIdResponse.UserVm with
         {
-            Email = "",
+            Email = ""
         };
 
         return Ok(new ApiSuccessResult<UserVm>(editedUserVm));
     }
-    
+
     [HttpPost("profile")]
     [Consumes("multipart/form-data")]
     public async Task<IActionResult> UpdateUserProfile([FromForm] ApiUpdateUserProfileRequest request)
@@ -158,7 +154,7 @@ public class UsersController : ControllerBase
             return Ok(new ApiErrorResult(ex.Message));
         }
     }
-    
+
     [HttpPost("password")]
     public async Task<IActionResult> UpdateUserPassword([FromBody] ApiUpdateUserPasswordRequest request)
     {
@@ -211,6 +207,54 @@ public class UsersController : ControllerBase
         }
     }
 
+    [HttpPut("read_chapter_count/increase")]
+    [Authorize]
+    public async Task<IActionResult> IncreaseReadChapterCount()
+    {
+        var userName = GetUserNameFromClaims();
+
+        var getUserByUserNameResponse = await _userService.GetUserByUserNameAsync(
+            new GetUserByUserNameRequest(userName));
+
+        if (getUserByUserNameResponse.UserVm is null) return Ok(new ApiErrorResult("The user does not exist."));
+
+        try
+        {
+            var increaseResponse = await _userService.IncreaseReadChapterCountBy1Async(
+                new IncreaseReadChapterCountBy1Request(getUserByUserNameResponse.UserVm.Id));
+            var response = new ApiIncreaseReadChapterCountResponse(increaseResponse.ReadChapterCount);
+            return Ok(new ApiSuccessResult<ApiIncreaseReadChapterCountResponse>(response));
+        }
+        catch (UserNotFoundException ex)
+        {
+            return Ok(new ApiErrorResult(ex.Message));
+        }
+    }
+
+    [HttpPut("read_book_count/increase")]
+    [Authorize]
+    public async Task<IActionResult> IncreaseReadBookCount()
+    {
+        var userName = GetUserNameFromClaims();
+
+        var getUserByUserNameResponse = await _userService.GetUserByUserNameAsync(
+            new GetUserByUserNameRequest(userName));
+
+        if (getUserByUserNameResponse.UserVm is null) return Ok(new ApiErrorResult("The user does not exist."));
+
+        try
+        {
+            var increaseResponse = await _userService.IncreaseReadBookCountBy1Async(
+                new IncreaseReadBookCountBy1Request(getUserByUserNameResponse.UserVm.Id));
+            var response = new ApiIncreaseReadBookCountResponse(increaseResponse.ReadBookCount);
+            return Ok(new ApiSuccessResult<ApiIncreaseReadBookCountResponse>(response));
+        }
+        catch (UserNotFoundException ex)
+        {
+            return Ok(new ApiErrorResult(ex.Message));
+        }
+    }
+    
     private string GetUserNameFromClaims()
     {
         var userName = User

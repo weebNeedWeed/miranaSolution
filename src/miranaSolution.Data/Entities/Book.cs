@@ -12,6 +12,7 @@ public class Book
     public bool IsRecommended { get; set; }
     public string Slug { get; set; } = string.Empty;
     public bool IsDone { get; set; }
+    public int ViewCount { get; set; }
 
     public int AuthorId { get; set; }
     public Author? Author { get; set; }
@@ -23,10 +24,12 @@ public class Book
     public List<Rating> Ratings { get; set; } = new();
 
     public List<Comment> Comments { get; set; } = new();
-    
+
     public List<BookUpvote> BookUpvotes { get; set; } = new();
-    
+
     public List<Bookmark> Bookmarks { get; set; } = new();
-    
+
     public List<BookRating> BookRatings { get; set; } = new();
+    
+    public List<CurrentlyReading> CurrentlyReadings { get; set; } = new();
 }

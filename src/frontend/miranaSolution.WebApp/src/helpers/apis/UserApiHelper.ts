@@ -77,6 +77,32 @@ class UserApiHelper extends BaseApiHelper {
 
         return response.data.data;
     }
+
+    async increaseReadBookCount(accessToken: string): Promise<void> {
+        const headers = {
+            Authorization: `Bearer ${accessToken}`,
+        }
+
+        const response = await this.init(headers)
+            .put<ApiResult<void>>(`/users/read_book_count/increase`);
+
+        if (response.data.status === "error") {
+            throw new Error(response.data.message);
+        }
+    }
+
+    async increaseReadChapterCount(accessToken: string): Promise<void> {
+        const headers = {
+            Authorization: `Bearer ${accessToken}`,
+        }
+
+        const response = await this.init(headers)
+            .put<ApiResult<void>>(`/users/read_chapter_count/increase`);
+
+        if (response.data.status === "error") {
+            throw new Error(response.data.message);
+        }
+    }
 }
 
 export const userApiHelper = new UserApiHelper();

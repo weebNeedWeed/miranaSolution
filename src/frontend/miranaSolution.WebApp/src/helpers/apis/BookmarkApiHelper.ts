@@ -24,7 +24,13 @@ class BookmarkApiHelper extends BaseApiHelper {
         const headers = {
             Authorization: `Bearer ${accessToken}`,
         }
-        const url = "/bookmarks" + (bookId && `?bookId=${bookId}`);
+
+        const queryString = new URLSearchParams();
+        if (typeof bookId !== "undefined") {
+            queryString.append("bookId", bookId.toString());
+        }
+
+        const url = `/bookmarks?${queryString.toString()}`;
         const response = await this.init(headers)
             .get<ApiResult<GetAllBookmarksResponse>>(url);
 

@@ -2,5 +2,7 @@
 
 public class UserAlreadyExistsException : Exception
 {
-    public UserAlreadyExistsException(string msg) : base(msg) {}
+    public UserAlreadyExistsException(string msg) : base(msg)
+    {
+    }
 }

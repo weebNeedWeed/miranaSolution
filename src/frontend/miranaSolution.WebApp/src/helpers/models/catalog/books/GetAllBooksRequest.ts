@@ -4,4 +4,5 @@ export interface GetAllBooksRequest {
     keyword?: string;
     genreIds?: string;
     isDone?: boolean;
+    author?: number;
 }

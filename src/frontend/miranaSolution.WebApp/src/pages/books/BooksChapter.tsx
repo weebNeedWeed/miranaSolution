@@ -22,6 +22,9 @@ import {useAccessToken} from "../../helpers/hooks/useAccessToken";
 import {Simulate} from "react-dom/test-utils";
 import change = Simulate.change;
 import {useMediaQuery} from "../../helpers/hooks/useMediaQuery";
+import {useLocalStorage} from "../../helpers/hooks/useLocalStorage";
+import {userApiHelper} from "../../helpers/apis/UserApiHelper";
+import {currentlyReadingApiHelper} from "../../helpers/apis/CurrentlyReadingApiHelper";
 
 type ChapterHeaderProps = {
     book: Book;
@@ -106,6 +109,42 @@ const ChapterContent = (props: { book: Book; chapter: Chapter }): JSX.Element =>
     const [accessToken,] = useAccessToken();
 
     const matches = useMediaQuery("(min-width: 768px)");
+
+    const [readBooks, setReadBooks] = useLocalStorage<string>("readBooks", "");
+    const [readChapters, setReadChapters] = useLocalStorage<string>("readChapters", "");
+
+    useEffect(() => {
+        const _readBooks = readBooks.split(",").filter(x => x !== "");
+        const _readChapters = readChapters.split(",").filter(x => x !== "");
+        const bookId = props.book.id.toString();
+        const chapterId = props.chapter.id.toString();
+
+        if (authContext.state.isLoggedIn) {
+            if (_readBooks.filter(x => x == bookId).length == 0) {
+                (async () => {
+                    try {
+                        await userApiHelper.increaseReadBookCount(accessToken);
+                    } catch (error: any) {
+                    }
+                })();
+
+                _readBooks.push(bookId);
+                setReadBooks(_readBooks.join(","));
+            }
+
+            if (_readChapters.filter(x => x == chapterId).length == 0) {
+                (async () => {
+                    try {
+                        await userApiHelper.increaseReadChapterCount(accessToken);
+                    } catch (error: any) {
+                    }
+                })();
+
+                _readChapters.push(chapterId);
+                setReadChapters(_readChapters.join(","));
+            }
+        }
+    }, []);
 
     const variants = {
         initial: {bottom: "-120%"},
@@ -225,7 +264,9 @@ const ChapterContent = (props: { book: Book; chapter: Chapter }): JSX.Element =>
 const BooksChapter = (): JSX.Element => {
     const {slug, index} = useParams();
     const [chapter, setChapter] = useState<Chapter>();
-    const [book, setBook] = useState<Book>()
+    const [book, setBook] = useState<Book>();
+    const authContext = useAuthenticationContext();
+    const [accessToken,] = useAccessToken();
 
     useEffect(() => {
         (async () => {
@@ -238,6 +279,9 @@ const BooksChapter = (): JSX.Element => {
                 setBook(result.book);
                 setChapter(_chapter);
 
+                if (authContext.state.isLoggedIn) {
+                    await currentlyReadingApiHelper.addBook(accessToken, {bookId, chapterIndex: _chapter.index});
+                }
             } catch (error: any) {
             }
         })();

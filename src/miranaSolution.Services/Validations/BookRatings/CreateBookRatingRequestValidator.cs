@@ -10,7 +10,7 @@ public class CreateBookRatingRequestValidator : AbstractValidator<CreateBookRati
         RuleFor(x => x.Content)
             .MaximumLength(256)
             .WithMessage("Content phải có độ dài từ 1 tới 256 ký tự.");
-        
+
         RuleFor(x => x.Star)
             .NotEmpty()
             .WithMessage("Star không được để trống.")

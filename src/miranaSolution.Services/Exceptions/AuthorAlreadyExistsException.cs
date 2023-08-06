@@ -2,5 +2,7 @@
 
 public class AuthorAlreadyExistsException : Exception
 {
-    public AuthorAlreadyExistsException(string msg) : base(msg) {}
+    public AuthorAlreadyExistsException(string msg) : base(msg)
+    {
+    }
 }

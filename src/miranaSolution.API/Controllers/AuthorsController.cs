@@ -1,12 +1,11 @@
-using FluentValidation;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using miranaSolution.API.Extensions;
 using miranaSolution.API.ViewModels.Authors;
 using miranaSolution.API.ViewModels.Common;
 using miranaSolution.DTOs.Core.Authors;
 using miranaSolution.Services.Core.Authors;
 using miranaSolution.Services.Exceptions;
+using miranaSolution.Services.Systems.Mails;
 using miranaSolution.Utilities.Constants;
 
 namespace miranaSolution.API.Controllers;
@@ -18,7 +17,7 @@ public class AuthorsController : ControllerBase
 {
     private readonly IAuthorService _authorService;
 
-    public AuthorsController(IAuthorService authorService)
+    public AuthorsController(IAuthorService authorService, IMailService mailService)
     {
         _authorService = authorService;
     }
@@ -29,7 +28,7 @@ public class AuthorsController : ControllerBase
     {
         var getAllAuthorsResponse = await _authorService.GetAllAuthorsAsync();
         var response = new ApiGetAllAuthorsResponse(getAllAuthorsResponse.AuthorVms);
-        
+
         return Ok(new ApiSuccessResult<ApiGetAllAuthorsResponse>(response));
     }
 
@@ -37,11 +36,11 @@ public class AuthorsController : ControllerBase
     public async Task<IActionResult> CreateAuthor([FromBody] ApiCreateAuthorRequest request)
     {
         var createAuthorResponse = await _authorService.CreateAuthorAsync(
-                new CreateAuthorRequest(request.Name));
+            new CreateAuthorRequest(request.Name));
 
         return Ok(new ApiSuccessResult<AuthorVm>(createAuthorResponse.AuthorVm));
     }
-    
+
     [HttpPatch("{authorId:int}")]
     public async Task<IActionResult> UpdateAuthor([FromRoute] int authorId, [FromBody] ApiUpdateAuthorRequest request)
     {
@@ -58,7 +57,7 @@ public class AuthorsController : ControllerBase
             return Ok(new ApiErrorResult(ex.Message));
         }
     }
-    
+
     [HttpDelete("{authorId:int}")]
     public async Task<IActionResult> DeleteAuthor([FromRoute] int authorId)
     {

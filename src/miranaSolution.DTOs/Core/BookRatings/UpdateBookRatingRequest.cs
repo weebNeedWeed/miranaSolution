@@ -3,5 +3,5 @@
 public record UpdateBookRatingRequest(
     Guid UserId,
     int BookId,
-    string Content, 
+    string Content,
     int Star);

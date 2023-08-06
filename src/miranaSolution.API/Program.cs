@@ -1,9 +1,9 @@
 using Microsoft.AspNetCore.Mvc;
-using miranaSolution.API.Filters;
 using miranaSolution.API.Extensions;
+using miranaSolution.API.Filters;
 using miranaSolution.API.HealthChecks;
-using miranaSolution.Services;
 using miranaSolution.Data;
+using miranaSolution.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 

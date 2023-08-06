@@ -10,14 +10,14 @@ namespace miranaSolution.Services.Authentication.Users;
 
 public class UserService : IUserService
 {
-    private readonly UserManager<AppUser> _userManager;
-    private readonly SignInManager<AppUser> _signInManager;
-    private readonly IJwtTokenGenerator _jwtTokenGenerator;
     private readonly IImageSaver _imageSaver;
+    private readonly IJwtTokenGenerator _jwtTokenGenerator;
+    private readonly SignInManager<AppUser> _signInManager;
+    private readonly UserManager<AppUser> _userManager;
     private readonly IValidatorProvider _validatorProvider;
 
     public UserService(
-        UserManager<AppUser> userManager, 
+        UserManager<AppUser> userManager,
         SignInManager<AppUser> signInManager,
         IJwtTokenGenerator jwtTokenGenerator, IImageSaver imageSaver, IValidatorProvider validatorProvider)
     {
@@ -27,27 +27,21 @@ public class UserService : IUserService
         _imageSaver = imageSaver;
         _validatorProvider = validatorProvider;
     }
-    
+
     /// <exception cref="UserAlreadyExistsException">
-    /// Thrown when the user with given Email or UserName already exists
+    ///     Thrown when the user with given Email or UserName already exists
     /// </exception>
     public async Task<RegisterUserResponse> RegisterUserAsync(RegisterUserRequest request)
     {
         _validatorProvider.Validate(request);
-        
-        var user = await _userManager.FindByEmailAsync(request.Email);
-        if (user is not null)
-        {
-            throw new UserAlreadyExistsException("The user with given Email already exists.");
-        }
-        
-        user = await _userManager.FindByNameAsync(request.UserName);
-        if (user is not null)
-        {
-            throw new UserAlreadyExistsException("The user with given UserName already exists.");
-        }
 
-        user = new AppUser()
+        var user = await _userManager.FindByEmailAsync(request.Email);
+        if (user is not null) throw new UserAlreadyExistsException("The user with given Email already exists.");
+
+        user = await _userManager.FindByNameAsync(request.UserName);
+        if (user is not null) throw new UserAlreadyExistsException("The user with given UserName already exists.");
+
+        user = new AppUser
         {
             FirstName = request.FirstName,
             LastName = request.LastName,
@@ -63,22 +57,19 @@ public class UserService : IUserService
         var response = new RegisterUserResponse(userVm);
         return response;
     }
-    
+
     /// <exception cref="UserNotFoundException">
-    /// Thrown when the user with given UserName does not exist
+    ///     Thrown when the user with given UserName does not exist
     /// </exception>
     /// <exception cref="InvalidCredentialException">
-    /// Thrown when the request's password does not match the found user's password
+    ///     Thrown when the request's password does not match the found user's password
     /// </exception>
     public async Task<AuthenticateUserResponse> AuthenticateUserAsync(AuthenticateUserRequest request)
     {
         _validatorProvider.Validate(request);
-        
+
         var user = await _userManager.FindByNameAsync(request.UserName);
-        if (user is null)
-        {
-            throw new UserNotFoundException("The user with given User Name does not exists.");
-        }
+        if (user is null) throw new UserNotFoundException("The user with given User Name does not exists.");
 
         var signInResult = await _signInManager.PasswordSignInAsync(
             request.UserName,
@@ -86,10 +77,7 @@ public class UserService : IUserService
             false,
             false);
 
-        if (!signInResult.Succeeded)
-        {
-            throw new InvalidCredentialException("Invalid credentials.");
-        }
+        if (!signInResult.Succeeded) throw new InvalidCredentialException("Invalid credentials.");
 
         var userVm = MapUserIntoUserVm(user);
 
@@ -102,10 +90,7 @@ public class UserService : IUserService
     public async Task<GetUserByUserNameResponse> GetUserByUserNameAsync(GetUserByUserNameRequest request)
     {
         var user = await _userManager.FindByNameAsync(request.UserName);
-        if (user is null)
-        {
-            return new GetUserByUserNameResponse(null);
-        }
+        if (user is null) return new GetUserByUserNameResponse(null);
 
         var userVm = MapUserIntoUserVm(user);
 
@@ -116,30 +101,24 @@ public class UserService : IUserService
     public async Task<GetUserByEmailResponse> GetUserByEmailAsync(GetUserByEmailRequest request)
     {
         var user = await _userManager.FindByNameAsync(request.Email);
-        if (user is null)
-        {
-            return new GetUserByEmailResponse(null);
-        }
+        if (user is null) return new GetUserByEmailResponse(null);
 
         var userVm = MapUserIntoUserVm(user);
 
         var response = new GetUserByEmailResponse(userVm);
         return response;
     }
-    
+
     /// <exception cref="UserNotFoundException">
-    /// Thrown when the user with given User Name does not exist
+    ///     Thrown when the user with given User Name does not exist
     /// </exception>
     public async Task<UpdateUserProfileResponse> UpdateUserProfileAsync(UpdateUserProfileRequest request)
     {
         _validatorProvider.Validate(request);
-        
+
         var user = await _userManager.FindByNameAsync(request.UserName);
-        if (user is null)
-        {
-            throw new UserNotFoundException("The user with given Id does not exists.");
-        }
-        
+        if (user is null) throw new UserNotFoundException("The user with given Id does not exists.");
+
         user.FirstName = request.FirstName;
         user.LastName = request.LastName;
         user.Email = request.Email;
@@ -149,9 +128,9 @@ public class UserService : IUserService
             await _imageSaver.DeleteImageIfExistAsync(user.Avatar);
             user.Avatar = await _imageSaver.SaveImageAsync(request.Avatar, request.AvatarExtension!);
         }
-        
+
         await _userManager.UpdateAsync(user);
-        
+
         var userVm = MapUserIntoUserVm(user);
 
         var response = new UpdateUserProfileResponse(userVm);
@@ -159,29 +138,24 @@ public class UserService : IUserService
     }
 
     /// <exception cref="UserNotFoundException">
-    /// Thrown when the user with given User Name does not exist
+    ///     Thrown when the user with given User Name does not exist
     /// </exception>
     /// <exception cref="InvalidCredentialException">
-    /// Thrown when the request's password does not match the current password of the user
+    ///     Thrown when the request's password does not match the current password of the user
     /// </exception>
     public async Task<UpdateUserPasswordResponse> UpdateUserPasswordAsync(UpdateUserPasswordRequest request)
     {
         _validatorProvider.Validate(request);
-        
+
         var user = await _userManager.FindByNameAsync(request.UserName);
-        if (user is null)
-        {
-            throw new UserNotFoundException("The user with given Id does not exists.");
-        }
+        if (user is null) throw new UserNotFoundException("The user with given Id does not exists.");
 
         if (!await _userManager.CheckPasswordAsync(user, request.CurrentPassword))
-        {
             throw new InvalidCredentialException("Invalid current password.");
-        }
-        
+
         await _userManager.ChangePasswordAsync(
             user, request.CurrentPassword, request.NewPassword);
-        
+
         var userVm = MapUserIntoUserVm(user);
 
         var response = new UpdateUserPasswordResponse(userVm);
@@ -191,10 +165,7 @@ public class UserService : IUserService
     public async Task<GetUserByIdResponse> GetUserByIdAsync(GetUserByIdRequest request)
     {
         var user = await _userManager.FindByIdAsync(request.UserId.ToString());
-        if (user is null)
-        {
-            return new GetUserByIdResponse(null);
-        }
+        if (user is null) return new GetUserByIdResponse(null);
 
         var userVm = MapUserIntoUserVm(user);
 
@@ -205,17 +176,33 @@ public class UserService : IUserService
     public async Task DeleteUserAsync(DeleteUserRequest request)
     {
         var user = await _userManager.FindByIdAsync(request.UserId.ToString());
-        if (user is null)
-        {
-            throw new UserNotFoundException("The user with given Id does not exist.");
-        }
+        if (user is null) throw new UserNotFoundException("The user with given Id does not exist.");
 
-        if (!string.IsNullOrEmpty(user.Avatar))
-        {
-            await _imageSaver.DeleteImageIfExistAsync(user.Avatar);
-        }
+        if (!string.IsNullOrEmpty(user.Avatar)) await _imageSaver.DeleteImageIfExistAsync(user.Avatar);
 
         await _userManager.DeleteAsync(user);
+    }
+
+    public async Task<IncreaseReadBookCountBy1Response> IncreaseReadBookCountBy1Async(IncreaseReadBookCountBy1Request request)
+    {
+        var user = await _userManager.FindByIdAsync(request.UserId.ToString());
+        if (user is null) throw new UserNotFoundException("The user with given Id does not exist.");
+
+        user.ReadBookCount++;
+        await _userManager.UpdateAsync(user);
+
+        return new IncreaseReadBookCountBy1Response(user.ReadBookCount);
+    }
+
+    public async Task<IncreaseReadChapterCountBy1Response> IncreaseReadChapterCountBy1Async(IncreaseReadChapterCountBy1Request request)
+    {
+        var user = await _userManager.FindByIdAsync(request.UserId.ToString());
+        if (user is null) throw new UserNotFoundException("The user with given Id does not exist.");
+
+        user.ReadChapterCount++;
+        await _userManager.UpdateAsync(user);
+
+        return new IncreaseReadChapterCountBy1Response(user.ReadChapterCount);
     }
 
     private UserVm MapUserIntoUserVm(AppUser user)
@@ -226,7 +213,9 @@ public class UserService : IUserService
             user.LastName,
             user.UserName,
             user.Email,
-            user.Avatar);
+            user.Avatar,
+            user.ReadBookCount,
+            user.ReadChapterCount);
 
         return userVm;
     }

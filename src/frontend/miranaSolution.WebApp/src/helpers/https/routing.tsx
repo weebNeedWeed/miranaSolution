@@ -1,14 +1,13 @@
 import {Router} from "@remix-run/router";
 import {createBrowserRouter, Navigate} from "react-router-dom";
 import {RouteObject} from "react-router/dist/lib/context";
-
 import {Home} from "../../pages";
 import {AuthLayout, DefaultLayout, UserLayout} from "../../layouts";
 import {Test} from "../../pages/Test";
 import {BooksChapter, BooksIndex, BooksInfo} from "../../pages/books";
 import React from "react";
-import {UserPassword, UserProfile} from "../../pages/user";
-import {Login, Register} from "../../pages/auth";
+import {UserBookmarks, UserCurrentlyReadings, UserPassword, UserProfile} from "../../pages/user";
+import {Login, PasswordRecovery, RedeemToken, Register} from "../../pages/auth";
 
 const routes: RouteObject[] = [
     {
@@ -60,6 +59,14 @@ const routes: RouteObject[] = [
                     {
                         path: "password",
                         element: <UserPassword/>
+                    },
+                    {
+                        path: "currently-readings",
+                        element: <UserCurrentlyReadings/>
+                    },
+                    {
+                        path: "bookmarks",
+                        element: <UserBookmarks/>
                     }
                 ]
             }
@@ -80,6 +87,19 @@ const routes: RouteObject[] = [
             {
                 path: "register",
                 element: <Register/>,
+            },
+            {
+                path: "password-recovery",
+                children: [
+                    {
+                        index: true,
+                        element: <PasswordRecovery/>
+                    },
+                    {
+                        path: "redeem-token",
+                        element: <RedeemToken/>,
+                    }
+                ]
             },
         ],
     },
