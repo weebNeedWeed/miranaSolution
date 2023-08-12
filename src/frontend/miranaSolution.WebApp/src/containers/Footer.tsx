@@ -17,21 +17,24 @@ const Footer = (): JSX.Element => {
 
                     <div className="flex flex-col">
                         <p className="font-bold text-deepKoamaru text-base">Tài khoản</p>
-                        <Link to={"/"} className="text-deepKoamaru text-bas">
+                        <Link to={"/auth/login"} className="text-deepKoamaru text-bas">
                             Đăng ký
                         </Link>
-                        <Link to={"/"} className="text-deepKoamaru text-bas">
+                        <Link to={"/auth/register"} className="text-deepKoamaru text-bas">
                             Đăng nhập
+                        </Link>
+                        <Link to={"/auth/password-recovery"} className="text-deepKoamaru text-bas">
+                            Quên mật khẩu
                         </Link>
                     </div>
 
                     <div className="flex flex-col">
                         <p className="font-bold text-deepKoamaru text-base">Truyện</p>
-                        <Link to={"/"} className="text-deepKoamaru text-bas">
+                        <Link to={"/books"} className="text-deepKoamaru text-bas">
                             Tìm kiếm
                         </Link>
-                        <Link to={"/"} className="text-deepKoamaru text-bas">
-                            Đọc truyện
+                        <Link to={"/books"} className="text-deepKoamaru text-bas">
+                            Thể loại
                         </Link>
                     </div>
 

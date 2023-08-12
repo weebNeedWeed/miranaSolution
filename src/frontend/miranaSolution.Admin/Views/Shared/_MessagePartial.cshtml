@@ -1,0 +1,12 @@
+﻿<script>
+    // Error
+    let title = "@Html.Raw(ViewData[Constants.Error] ?? "")";
+    if(title.trim() !== "") {
+        Swal.fire({
+            title: 'Lỗi!',
+            text: title,
+            icon: 'error',
+            confirmButtonText: 'Đóng'
+        });
+    }
+</script>

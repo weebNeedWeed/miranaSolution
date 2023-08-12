@@ -25,6 +25,7 @@ import {useMediaQuery} from "../../helpers/hooks/useMediaQuery";
 import {useLocalStorage} from "../../helpers/hooks/useLocalStorage";
 import {userApiHelper} from "../../helpers/apis/UserApiHelper";
 import {currentlyReadingApiHelper} from "../../helpers/apis/CurrentlyReadingApiHelper";
+import {CurrentlyReading} from "../../helpers/models/catalog/currentlyReading/CurrentlyReading";
 
 type ChapterHeaderProps = {
     book: Book;
@@ -143,6 +144,35 @@ const ChapterContent = (props: { book: Book; chapter: Chapter }): JSX.Element =>
                 _readChapters.push(chapterId);
                 setReadChapters(_readChapters.join(","));
             }
+        }
+    }, []);
+
+    // Handle storing the user's reading books if not logging in
+    const [offlineReadingBooks, setOfflineReadingBooks] = useLocalStorage<CurrentlyReading[]>("readings", []);
+    useEffect(() => {
+        const _books = offlineReadingBooks.filter(x => x.bookId == props.book.id);
+        if (_books.length === 0) {
+            const newReadingBook: CurrentlyReading = {
+                bookId: props.book.id,
+                chapterIndex: props.chapter.index,
+                userId: "guest",
+                createdAt: new Date(Date.now())
+            };
+
+            const clone = [...offlineReadingBooks];
+            clone.push(newReadingBook);
+
+            setOfflineReadingBooks(clone);
+
+            return;
+        }
+
+        const _book = _books[0];
+        if (_book.chapterIndex !== props.chapter.index) {
+            _book.chapterIndex = props.chapter.index;
+            _book.createdAt = new Date(Date.now());
+
+            setOfflineReadingBooks([...offlineReadingBooks]);
         }
     }, []);
 

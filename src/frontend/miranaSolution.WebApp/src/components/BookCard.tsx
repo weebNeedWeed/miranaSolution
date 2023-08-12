@@ -1,10 +1,13 @@
 import {Link} from "react-router-dom";
 import {Book} from "../helpers/models/catalog/books/Book";
+import {useBaseUrl} from "../helpers/hooks/useBaseUrl";
+import {FaPen} from "react-icons/fa";
 
 type BookCardProps = {
     book: Book
 };
 const BookCard = ({book}: BookCardProps): JSX.Element => {
+    const baseUrl = useBaseUrl();
     return (
         <div className="md:w-[calc(calc(100%/2)-0.75rem)] md:mr-3 mb-3">
             <Link
@@ -13,9 +16,9 @@ const BookCard = ({book}: BookCardProps): JSX.Element => {
             >
                 <div className="flex flex-row justify-center items-center">
                     <img
-                        src={book.thumbnailImage}
+                        src={`${baseUrl}${book.thumbnailImage}`}
                         alt=""
-                        className="w-14 max-h-[84px] aspect-[2/3]"
+                        className="w-14 max-h-[84px] aspect-[2/3] shrink-0"
                     />
 
                     <div className="flex flex-col ml-2 h-full items-start justify-start">
@@ -27,9 +30,11 @@ const BookCard = ({book}: BookCardProps): JSX.Element => {
                             {book.shortDescription}
                         </p>
 
-                        <div className="flex flex-row justify-start items-center">
+                        <div className="flex flex-row justify-start items-center gap-x-1">
+                            <FaPen className="text-oldRose text-xs"/>
+
                             <span
-                                className="text-xs text-oldRose border-b-[1px] border-oldRose font-semibold">
+                                className="text-xs text-oldRose border-b-[1px] border-oldRose font-semibold line-clamp-1">
                                 {book.authorName}
                             </span>
                         </div>

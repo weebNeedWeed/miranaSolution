@@ -222,7 +222,7 @@ public class BookService : IBookService
     public async Task<GetMostReadingBooksResponse> GetMostReadingBooks(GetMostReadingBooksRequest request)
     {
         var books = await _context.Books
-            .OrderByDescending(x => x.UpdatedAt)
+            .OrderByDescending(x => x.ViewCount)
             .Take(request.NumberOfBooks)
             .ToListAsync();
 

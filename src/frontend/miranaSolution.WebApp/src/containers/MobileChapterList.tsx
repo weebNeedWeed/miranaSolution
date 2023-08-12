@@ -56,9 +56,10 @@ const MobileChapterList = (props: MobileChapterListProps): JSX.Element => {
             if (index % sizeOfRow === 0) {
                 renderArray.push([]);
             }
-            const actualIndex = index / sizeOfRow;
+            const actualIndex = Math.floor(index / sizeOfRow);
             renderArray[actualIndex].push(
                 <Link
+                    onClick={handleClose}
                     key={index}
                     to={`/books/${book.slug}/chapters/${chapter.index}`}
                     className="w-1/3 pr-6 line-clamp-1">Chương {chapter.index}: {chapter.name}

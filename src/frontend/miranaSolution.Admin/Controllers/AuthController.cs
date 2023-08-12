@@ -5,10 +5,11 @@ using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using miranaSolution.Admin.Models.Auth;
 using miranaSolution.Admin.Services.Interfaces;
-using miranaSolution.DTOs.Auth.Users;
+using miranaSolution.DTOs.Authentication.Users;
 using miranaSolution.Utilities.Constants;
 using Newtonsoft.Json;
 
@@ -17,13 +18,15 @@ namespace miranaSolution.Admin.Controllers;
 [AllowAnonymous]
 public class AuthController : Controller
 {
-    private readonly IUsersApiService _usersApiService;
+    private readonly IAuthApiService _authApiService;
     private readonly IConfiguration _configuration;
+    private readonly JwtOptions _jwtOptions;
 
-    public AuthController(IUsersApiService usersApiService, IConfiguration configuration)
+    public AuthController(IConfiguration configuration, IAuthApiService authApiService, IOptions<JwtOptions> jwtOptions)
     {
         _configuration = configuration;
-        _usersApiService = usersApiService;
+        _authApiService = authApiService;
+        _jwtOptions = jwtOptions.Value;
     }
 
     [HttpGet]
@@ -43,22 +46,17 @@ public class AuthController : Controller
 
         if (!ModelState.IsValid) return View(loginViewModel);
 
-        var response = await _usersApiService.Authenticate(new UserAuthenticationRequest()
-        {
-            Password = loginViewModel.Password,
-            RememberMe = false,
-            UserName = loginViewModel.UserName
-        });
+        var response = await _authApiService.AuthenticateUserAsync(new AuthenticateUserRequest(
+            loginViewModel.UserName,
+            loginViewModel.Password));
 
         if (response.Status == "fail" || response.Status == "error")
         {
             ModelState.AddModelError("", "Unknown error.");
             return View(loginViewModel);
         }
-
-        var accessToken = JsonConvert.DeserializeObject<dynamic>(response.Data.ToString()).accessToken;
-
-        var claimsIdentity = GetClaimsIdentity((string)accessToken);
+        
+        var claimsIdentity = GetClaimsIdentity(response.Data.Token);
         if (claimsIdentity == null)
         {
             ModelState.AddModelError("", "Unknown error.");
@@ -75,25 +73,36 @@ public class AuthController : Controller
             new ClaimsPrincipal(claimsIdentity),
             authProperties);
 
-        HttpContext.Session.SetString("accessToken", (string)accessToken);
+        HttpContext.Session.SetString(Constants.AccessToken, response.Data.Token);
 
         if (Url.IsLocalUrl(returnUrl)) return Redirect(returnUrl);
 
         return RedirectToAction("Index", "Home");
     }
 
+    [HttpPost]
+    [Authorize]
+    [AutoValidateAntiforgeryToken]
+    public async Task<IActionResult> Logout()
+    {
+        await HttpContext.SignOutAsync(
+            CookieAuthenticationDefaults.AuthenticationScheme);
+        return RedirectToAction("Login");
+    }
+    
     private ClaimsIdentity? GetClaimsIdentity(string accessToken)
     {
         try
         {
             var tokenHandler = new JwtSecurityTokenHandler();
-            var key = Encoding.ASCII.GetBytes(_configuration["Jwt:Key"]);
+            var key = Encoding.ASCII.GetBytes(_jwtOptions.Secret);
             tokenHandler.ValidateToken(accessToken, new TokenValidationParameters
             {
                 ValidateIssuerSigningKey = true,
+                ValidateLifetime = true,
                 IssuerSigningKey = new SymmetricSecurityKey(key),
-                ValidIssuer = _configuration["Jwt:Issuer"],
-                ValidAudience = _configuration["Jwt:Issuer"],
+                ValidIssuer = _jwtOptions.Issuer,
+                ValidAudience = _jwtOptions.Audience,
                 ValidateIssuer = true,
                 ValidateAudience = true,
                 // set clockskew to zero so tokens expire exactly at token expiration time (instead of 5 minutes later)
@@ -101,7 +110,7 @@ public class AuthController : Controller
             }, out var validatedToken);
 
             var jwtToken = (JwtSecurityToken)validatedToken;
-            if (!jwtToken.Claims.First(x => x.Type == "roles").Value.Contains(RolesConstant.Administrator)) return null;
+            if (!jwtToken.Claims.First(x => x.Type.Equals(ClaimTypes.Role)).Value.Contains(RolesConstant.Administrator)) return null;
 
             var claimsIdentity = new ClaimsIdentity(
                 jwtToken.Claims, CookieAuthenticationDefaults.AuthenticationScheme);

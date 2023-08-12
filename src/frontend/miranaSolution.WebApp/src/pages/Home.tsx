@@ -1,5 +1,5 @@
 import {Divider, Header, Section} from "../components";
-import {CurrentlyReading, EditorRecommendation, MostReading, NewestChapters,} from "../containers";
+import {CurrentlyReadingsSection, EditorRecommendation, MostReading, NewestChapters,} from "../containers";
 import {useMediaQuery} from "../helpers/hooks/useMediaQuery";
 
 const Home = (): JSX.Element => {
@@ -21,7 +21,7 @@ const Home = (): JSX.Element => {
                     </div>
 
                     <div className="w-full md:w-[calc(calc(100%/3)-20px)] md:ml-[20px] md:min-h-[600px]">
-                        <CurrentlyReading/>
+                        <CurrentlyReadingsSection/>
                     </div>
                 </div>
             </Section>

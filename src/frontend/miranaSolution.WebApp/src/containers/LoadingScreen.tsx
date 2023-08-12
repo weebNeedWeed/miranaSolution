@@ -7,7 +7,7 @@ const LoadingScreen = (): JSX.Element => {
     const {state, dispatch} = useSystemContext();
     const location = useLocation();
 
-    const timeout = 0;
+    const timeout = 2000;
 
     useLayoutEffect(() => {
         dispatch({type: "startLoading"});

@@ -11,6 +11,10 @@ export function useLocalStorage<TData>(key: string, defaultValue: TData) {
     });
 
     useEffect(() => {
+        
+    }, [setValue]);
+
+    useEffect(() => {
         const stringified = JSON.stringify(value);
         localStorage.setItem(key, stringified);
     }, [value, defaultValue]);

@@ -1,4 +1,5 @@
-@model miranaSolution.DTOs.Common.PagedResult<miranaSolution.DTOs.Catalog.Books.Chapters.ChapterDto>
+@using miranaSolution.Admin.ViewModels.Common
+@model miranaSolution.API.ViewModels.Books.ApiGetAllBookChaptersResponse
 
 @{
     ViewData["title"] = "Chapters Of " + ViewBag.Book.Name;
@@ -45,7 +46,7 @@
             </tr>
             </thead>
             <tbody>
-            @foreach (var book in Model.Items)
+            @foreach (var book in Model.Chapters)
             {
                 <tr>
                     <td>@book.Id</td>
@@ -63,6 +64,7 @@
     </div>
 
     <div class="card-body">
-        @await Component.InvokeAsync("Pager", Model)
+        @await Component.InvokeAsync("Pager", new PagerResult(
+                   Model.PageIndex, Model.PageSize, Model.TotalPages))
     </div>
 </div>

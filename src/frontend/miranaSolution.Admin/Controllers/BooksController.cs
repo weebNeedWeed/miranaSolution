@@ -1,9 +1,9 @@
-using System.Text;
 using Refit;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using miranaSolution.Admin.Services.Interfaces;
-using miranaSolution.DTOs.Catalog.Books.Chapters;
+using miranaSolution.API.ViewModels.Books;
+using miranaSolution.DTOs.Core.Authors;
 using Newtonsoft.Json;
 
 namespace miranaSolution.Admin.Controllers;
@@ -25,12 +25,14 @@ public class BooksController : Controller
     public async Task<IActionResult> Index([FromQuery] int pageIndex = 1, [FromQuery] int pageSize = 10,
         [FromQuery] string keyword = "")
     {
-        var books = await _booksApiService.GetPaging(new BookGetPagingRequest()
-        {
-            PageSize = pageSize,
-            PageIndex = pageIndex,
-            Keyword = keyword
-        });
+        var books = await _booksApiService.GetAllBooksAsync(
+            new ApiGetAllBooksRequest(
+                keyword,
+                null,
+                null,
+                null,
+                pageIndex,
+                pageSize));
 
         return View(books.Data);
     }
@@ -39,8 +41,8 @@ public class BooksController : Controller
     [HttpGet]
     public async Task<IActionResult> Create()
     {
-        var authors = (await _authorsApiService.GetAll()).Data;
-        ViewBag.Authors = new SelectList(authors, nameof(AuthorDto.Id), nameof(AuthorDto.Name));
+        var authors = (await _authorsApiService.GetAllAuthorAsync()).Data;
+        ViewBag.Authors = new SelectList(authors.Authors, nameof(AuthorVm.Id), nameof(AuthorVm.Name));
 
         return View();
     }
@@ -53,16 +55,15 @@ public class BooksController : Controller
         [FromQuery] int pageSize = 10,
         [FromQuery] string keyword = "")
     {
-        var book = await _booksApiService.GetById(id);
+        var book = await _booksApiService.GetBookByIdAsync(id);
         if (book.Status is null || book.Status == "fail" || book.Status == "error") return RedirectToAction("Index");
 
         ViewBag.Book = book.Data;
 
-        var chapters = await _booksApiService.GetChaptersPaging(id, new ChapterGetPagingRequest()
+        var chapters = await _booksApiService.GetAllBookChaptersAsync(id, new ApiGetAllBookChaptersRequest()
         {
             PageSize = pageSize,
             PageIndex = pageIndex
-            // Keyword = keyword
         });
 
         return View(chapters.Data);
@@ -72,45 +73,38 @@ public class BooksController : Controller
     [HttpPost]
     [Consumes("multipart/form-data")]
     [AutoValidateAntiforgeryToken]
-    public async Task<IActionResult> Create([FromForm] BookCreateRequest request)
+    public async Task<IActionResult> Create([FromForm] ApiCreateBookRequest request)
     {
-        var authors = (await _authorsApiService.GetAll()).Data;
-        ViewBag.Authors = new SelectList(authors, nameof(AuthorDto.Id), nameof(AuthorDto.Name));
+        var authors = (await _authorsApiService.GetAllAuthorAsync()).Data;
+        ViewBag.Authors = new SelectList(authors.Authors, nameof(AuthorVm.Id), nameof(AuthorVm.Name));
 
         if (!ModelState.IsValid) return View(request);
 
         var memoryStream = new MemoryStream();
-        request.ThumbnailImage.OpenReadStream().CopyTo(memoryStream);
+        await request.ThumbnailImage.OpenReadStream().CopyToAsync(memoryStream);
         var byteArrayPart = new ByteArrayPart(memoryStream.ToArray(), request.ThumbnailImage.FileName);
 
-        var token = HttpContext.Session.GetString("accessToken")!;
+        var token = HttpContext.Session.GetString(Constants.AccessToken)!;
 
-        var response = await _booksApiService.Create(request.Name,
+        var response = await _booksApiService.CreateAsync(request.Name,
             request.ShortDescription,
             request.LongDescription,
             slug: request.Slug,
             authorId: request.AuthorId,
+            isDone: request.IsDone,
             isRecommended: request.IsRecommended,
-            thumbnailImage: byteArrayPart,
-            authorization: "Bearer " + token);
+            thumbnailImage: byteArrayPart);
 
         if (response.Status == "error")
         {
-            ModelState.AddModelError("", "Unknown error.");
+            ViewData[Constants.Error] = response.Message;
             return View(request);
         }
 
         if (response.Status == "fail")
         {
-            var errorDict = JsonConvert.DeserializeObject<Dictionary<string, string[]>>(response.Data.ToString());
-            foreach (var pair in errorDict)
-            {
-                var errorString = new StringBuilder();
-                foreach (var error in pair.Value) errorString.Append(error);
-
-                ModelState.AddModelError(pair.Key, errorString.ToString());
-            }
-
+            var errors = (Dictionary<string, string>)JsonConvert.DeserializeObject<Dictionary<string,string>>(response.Data.ToString());
+            ViewData[Constants.Error] = errors.Values.ElementAt(0);
             return View(request);
         }
 
@@ -121,7 +115,7 @@ public class BooksController : Controller
     [HttpGet("[controller]/{id:int}/chapters/create")]
     public async Task<IActionResult> AddChapter([FromRoute] int id)
     {
-        var book = await _booksApiService.GetById(id);
+        var book = await _booksApiService.GetBookByIdAsync(id);
         if (book.Status is null || book.Status == "fail" || book.Status == "error") return RedirectToAction("Index");
 
         ViewBag.Book = book.Data;
@@ -132,17 +126,28 @@ public class BooksController : Controller
     // POST /books/{id}/chapters/create
     [HttpPost("[controller]/{id:int}/chapters/create")]
     [AutoValidateAntiforgeryToken]
-    public async Task<IActionResult> AddChapter([FromRoute] int id, [FromForm] ChapterCreateRequest request)
+    public async Task<IActionResult> AddChapter([FromRoute] int id, [FromForm] ApiCreateBookChapterRequest request)
     {
-        var book = await _booksApiService.GetById(id);
+        var book = await _booksApiService.GetBookByIdAsync(id);
         if (book.Status is null || book.Status == "fail" || book.Status == "error") return RedirectToAction("Index");
 
         ViewBag.Book = book.Data;
 
-        var result = await _booksApiService.AddChapter(id, request);
-        if (result.Status == "fail" || result.Status == "error")
+        var accessToken = HttpContext.Session.GetString(Constants.AccessToken);
+
+        var response = await _booksApiService.CreateBookChapterAsync(
+            id, 
+            request);
+        if (response.Status == "error")
         {
-            ModelState.AddModelError("", !string.IsNullOrEmpty(result.Message) ? result.Message : "Unknown error");
+            ViewData[Constants.Error] = response.Message;
+            return View(request);
+        }
+
+        if (response.Status == "fail")
+        {
+            var errors = (Dictionary<string, string>)JsonConvert.DeserializeObject<Dictionary<string,string>>(response.Data.ToString());
+            ViewData[Constants.Error] = errors.Values.ElementAt(0);
             return View(request);
         }
 

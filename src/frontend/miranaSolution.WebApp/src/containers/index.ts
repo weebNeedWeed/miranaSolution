@@ -1,5 +1,5 @@
 export {LoadingScreen} from "./LoadingScreen";
-export {CurrentlyReading} from "./CurrentlyReading";
+export {CurrentlyReadingsSection} from "./CurrentlyReadingsSection";
 export {EditorRecommendation} from "./EditorRecommendation";
 export {NewestChapters} from "./NewestChapters";
 export {MostReading} from "./MostReading";

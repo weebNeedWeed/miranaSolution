@@ -1,31 +1,34 @@
-using miranaSolution.DTOs.Catalog.Books.Chapters;
-using miranaSolution.DTOs.Common;
+using miranaSolution.API.ViewModels.Books;
+using miranaSolution.API.ViewModels.Common;
+using miranaSolution.DTOs.Core.Books;
 using Refit;
 
 namespace miranaSolution.Admin.Services.Interfaces;
 
 public interface IBooksApiService
 {
-    [Get("/books")]
-    Task<ApiResult<PagedResult<BookDto>>> GetPaging(BookGetPagingRequest request);
+    [Get("/api/books")]
+    Task<ApiResult<ApiGetAllBooksResponse>> GetAllBooksAsync(ApiGetAllBooksRequest request);
 
     [Multipart]
-    [Post("/books")]
-    Task<ApiResult<dynamic>> Create([AliasAs("Name")] string name,
+    [Post("/api/books")]
+    Task<ApiResult<dynamic>> CreateAsync([AliasAs("Name")] string name,
         [AliasAs("ShortDescription")] string shortDescription,
         [AliasAs("LongDescription")] string longDescription,
         [AliasAs("IsRecommended")] bool isRecommended,
         [AliasAs("Slug")] string slug,
         [AliasAs("AuthorId")] int authorId,
-        [AliasAs("ThumbnailImage")] ByteArrayPart thumbnailImage,
-        [Header("Authorization")] string authorization);
+        [AliasAs("IsDone")] bool isDone,
+        [AliasAs("ThumbnailImage")] ByteArrayPart thumbnailImage);
 
-    [Get("/books/{id}")]
-    Task<ApiResult<BookDto>> GetById([AliasAs("id")] int id);
+    [Get("/api/books/{id}")]
+    Task<ApiResult<BookVm>> GetBookByIdAsync([AliasAs("id")] int id);
 
-    [Get("/books/{id}/chapters")]
-    Task<ApiResult<PagedResult<ChapterDto>>> GetChaptersPaging([AliasAs("id")] int id, ChapterGetPagingRequest request);
+    [Get("/api/books/{id}/chapters")]
+    Task<ApiResult<ApiGetAllBookChaptersResponse>> GetAllBookChaptersAsync([AliasAs("id")] int id, ApiGetAllBookChaptersRequest request);
 
-    [Post("/books/{id}/chapters")]
-    Task<ApiResult<ChapterDto>> AddChapter([AliasAs("id")] int id, [Body] ChapterCreateRequest request);
+    [Post("/api/books/{id}/chapters")]
+    Task<ApiResult<dynamic>> CreateBookChapterAsync(
+        [AliasAs("id")] int id, 
+        [Body] ApiCreateBookChapterRequest request);
 }

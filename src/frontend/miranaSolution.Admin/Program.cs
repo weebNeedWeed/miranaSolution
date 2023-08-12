@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Authentication.Cookies;
-using miranaSolution.Admin.Services.Interfaces;
-using Refit;
+using miranaSolution.Admin;
+using miranaSolution.Admin.Extensions;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -35,11 +35,8 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
         options.LoginPath = "/Auth/Login";
     });
 
-var configureClient = (HttpClient client) => { client.BaseAddress = new Uri(builder.Configuration["BaseAddress"]); };
-
-builder.Services.AddRefitClient<IUsersApiService>().ConfigureHttpClient(configureClient);
-builder.Services.AddRefitClient<IBooksApiService>().ConfigureHttpClient(configureClient);
-builder.Services.AddRefitClient<IAuthorsApiService>().ConfigureHttpClient(configureClient);
+builder.Services.Configure<JwtOptions>(builder.Configuration.GetSection(JwtOptions.SectionName));
+builder.Services.AddRefitClients();
 
 var app = builder.Build();
 

@@ -64,7 +64,7 @@ const MobileTabSection = (props: MobileTabsSectionProps) => {
             </h4>
 
             <div className="px-4 py-2">
-                <AuthorBooks isMobile authorId={book.authorId} authorName={book.authorName}/>
+                <AuthorBooks book={book} isMobile authorId={book.authorId} authorName={book.authorName}/>
             </div>
         </div>
 
@@ -96,9 +96,10 @@ type AuthorBooks = {
     authorId: number;
     authorName: string;
     isMobile?: boolean;
+    book: Book;
 };
 const AuthorBooks = (props: AuthorBooks): JSX.Element => {
-    const {authorId, authorName} = props;
+    const {authorId, authorName, book} = props;
     const {data: booksData} = useQuery(
         ["author", authorId],
         () => authorApiHelper.getAllBooksByAuthorId(authorId)
@@ -121,9 +122,9 @@ const AuthorBooks = (props: AuthorBooks): JSX.Element => {
 
                 <ul className="list-disc ml-5">
                     {booksData && <div
-                        className="flex flex-col w-full justify-center items-center text-base font-normal mt-1">
+                        className="flex flex-col w-full justify-start items-start text-base font-normal mt-1">
                         {booksData
-                            .filter(book => book.id !== authorId)
+                            .filter(book => book.id !== book.id)
                             .map(book => <li key={book.id}>
                                 <Link
                                     to={`/books/${book.slug}`}
@@ -150,7 +151,7 @@ const AuthorBooks = (props: AuthorBooks): JSX.Element => {
         {booksData && <div
             className="flex flex-col w-full justify-center items-center text-base font-normal mt-1">
             {booksData
-                .filter(book => book.id !== authorId)
+                .filter(x => x.id !== book.id)
                 .map(book => <Link
                     key={book.id}
                     to={`/books/${book.slug}`}
@@ -171,11 +172,12 @@ const ChapterList = (props: ChapterListProps): JSX.Element => {
 
     const renderArray: JSX.Element[][] = [];
     const sizeOfRow = 3;
+
     chapters.forEach((chapter, index) => {
         if (index % sizeOfRow === 0) {
             renderArray.push([]);
         }
-        const actualIndex = index / sizeOfRow;
+        const actualIndex = Math.floor(index / sizeOfRow);
         renderArray[actualIndex].push(
             <Link
                 key={index}
@@ -239,7 +241,7 @@ const TabsSection = ({getChaptersResponse, book}: TabsSectionProps): JSX.Element
                         {book.longDescription}
                     </div>
 
-                    <AuthorBooks authorId={book.authorId} authorName={book.authorName}/>
+                    <AuthorBooks book={book} authorId={book.authorId} authorName={book.authorName}/>
                 </div>
             </div>
 
@@ -312,7 +314,7 @@ const BooksInfo = (): JSX.Element => {
                 navigate("/404");
             }
         })();
-    }, [pageIndex, pageSize, authContext.state.isLoggedIn]);
+    }, [pageIndex, pageSize, authContext.state.isLoggedIn, slug]);
 
     let avgStar = useMemo(() => {
         let _ = 0;

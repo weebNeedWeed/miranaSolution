@@ -21,10 +21,6 @@ const Loading = ({show}: LoadingProps): JSX.Element => {
         <AnimatePresence>
             {show && (
                 <motion.div
-                    initial={{
-                        opacity: 0.5,
-                    }}
-                    animate={{opacity: 1}}
                     exit={{opacity: 0}}
                     className="fixed top-0 left-0 w-full h-full bg-whiteChocolate z-[10000] flex items-center justify-center"
                 >
