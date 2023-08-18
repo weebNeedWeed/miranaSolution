@@ -12,5 +12,4 @@ public record UpdateBookRequest(
     int AuthorId,
     bool IsDone,
     Stream? ThumbnailImage,
-    string? ThumbnailImageExtension,
-    List<CheckboxItem> GenreCheckboxItems);
+    string? ThumbnailImageExtension);

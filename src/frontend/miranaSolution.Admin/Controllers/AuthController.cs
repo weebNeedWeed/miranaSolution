@@ -16,6 +16,7 @@ using Newtonsoft.Json;
 namespace miranaSolution.Admin.Controllers;
 
 [AllowAnonymous]
+[AutoValidateAntiforgeryToken]
 public class AuthController : Controller
 {
     private readonly IAuthApiService _authApiService;
@@ -39,7 +40,6 @@ public class AuthController : Controller
 
     [HttpPost]
     [AllowAnonymous]
-    [AutoValidateAntiforgeryToken]
     public async Task<IActionResult> Login([FromForm] LoginViewModel loginViewModel, [FromQuery] string? returnUrl)
     {
         ViewBag.ReturnUrl = returnUrl ?? "/";
@@ -82,7 +82,6 @@ public class AuthController : Controller
 
     [HttpPost]
     [Authorize]
-    [AutoValidateAntiforgeryToken]
     public async Task<IActionResult> Logout()
     {
         await HttpContext.SignOutAsync(
@@ -110,7 +109,10 @@ public class AuthController : Controller
             }, out var validatedToken);
 
             var jwtToken = (JwtSecurityToken)validatedToken;
-            if (!jwtToken.Claims.First(x => x.Type.Equals(ClaimTypes.Role)).Value.Contains(RolesConstant.Administrator)) return null;
+            if (!jwtToken.Claims
+                    .Where(x => x.Type.Equals(ClaimTypes.Role))
+                    .Select(x => x.Value)
+                    .Contains(RolesConstant.Administrator)) return null;
 
             var claimsIdentity = new ClaimsIdentity(
                 jwtToken.Claims, CookieAuthenticationDefaults.AuthenticationScheme);

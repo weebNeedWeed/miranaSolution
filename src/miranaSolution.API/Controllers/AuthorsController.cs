@@ -41,7 +41,7 @@ public class AuthorsController : ControllerBase
         return Ok(new ApiSuccessResult<AuthorVm>(createAuthorResponse.AuthorVm));
     }
 
-    [HttpPatch("{authorId:int}")]
+    [HttpPut("{authorId:int}")]
     public async Task<IActionResult> UpdateAuthor([FromRoute] int authorId, [FromBody] ApiUpdateAuthorRequest request)
     {
         try

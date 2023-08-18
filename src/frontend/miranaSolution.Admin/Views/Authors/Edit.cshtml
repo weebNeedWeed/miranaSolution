@@ -1,0 +1,26 @@
+﻿@model miranaSolution.API.ViewModels.Authors.ApiUpdateAuthorRequest
+
+@{
+    var authorId = (int)ViewData["AuthorId"]!;
+    ViewData["Title"] = $"Edit author #{authorId}";
+}
+
+<h1 class="mt-4">Edit author #@authorId</h1>
+<div class="card mb-4">
+    <div class="card-header">
+        <a asp-action="Index" class="btn btn-danger">Back</a>
+    </div>
+    <div class="card-body">
+        <form asp-route-id="@authorId" enctype="multipart/form-data" asp-action="Edit" asp-controller="Authors" method="POST">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+            <div class="form-group">
+                <label asp-for="Name">Name</label>
+                <input class="form-control" placeholder="Enter name" asp-for="Name">
+                <span asp-validation-for="Name" class="text-danger form-text"></span>
+            </div>
+            
+            <button type="submit" class="btn btn-primary mt-4">Submit</button>
+        </form>
+    </div>
+</div>

@@ -12864,3 +12864,9 @@ body {
     font-size: 0.75rem;
     border-radius: 0.375rem !important;
 }
+
+.row-table-action {
+    display: flex;
+    flex-direction: row;
+    gap: 10px;
+}

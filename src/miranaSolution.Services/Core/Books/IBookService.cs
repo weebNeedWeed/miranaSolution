@@ -19,4 +19,6 @@ public interface IBookService
     Task<GetAllBooksResponse> GetAllBooksAsync(GetAllBooksRequest request);
 
     Task<GetMostReadingBooksResponse> GetMostReadingBooks(GetMostReadingBooksRequest request);
+
+    Task AssignGenresAsync(AssignGenresRequest request);
 }

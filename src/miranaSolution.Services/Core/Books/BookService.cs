@@ -115,24 +115,6 @@ public class BookService : IBookService
                 await _imageSaver.SaveImageAsync(request.ThumbnailImage, request.ThumbnailImageExtension!);
         }
 
-        foreach (var item in request.GenreCheckboxItems)
-            if (!item.IsChecked)
-            {
-                var bookGenre = await _context.BookGenres
-                    .FirstOrDefaultAsync(x => x.BookId == book.Id && x.GenreId == item.Id);
-                if (bookGenre is not null) _context.BookGenres.Remove(bookGenre);
-            }
-            else
-            {
-                var bookGenre = new BookGenre
-                {
-                    BookId = book.Id,
-                    GenreId = item.Id
-                };
-
-                await _context.BookGenres.AddAsync(bookGenre);
-            }
-
         await _context.SaveChangesAsync();
 
         var bookVm = MapBookIntoBookVm(book);
@@ -230,6 +212,34 @@ public class BookService : IBookService
             .ToList();
 
         return new GetMostReadingBooksResponse(bookVms);
+    }
+
+    public async Task AssignGenresAsync(AssignGenresRequest request)
+    {
+        _validatorProvider.Validate(request);
+        
+        var book = await _context.Books.FindAsync(request.BookId);
+        if (book is null) throw new BookNotFoundException("The book with given Id does not exists.");
+        
+        foreach (var item in request.GenreCheckboxItems)
+            if (!item.IsChecked)
+            {
+                var bookGenre = await _context.BookGenres
+                    .FirstOrDefaultAsync(x => x.BookId == book.Id && x.GenreId == item.Id);
+                if (bookGenre is not null) _context.BookGenres.Remove(bookGenre);
+            }
+            else if(!await _context.BookGenres.AnyAsync(x => x.BookId == book.Id && x.GenreId == item.Id))
+            {
+                var bookGenre = new BookGenre
+                {
+                    BookId = book.Id,
+                    GenreId = item.Id
+                };
+
+                await _context.BookGenres.AddAsync(bookGenre);
+            }
+        
+        await _context.SaveChangesAsync();
     }
 
     private BookVm MapBookIntoBookVm(Book book)

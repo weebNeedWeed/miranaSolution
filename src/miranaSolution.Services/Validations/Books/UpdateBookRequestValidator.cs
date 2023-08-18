@@ -43,9 +43,5 @@ public class UpdateBookRequestValidator : AbstractValidator<UpdateBookRequest>
         RuleFor(x => x.AuthorId)
             .NotNull()
             .WithMessage("AuthorId không được để trống.");
-
-        RuleForEach(x => x.GenreCheckboxItems)
-            .NotNull()
-            .SetValidator(new CheckboxItemValidator());
     }
 }

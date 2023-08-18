@@ -11,5 +11,13 @@ public interface IAuthorsApiService
     Task<ApiResult<ApiGetAllAuthorsResponse>> GetAllAuthorAsync();
     
     [Post("/api/authors")]
-    Task<ApiResult<dynamic>> CreateAuthor(ApiCreateAuthorRequest request);
+    Task<ApiResult<dynamic>> CreateAuthorAsync(ApiCreateAuthorRequest request);
+
+    [Delete("/api/authors/{id}")]
+    Task<ApiResult<dynamic>> DeleteAuthorAsync(
+        [AliasAs("id")] int authorId);
+    
+    [Put("/api/authors/{id}")]
+    Task<ApiResult<dynamic>> UpdateAuthorAsync(
+        [AliasAs("id")] int authorId, [Body] ApiUpdateAuthorRequest request);
 }

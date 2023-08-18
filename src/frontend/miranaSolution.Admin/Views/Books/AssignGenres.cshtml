@@ -1,0 +1,34 @@
+﻿@model miranaSolution.API.ViewModels.Books.ApiAssignGenresRequest
+
+@{
+    ViewData["Title"] = "Assign genres #" + ViewData["BookId"];
+}
+
+<h1 class="mt-4">Edit book #@ViewData["BookId"]</h1>
+<div class="card mb-4">
+    <div class="card-header">
+        <a asp-action="Index" class="btn btn-danger">Back</a>
+    </div>
+    <div class="card-body">
+        <form enctype="multipart/form-data" asp-action="AssignGenres" asp-route-id="@ViewData["BookId"]" asp-controller="Books" method="POST">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            
+            <div class="form-group mt-4">
+                <label>Genres</label>
+                @for (var index = 0; index < Model.GenreCheckboxItems.Count; ++index)
+                {
+                    <div class="form-check">
+                        <input class="form-check-input"
+                               type="checkbox"
+                               asp-for="GenreCheckboxItems[index].IsChecked"/>
+                        <label class="form-check-label" asp-for="GenreCheckboxItems[index].IsChecked">@Model.GenreCheckboxItems[index].Label</label>
+                        <input type="hidden" asp-for="GenreCheckboxItems[index].Id"/>
+                        <input type="hidden" asp-for="GenreCheckboxItems[index].Label"/>
+                    </div>
+                }
+            </div>
+
+            <button type="submit" class="btn btn-primary mt-4">Submit</button>
+        </form>
+    </div>
+</div>

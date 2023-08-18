@@ -30,6 +30,10 @@ public static class ServiceCollectionExtensions
             .ConfigureHttpClient(ConfigureDefaultClient)
             .AddHttpMessageHandler<AuthHeaderHandler>();
         
+        services.AddRefitClient<IGenresApiService>()
+            .ConfigureHttpClient(ConfigureDefaultClient)
+            .AddHttpMessageHandler<AuthHeaderHandler>();
+        
         services.AddRefitClient<IAuthApiService>()
             .ConfigureHttpClient(ConfigureDefaultClient);
 

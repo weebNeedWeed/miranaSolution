@@ -6,6 +6,7 @@ using miranaSolution.Admin.Models;
 namespace miranaSolution.Admin.Controllers;
 
 [Authorize]
+[AutoValidateAntiforgeryToken]
 public class HomeController : Controller
 {
     private readonly ILogger<HomeController> _logger;

@@ -89,4 +89,22 @@ public class GenreService : IGenreService
 
         return response;
     }
+
+    public async Task<GetAllGenresByBookIdResponse> GetAllGenresByBookIdAsync(GetAllGenresByBookIdRequest request)
+    {
+        if (!await _context.Books.AnyAsync(x => x.Id == request.BookId))
+        {
+            throw new BookNotFoundException("The book with given Id does not exist.");
+        }
+
+        var genres = await _context.BookGenres
+            .Include(x => x.Genre)
+            .Where(x => x.BookId == request.BookId)
+            .ToListAsync();
+
+        var genreVms = genres.Select(x => new GenreVm(
+            x.GenreId, x.Genre!.Name)).ToList();
+
+        return new GetAllGenresByBookIdResponse(genreVms);
+    }
 }

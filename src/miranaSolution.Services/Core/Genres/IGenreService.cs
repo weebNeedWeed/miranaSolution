@@ -13,4 +13,6 @@ public interface IGenreService
     Task DeleteGenreAsync(DeleteGenreRequest request);
 
     Task<UpdateGenreResponse> UpdateGenreAsync(UpdateGenreRequest request);
+    
+    Task<GetAllGenresByBookIdResponse> GetAllGenresByBookIdAsync(GetAllGenresByBookIdRequest request);
 }

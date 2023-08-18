@@ -11,10 +11,6 @@
     <link href="https://cdn.jsdelivr.net/npm/simple-datatables@7.1.2/dist/style.min.css" rel="stylesheet"/>
 }
 
-@section Styles {
-    <link rel="stylesheet" href="~/css/books/index.css">
-}
-
 @section Scripts
 {
     <script src="https://cdn.jsdelivr.net/npm/simple-datatables@7.1.2/dist/umd/simple-datatables.min.js" crossorigin="anonymous"></script>
@@ -66,9 +62,20 @@
                                 <i class="fa-solid fa-book"></i>
                             </a>
 
-                            <a href="#" title="Edit">
+                            <a asp-route-id="@book.Id" asp-action="Edit" title="Edit">
                                 <i class="fa-solid fa-pen-to-square"></i>
                             </a>
+                            
+                            <a asp-route-id="@book.Id" asp-action="AssignGenres" title="Assign Genres">
+                                <i class="fa-solid fa-layer-group"></i>
+                            </a>
+                            
+                            <form method="POST" asp-action="DeleteBook">
+                                <input type="hidden" name="bookId" value="@book.Id">
+                                <button title="Delete" type="submit" class="p-0 text-danger bg-transparent border-0">
+                                    <i class="fa-solid fa-trash"></i>
+                                </button>
+                            </form>
                         </div>
                     </td>
                 </tr>

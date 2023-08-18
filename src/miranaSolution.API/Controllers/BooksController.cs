@@ -10,12 +10,14 @@ using miranaSolution.DTOs.Core.Books;
 using miranaSolution.DTOs.Core.BookUpvotes;
 using miranaSolution.DTOs.Core.Chapters;
 using miranaSolution.DTOs.Core.Comments;
+using miranaSolution.DTOs.Core.Genres;
 using miranaSolution.Services.Core.Bookmarks;
 using miranaSolution.Services.Core.BookRatings;
 using miranaSolution.Services.Core.Books;
 using miranaSolution.Services.Core.BookUpvotes;
 using miranaSolution.Services.Core.Chapters;
 using miranaSolution.Services.Core.Comments;
+using miranaSolution.Services.Core.Genres;
 using miranaSolution.Services.Exceptions;
 using miranaSolution.Utilities.Constants;
 
@@ -32,9 +34,10 @@ public class BooksController : ControllerBase
     private readonly IBookUpvoteService _bookUpvoteService;
     private readonly IChapterService _chapterService;
     private readonly ICommentService _commentService;
+    private readonly IGenreService _genreService;
 
     public BooksController(IBookService bookService, IChapterService chapterService, ICommentService commentService,
-        IBookUpvoteService bookUpvoteService, IBookRatingService bookRatingService, IBookmarkService bookmarkService)
+        IBookUpvoteService bookUpvoteService, IBookRatingService bookRatingService, IBookmarkService bookmarkService, IGenreService genreService)
     {
         _bookService = bookService;
         _chapterService = chapterService;
@@ -42,6 +45,7 @@ public class BooksController : ControllerBase
         _bookUpvoteService = bookUpvoteService;
         _bookRatingService = bookRatingService;
         _bookmarkService = bookmarkService;
+        _genreService = genreService;
     }
 
     // GET /api/books
@@ -267,8 +271,7 @@ public class BooksController : ControllerBase
                     request.AuthorId,
                     request.IsDone,
                     thumbnailImage,
-                    fileExtension,
-                    request.GenreCheckboxItems));
+                    fileExtension));
 
             return Ok(new ApiSuccessResult<BookVm>(updateBookResponse.BookVm));
         }
@@ -286,6 +289,28 @@ public class BooksController : ControllerBase
         }
     }
 
+    [HttpPost("{bookId:int}/genres")]
+    public async Task<IActionResult> UpdateBookGenres([FromRoute] int bookId, [FromForm] ApiAssignGenresRequest request)
+    {
+        try
+        {
+            await _bookService.AssignGenresAsync(
+                new AssignGenresRequest(
+                    bookId,
+                    request.GenreCheckboxItems));
+
+            return Ok(new ApiSuccessResult<object>());
+        }
+        catch (BookNotFoundException ex)
+        {
+            return Ok(new ApiErrorResult(ex.Message));
+        }
+        catch (GenreNotFoundException ex)
+        {
+            return Ok(new ApiErrorResult(ex.Message));
+        }
+    }
+    
     [HttpDelete("{bookId:int}")]
     public async Task<IActionResult> DeleteBook([FromRoute] int bookId)
     {
@@ -589,6 +614,24 @@ public class BooksController : ControllerBase
         }
     }
 
+    [HttpGet("{bookId:int}/genres")]
+    [AllowAnonymous]
+    public async Task<IActionResult> GetBookGenresByBookId([FromRoute] int bookId)
+    {
+        try
+        {
+            var getGenresResult = await _genreService.GetAllGenresByBookIdAsync(
+                new GetAllGenresByBookIdRequest(bookId));
+            var response = new ApiGetBookGenresByBookIdResponse(getGenresResult.GenreVms);
+
+            return Ok(new ApiSuccessResult<ApiGetBookGenresByBookIdResponse>(response));
+        }
+        catch (BookNotFoundException ex)
+        {
+            return Ok(new ApiErrorResult(ex.Message));
+        }
+    }
+    
     private Guid GetUserIdFromClaim()
     {
         var userId = User.Claims.First(

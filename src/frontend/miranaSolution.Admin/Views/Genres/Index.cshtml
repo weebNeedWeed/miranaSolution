@@ -1,6 +1,6 @@
-﻿@model miranaSolution.API.ViewModels.Authors.ApiGetAllAuthorsResponse
+﻿@model miranaSolution.API.ViewModels.Genres.ApiGetAllGenreResponse
 @{
-    ViewData["Title"] = "Authors";
+    ViewData["Title"] = "Genres";
 }
 
 @section LibResources
@@ -14,10 +14,10 @@
     <script src="~/js/datatables-simple-demo.js"></script>
 }
 
-<h1 class="mt-4">Authors</h1>
+<h1 class="mt-4">Genres</h1>
 <div class="card mb-4">
     <div class="card-header">
-        <a asp-action="Create" class="btn btn-success"><i class="fa-solid fa-plus"></i> Create new</a>
+        <a class="btn btn-success"><i class="fa-solid fa-plus"></i> Create new</a>
     </div>
     <div class="card-body">
         <table id="datatablesSimple">
@@ -29,23 +29,23 @@
             </tr>
             </thead>
             <tbody>
-            @foreach (var author in Model.Authors)
+            @foreach (var genre in Model.Genres)
             {
                 <tr>
-                    <td>@author.Id</td>
-                    <td>@author.Name</td>
+                    <td>@genre.Id</td>
+                    <td>@genre.Name</td>
                     <td>
                         <div class="row-table-action">
-                            <a asp-route-id="@author.Id" asp-action="Edit" title="Edit">
-                                <i class="fa-solid fa-pen-to-square"></i>
-                            </a>
-                            
-                            <form method="POST" asp-action="DeleteAuthor">
-                                <input type="hidden" name="authorId" value="@author.Id">
-                                <button title="Delete" type="submit" class="p-0 text-danger bg-transparent border-0">
-                                    <i class="fa-solid fa-trash"></i>
-                                </button>
-                            </form>
+                            @* <a asp-route-id="@author.Id" asp-action="Edit" title="Edit"> *@
+                            @*     <i class="fa-solid fa-pen-to-square"></i> *@
+                            @* </a> *@
+                            @* *@
+                            @* <form method="POST" asp-action="DeleteAuthor"> *@
+                            @*     <input type="hidden" name="authorId" value="@author.Id"> *@
+                            @*     <button title="Delete" type="submit" class="p-0 text-danger bg-transparent border-0"> *@
+                            @*         <i class="fa-solid fa-trash"></i> *@
+                            @*     </button> *@
+                            @* </form> *@
                         </div>
                     </td>
                 </tr>

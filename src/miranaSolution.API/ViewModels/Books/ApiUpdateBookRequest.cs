@@ -10,5 +10,4 @@ public record ApiUpdateBookRequest(
     string Slug,
     int AuthorId,
     bool IsDone,
-    IFormFile? ThumbnailImage,
-    List<CheckboxItem> GenreCheckboxItems);
+    IFormFile? ThumbnailImage);
