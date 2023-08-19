@@ -53,7 +53,7 @@ public class GenresController : ControllerBase
         return Ok(new ApiSuccessResult<GenreVm>(createGenreResponse.GenreVm));
     }
 
-    [HttpPatch("{genreId:int}")]
+    [HttpPut("{genreId:int}")]
     public async Task<IActionResult> UpdateGenre([FromRoute] int genreId, [FromBody] ApiUpdateGenreRequest request)
     {
         try

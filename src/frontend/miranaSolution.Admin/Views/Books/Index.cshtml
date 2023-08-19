@@ -19,8 +19,17 @@
 
 <h1 class="mt-4">Books</h1>
 <div class="card mb-4">
-    <div class="card-header">
+    <div class="card-header d-flex justify-content-between">
         <a asp-action="Create" class="btn btn-success"><i class="fa-solid fa-plus"></i> Create new</a>
+    
+        <form method="GET">
+            <div class="input-group">
+                <input name="keyword" class="form-control" type="text" placeholder="Search for..." aria-label="Search for..." aria-describedby="btnNavbarSearch"/>
+                <button class="btn btn-primary" id="btnNavbarSearch" type="button">
+                    <i class="fas fa-search"></i>
+                </button>
+            </div>
+        </form>
     </div>
     <div class="card-body">
         <table id="datatablesSimple">
@@ -70,8 +79,7 @@
                                 <i class="fa-solid fa-layer-group"></i>
                             </a>
                             
-                            <form method="POST" asp-action="DeleteBook">
-                                <input type="hidden" name="bookId" value="@book.Id">
+                            <form method="POST" asp-action="DeleteBook" asp-route-id="@book.Id">
                                 <button title="Delete" type="submit" class="p-0 text-danger bg-transparent border-0">
                                     <i class="fa-solid fa-trash"></i>
                                 </button>

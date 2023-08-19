@@ -53,9 +53,9 @@ public class AuthorsController : Controller
     }
 
     [HttpPost]
-    public async Task<IActionResult> DeleteAuthor([FromForm] int authorId)
+    public async Task<IActionResult> DeleteAuthor([FromRoute] int id)
     {
-        await _authorsApiService.DeleteAuthorAsync(authorId);
+        await _authorsApiService.DeleteAuthorAsync(id);
         return RedirectToAction("Index");
     }
 

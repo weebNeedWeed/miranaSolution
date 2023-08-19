@@ -32,7 +32,9 @@ public class BooksController : Controller
 
     // GET /books
     [HttpGet]
-    public async Task<IActionResult> Index([FromQuery] int pageIndex = 1, [FromQuery] int pageSize = 10,
+    public async Task<IActionResult> Index(
+        [FromQuery] int pageIndex = 1, 
+        [FromQuery] int pageSize = 10,
         [FromQuery] string keyword = "")
     {
         var books = await _booksApiService.GetAllBooksAsync(
@@ -163,9 +165,9 @@ public class BooksController : Controller
     }
 
     [HttpPost]
-    public async Task<IActionResult> DeleteBook([FromForm] int bookId)
+    public async Task<IActionResult> DeleteBook([FromRoute] int id)
     {
-        await _booksApiService.DeleteBookAsync(bookId);
+        await _booksApiService.DeleteBookAsync(id);
         return RedirectToAction("Index");
     }
 

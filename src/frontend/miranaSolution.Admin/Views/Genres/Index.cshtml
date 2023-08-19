@@ -17,7 +17,7 @@
 <h1 class="mt-4">Genres</h1>
 <div class="card mb-4">
     <div class="card-header">
-        <a class="btn btn-success"><i class="fa-solid fa-plus"></i> Create new</a>
+        <a asp-action="Create" class="btn btn-success"><i class="fa-solid fa-plus"></i> Create new</a>
     </div>
     <div class="card-body">
         <table id="datatablesSimple">
@@ -36,16 +36,15 @@
                     <td>@genre.Name</td>
                     <td>
                         <div class="row-table-action">
-                            @* <a asp-route-id="@author.Id" asp-action="Edit" title="Edit"> *@
-                            @*     <i class="fa-solid fa-pen-to-square"></i> *@
-                            @* </a> *@
-                            @* *@
-                            @* <form method="POST" asp-action="DeleteAuthor"> *@
-                            @*     <input type="hidden" name="authorId" value="@author.Id"> *@
-                            @*     <button title="Delete" type="submit" class="p-0 text-danger bg-transparent border-0"> *@
-                            @*         <i class="fa-solid fa-trash"></i> *@
-                            @*     </button> *@
-                            @* </form> *@
+                            <a asp-route-id="@genre.Id" asp-action="Edit" title="Edit">
+                                <i class="fa-solid fa-pen-to-square"></i>
+                            </a>
+                            
+                            <form method="POST" asp-action="Delete" asp-route-id="@genre.Id">
+                                <button title="Delete" type="submit" class="p-0 text-danger bg-transparent border-0">
+                                    <i class="fa-solid fa-trash"></i>
+                                </button>
+                            </form>
                         </div>
                     </td>
                 </tr>

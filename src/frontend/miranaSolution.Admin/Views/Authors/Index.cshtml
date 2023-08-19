@@ -40,8 +40,7 @@
                                 <i class="fa-solid fa-pen-to-square"></i>
                             </a>
                             
-                            <form method="POST" asp-action="DeleteAuthor">
-                                <input type="hidden" name="authorId" value="@author.Id">
+                            <form method="POST" asp-action="DeleteAuthor" asp-route-id="@author.Id">
                                 <button title="Delete" type="submit" class="p-0 text-danger bg-transparent border-0">
                                     <i class="fa-solid fa-trash"></i>
                                 </button>
