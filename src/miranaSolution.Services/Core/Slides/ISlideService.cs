@@ -9,4 +9,8 @@ public interface ISlideService
     Task<GetSlideByIdResponse> GetSlideByIdAsync(GetSlideByIdRequest request);
 
     Task<CreateSlideResponse> CreateSlideAsync(CreateSlideRequest request);
+
+    Task<UpdateSlideResponse> UpdateSlideAsync(UpdateSlideRequest request);
+
+    Task DeleteSlideAsync(DeleteSlideRequest request);
 }

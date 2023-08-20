@@ -23,4 +23,6 @@ public interface IUserService
     Task<IncreaseReadBookCountBy1Response> IncreaseReadBookCountBy1Async(IncreaseReadBookCountBy1Request request);
 
     Task<IncreaseReadChapterCountBy1Response> IncreaseReadChapterCountBy1Async(IncreaseReadChapterCountBy1Request request);
+
+    Task<GetAllUsersResponse> GetAllUsersAsync(GetAllUsersRequest request);
 }

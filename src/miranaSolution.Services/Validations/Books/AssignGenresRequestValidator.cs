@@ -8,7 +8,6 @@ public class AssignGenresRequestValidator : AbstractValidator<AssignGenresReques
 {
     public AssignGenresRequestValidator()
     {
-        
         RuleForEach(x => x.GenreCheckboxItems)
             .NotNull()
             .SetValidator(new CheckboxItemValidator());

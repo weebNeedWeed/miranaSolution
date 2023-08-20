@@ -1,6 +1,8 @@
 ﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using miranaSolution.Data.Entities;
 using miranaSolution.DTOs.Authentication.Users;
+using miranaSolution.DTOs.Common;
 using miranaSolution.Services.Exceptions;
 using miranaSolution.Services.Systems.Images;
 using miranaSolution.Services.Systems.JwtTokenGenerators;
@@ -203,6 +205,32 @@ public class UserService : IUserService
         await _userManager.UpdateAsync(user);
 
         return new IncreaseReadChapterCountBy1Response(user.ReadChapterCount);
+    }
+
+    public async Task<GetAllUsersResponse> GetAllUsersAsync(GetAllUsersRequest request)
+    {
+        var query = _userManager.Users;
+        if (request.Keyword is not null)
+        {
+            query = query.Where(
+                x => x.FirstName.Contains(request.Keyword)
+                     || x.LastName.Contains(request.Keyword)
+                     || x.Email.Contains(request.Keyword));
+        }
+
+        var totalRecords = await query.CountAsync();
+        var pageSize = request.PagerRequest.PageSize;
+        var pageIndex = request.PagerRequest.PageIndex;
+
+        query = query.Skip((pageIndex - 1) * pageSize)
+            .Take(pageSize);
+
+        var users = await query.ToListAsync();
+        var userVms = users.Select(MapUserIntoUserVm).ToList();
+        var pagerResponse = new PagerResponse(
+            pageIndex, pageSize, totalRecords);
+        
+        return new GetAllUsersResponse(userVms, pagerResponse);
     }
 
     private UserVm MapUserIntoUserVm(AppUser user)

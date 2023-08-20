@@ -4,6 +4,7 @@ using miranaSolution.API.ViewModels.Common;
 using miranaSolution.API.ViewModels.Slides;
 using miranaSolution.DTOs.Core.Slides;
 using miranaSolution.Services.Core.Slides;
+using miranaSolution.Services.Exceptions;
 using miranaSolution.Utilities.Constants;
 
 namespace miranaSolution.API.Controllers;
@@ -25,7 +26,9 @@ public class SlidesController : ControllerBase
     public async Task<IActionResult> GetAllSlides()
     {
         var getAllSlidesResponse = await _slideService.GetAllSlidesAsync();
-        return Ok(new ApiSuccessResult<List<SlideVm>>(getAllSlidesResponse.SlideVms));
+        return Ok(
+            new ApiSuccessResult<ApiGetAllSlidesResponse>(
+                new(getAllSlidesResponse.SlideVms)));
     }
 
     [HttpGet("{slideId}")]
@@ -42,16 +45,81 @@ public class SlidesController : ControllerBase
     }
 
     [HttpPost]
-    public async Task<IActionResult> CreateSlide([FromBody] ApiCreateSlideRequest request)
+    [Consumes("multipart/form-data")]
+    public async Task<IActionResult> CreateSlide([FromForm] ApiCreateSlideRequest request)
     {
-        var createSlideResponse = await _slideService.CreateSlideAsync(
-            new CreateSlideRequest(
-                request.Name,
-                request.ShortDescription,
-                request.ThumbnailImage,
-                request.Genres,
-                request.SortOrder));
+        var stream = request.ThumbnailImage.OpenReadStream();
+        var ext = Path.GetExtension(request.ThumbnailImage.FileName);
 
-        return Ok(new ApiSuccessResult<SlideVm>(createSlideResponse.SlideVm));
+        try
+        {
+            var createSlideResponse = await _slideService.CreateSlideAsync(
+                new CreateSlideRequest(
+                    request.Name,
+                    request.ShortDescription,
+                    request.Genres,
+                    request.SortOrder,
+                    stream,
+                    ext));
+
+            return Ok(new ApiSuccessResult<SlideVm>(createSlideResponse.SlideVm));
+        }
+        catch (InvalidImageExtensionException ex)
+        {
+            return Ok(new ApiErrorResult(ex.Message));
+        } 
+       
+    }
+
+    [HttpDelete("{slideId:int}")]
+    public async Task<IActionResult> DeleteSlide([FromRoute] int slideId)
+    {
+        try
+        {
+            await _slideService.DeleteSlideAsync(
+                new DeleteSlideRequest(slideId));
+
+            return Ok(new ApiSuccessResult<object>());
+        }
+        catch (SlideNotFoundException ex)
+        {
+            return Ok(new ApiErrorResult(ex.Message));
+        }
+    }
+    
+    [HttpPut("{slideId:int}")]
+    public async Task<IActionResult> UpdateSlide([FromRoute] int slideId,
+        [FromBody] ApiUpdateSlideRequest request)
+    {
+        Stream? stream = null;
+        string? ext = null;
+
+        if (request.ThumbnailImage is not null)
+        {
+            stream = request.ThumbnailImage.OpenReadStream();
+            ext = Path.GetExtension(request.ThumbnailImage.FileName);
+        }
+        
+        try {
+            var updateSlideResponse = await _slideService.UpdateSlideAsync(
+                    new UpdateSlideRequest(
+                        slideId,
+                        request.Name,
+                        request.ShortDescription,
+                        request.Genres,
+                        request.SortOrder,
+                        stream,
+                        ext));
+
+            return Ok(new ApiSuccessResult<SlideVm>(updateSlideResponse.SlideVm));
+        }
+        catch (SlideNotFoundException ex)
+        {
+            return Ok(new ApiErrorResult(ex.Message));
+        }
+        catch (InvalidImageExtensionException ex)
+        {
+            return Ok(new ApiErrorResult(ex.Message));
+        } 
     }
 }

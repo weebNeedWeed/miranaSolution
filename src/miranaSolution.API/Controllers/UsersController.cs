@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using miranaSolution.API.ViewModels.Common;
 using miranaSolution.API.ViewModels.Users;
 using miranaSolution.DTOs.Authentication.Users;
+using miranaSolution.DTOs.Common;
 using miranaSolution.DTOs.Core.Bookmarks;
 using miranaSolution.DTOs.Core.BookRatings;
 using miranaSolution.DTOs.Core.BookUpvotes;
@@ -254,6 +255,28 @@ public class UsersController : ControllerBase
             return Ok(new ApiErrorResult(ex.Message));
         }
     }
+
+    [HttpGet]
+    [Authorize(Roles = RolesConstant.Administrator)]
+    public async Task<IActionResult> GetAllUsers([FromQuery] ApiGetAllUsersRequest request)
+    {
+        var getAllUsersResponse = await _userService.GetAllUsersAsync(
+            new GetAllUsersRequest(
+                request.Keyword,
+                new PagerRequest(request.PageIndex, request.PageSize)));
+
+        var (userVms, pagerResponse) = getAllUsersResponse;
+
+        var response = new ApiGetAllUsersResponse(
+            userVms,
+            pagerResponse.PageIndex,
+            pagerResponse.PageSize,
+            pagerResponse.TotalRecords,
+            pagerResponse.TotalPages);
+
+        return Ok(new ApiSuccessResult<ApiGetAllUsersResponse>(response));
+    }
+    
     
     private string GetUserNameFromClaims()
     {
