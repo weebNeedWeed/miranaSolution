@@ -16,14 +16,16 @@ const Header = (): JSX.Element => {
 
     const {isLoading, error, data} = useQuery(
         "slides",
-        () => slideApiHelper.getAll(),
+        () => slideApiHelper.getAllSlides(),
     );
 
     if (isLoading || error || !data) {
         return <></>;
     }
 
-    const currentSlide = data![slideIndex];
+    const slides = data.slides;
+
+    const currentSlide = slides![slideIndex];
 
     const genres = currentSlide.genres.split(",").map((elm) => elm.trim());
 
@@ -67,7 +69,7 @@ const Header = (): JSX.Element => {
 
                 <div className="w-full sm:w-1/2 mb-4 p-2 md:w-1/3 flex flex-row items-center justify-end">
                     <Slider
-                        images={data!.map((elm) => elm.thumbnailImage)}
+                        images={slides!.map((elm) => elm.thumbnailImage)}
                         setSlideIndex={setSlideIndex}
                     />
                 </div>

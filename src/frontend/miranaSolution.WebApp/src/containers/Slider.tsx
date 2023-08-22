@@ -5,6 +5,7 @@ import SwiperClass from "swiper/types/swiper-class";
 import "swiper/css";
 import "swiper/css/effect-cube";
 import "swiper/css/effect-fade";
+import {useBaseUrl} from "../helpers/hooks/useBaseUrl";
 
 type SliderProps = {
     images: Array<string>;
@@ -15,12 +16,13 @@ type SwiperChildSlideProps = {
 };
 
 const SwiperSlideChild = ({image}: SwiperChildSlideProps): JSX.Element => {
+    const baseUrl = useBaseUrl();
     return (
         <div
             className={`w-[150px] h-[224px] sm:w-[215px] sm:h-[322px] bg-cover bg-center`}
             style={{
                 boxShadow: "rgba(0, 0, 0, 0.35) 0px 5px 15px",
-                backgroundImage: `url('${image}')`,
+                backgroundImage: `url('${baseUrl}/${image}')`,
             }}
         ></div>
     );
