@@ -1,0 +1,48 @@
+﻿@model miranaSolution.API.ViewModels.Slides.ApiUpdateSlideRequest
+
+@{
+    ViewData["Title"] = "Edit slide #" + ViewData["SlideId"];
+}
+
+<h1 class="mt-4">Edit slide #@ViewData["SlideId"]</h1>
+<div class="card mb-4">
+    <div class="card-header">
+        <a asp-action="Index" class="btn btn-danger">Back</a>
+    </div>
+    <div class="card-body">
+        <form enctype="multipart/form-data" asp-action="Edit" method="POST">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+            <div class="form-group">
+                <label asp-for="Name">Name</label>
+                <input class="form-control" placeholder="Enter name" asp-for="Name">
+                <span asp-validation-for="Name" class="text-danger form-text"></span>
+            </div>
+            
+            <div class="form-group mt-4">
+                <label asp-for="ShortDescription">Short description</label>
+                <textarea class="form-control" asp-for="ShortDescription" placeholder="Enter short description" rows="4"></textarea>
+                <span asp-validation-for="ShortDescription" class="text-danger form-text"></span>
+            </div>
+
+            <div class="form-group mt-4">
+                <label asp-for="Genres">Genres (Separating by ,)</label>
+                <input class="form-control" placeholder="Enter genres (Separating by ,)" asp-for="Genres">
+                <span asp-validation-for="Genres" class="text-danger form-text"></span>
+            </div>
+            
+            <div class="form-group mt-4">
+                <label asp-for="SortOrder">Sort Order (> 0)</label>
+                <input class="form-control" placeholder="Enter sort order" asp-for="SortOrder" type="number">
+                <span asp-validation-for="SortOrder" class="text-danger form-text"></span>
+            </div>
+            
+            <div class="input-group mt-4 d-flex flex-column">
+                <input type="file" asp-for="ThumbnailImage">
+                <span asp-validation-for="ThumbnailImage" class="text-danger form-text"></span>
+            </div>
+
+            <button type="submit" class="btn btn-primary mt-4">Submit</button>
+        </form>
+    </div>
+</div>

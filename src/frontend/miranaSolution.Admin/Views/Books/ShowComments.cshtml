@@ -1,0 +1,72 @@
+﻿@using miranaSolution.Admin.ViewModels.Common
+@using Microsoft.AspNetCore.Mvc.TagHelpers
+@model miranaSolution.API.ViewModels.Books.ApiGetAllBookCommentsResponse
+
+@{
+    ViewData["title"] = "Comments Of " + ViewBag.Book.Name;
+}
+
+@section LibResources
+{
+    <link href="https://cdn.jsdelivr.net/npm/simple-datatables@7.1.2/dist/style.min.css" rel="stylesheet"/>
+}
+
+@section Scripts
+{
+    <script src="https://cdn.jsdelivr.net/npm/simple-datatables@7.1.2/dist/umd/simple-datatables.min.js" crossorigin="anonymous"></script>
+    <script src="~/js/datatables-simple-demo.js"></script>
+}
+
+<h1 class="mt-4">Comments of @ViewBag.Book.Name</h1>
+<div class="card mb-4">
+    <div class="card-header">
+        <a
+            asp-action="Index"
+            class="btn btn-danger">
+            Back
+        </a>
+    </div>
+    <div class="card-body">
+        <table id="datatablesSimple">
+            <thead>
+            <tr>
+                <th>Id</th>
+                <th>Content</th>
+                <th></th>
+            </tr>
+            </thead>
+            <tbody>
+            @foreach (var comment in Model.Comments)
+            {
+                <tr>
+                    <td>@comment.Id</td>
+                    <td>@comment.Content</td>
+                    <td>
+                        <div class="row-table-action">
+                            @if (comment.ParentId is null)
+                            {
+                                <a asp-route-parentId="@comment.Id" asp-action="ShowComments" title="Show replies">
+                                    <i class="fa-solid fa-comment"></i>
+                                </a>
+                            }
+
+                            <form method="POST" asp-action="DeleteComment">
+                                <input name="bookId" type="hidden" value="@comment.BookId"/>
+                                <input name="commentId" type="hidden" value="@comment.Id"/>
+                                <button title="Delete" type="submit" class="p-0 text-danger bg-transparent border-0">
+                                    <i class="fa-solid fa-trash"></i>
+                                </button>
+                            </form>
+                        </div>
+                    </td>
+                </tr>
+            }
+            </tbody>
+        </table>
+    </div>
+
+    <div class="card-body">
+        @await Component.InvokeAsync("Pager", new PagerResult(
+                   Model.PageIndex, Model.PageSize, Model.TotalPages))
+    </div>
+</div>

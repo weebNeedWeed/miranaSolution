@@ -23,8 +23,7 @@ public class AuthenticationController : ControllerBase
         _userService = userService;
         _passwordRecoveryService = passwordRecoveryService;
     }
-
-    // TODO: Implement the credentials validation here
+    
     [HttpPost("register")]
     public async Task<IActionResult> RegisterUser([FromBody] ApiRegisterUserRequest request)
     {

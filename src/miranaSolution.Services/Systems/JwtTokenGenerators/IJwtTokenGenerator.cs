@@ -4,5 +4,5 @@ namespace miranaSolution.Services.Systems.JwtTokenGenerators;
 
 public interface IJwtTokenGenerator
 {
-    string GenerateToken(AppUser user);
+    Task<string> GenerateTokenAsync(AppUser user);
 }

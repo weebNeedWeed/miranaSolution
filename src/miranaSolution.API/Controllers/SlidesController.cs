@@ -11,7 +11,7 @@ namespace miranaSolution.API.Controllers;
 
 [Route("api/[controller]")]
 [ApiController]
-[Authorize(Roles = RolesConstant.Administrator)]
+[Authorize]
 public class SlidesController : ControllerBase
 {
     private readonly ISlideService _slideService;
@@ -46,6 +46,7 @@ public class SlidesController : ControllerBase
 
     [HttpPost]
     [Consumes("multipart/form-data")]
+    [Authorize(Roles = RolesConstant.Administrator)]
     public async Task<IActionResult> CreateSlide([FromForm] ApiCreateSlideRequest request)
     {
         var stream = request.ThumbnailImage.OpenReadStream();
@@ -72,6 +73,7 @@ public class SlidesController : ControllerBase
     }
 
     [HttpDelete("{slideId:int}")]
+    [Authorize(Roles = RolesConstant.Administrator)]
     public async Task<IActionResult> DeleteSlide([FromRoute] int slideId)
     {
         try
@@ -87,9 +89,10 @@ public class SlidesController : ControllerBase
         }
     }
     
-    [HttpPut("{slideId:int}")]
+    [HttpPost("{slideId:int}")]
+    [Authorize(Roles = RolesConstant.Administrator)]
     public async Task<IActionResult> UpdateSlide([FromRoute] int slideId,
-        [FromBody] ApiUpdateSlideRequest request)
+        [FromForm] ApiUpdateSlideRequest request)
     {
         Stream? stream = null;
         string? ext = null;

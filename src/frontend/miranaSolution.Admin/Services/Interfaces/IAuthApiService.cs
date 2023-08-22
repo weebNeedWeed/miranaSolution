@@ -9,4 +9,7 @@ public interface IAuthApiService
 {
     [Post("/auth/authenticate")]
     Task<ApiResult<ApiAuthenticateUserResponse>> AuthenticateUserAsync([Body] AuthenticateUserRequest request);
+
+    [Post("/auth/register")]
+    Task<ApiResult<dynamic>> RegisterUserAsync([Body] ApiRegisterUserRequest request);
 }

@@ -12,14 +12,16 @@ public class JwtTokenGenerator : IJwtTokenGenerator
 {
     private readonly JwtOptions _jwtOptions;
     private readonly RoleManager<AppRole> _roleManager;
+    private readonly UserManager<AppUser> _userManager;
 
-    public JwtTokenGenerator(IOptions<JwtOptions> jwtOptions, RoleManager<AppRole> roleManager)
+    public JwtTokenGenerator(IOptions<JwtOptions> jwtOptions, RoleManager<AppRole> roleManager, UserManager<AppUser> userManager)
     {
         _roleManager = roleManager;
+        _userManager = userManager;
         _jwtOptions = jwtOptions.Value;
     }
 
-    public string GenerateToken(AppUser user)
+    public async Task<string> GenerateTokenAsync(AppUser user)
     {
         var claims = new List<Claim>
         {
@@ -31,8 +33,8 @@ public class JwtTokenGenerator : IJwtTokenGenerator
             new(JwtRegisteredClaimNames.Sub, user.UserName)
         };
 
-        var roles = _roleManager.Roles.ToList();
-        roles.ForEach(role => { claims.Add(new Claim(ClaimTypes.Role, role.Name)); });
+        var roles = await _userManager.GetRolesAsync(user);
+        roles.ToList().ForEach(role => { claims.Add(new Claim(ClaimTypes.Role, role)); });
 
         var signingCredentials = new SigningCredentials(
             new SymmetricSecurityKey(

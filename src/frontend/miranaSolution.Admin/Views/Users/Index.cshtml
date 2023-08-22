@@ -1,9 +1,11 @@
+﻿@model miranaSolution.API.ViewModels.Users.ApiGetAllUsersResponse
 @using miranaSolution.DTOs.Common
 @using miranaSolution.Admin.ViewModels.Common
-@model miranaSolution.API.ViewModels.Books.ApiGetAllBooksResponse
+@using System.Security.Claims
+@using System.IdentityModel.Tokens.Jwt
 
 @{
-    ViewData["title"] = "Books";
+    ViewData["title"] = "Users";
 }
 
 @section LibResources
@@ -17,7 +19,7 @@
     <script src="~/js/datatables-simple-demo.js"></script>
 }
 
-<h1 class="mt-4">Books</h1>
+<h1 class="mt-4">Users</h1>
 <div class="card mb-4">
     <div class="card-header d-flex justify-content-between">
         <a asp-action="Create" class="btn btn-success"><i class="fa-solid fa-plus"></i> Create new</a>
@@ -36,54 +38,34 @@
             <thead>
             <tr>
                 <th>Id</th>
-                <th>Name</th>
-                <th>Author</th>
-                <th>Updated At</th>
-                <th>Is Recommended</th>
+                <th>First Name</th>
+                <th>Last Name</th>
+                <th>Email</th>
+                <th>Username</th>
                 <th></th>
             </tr>
             </thead>
             <tbody>
-            @foreach (var book in Model.Books)
+            @foreach (var user in Model.Users)
             {
+                @if (user.UserName ==
+                     User.Claims.FirstOrDefault(x => x.Type.Equals(JwtRegisteredClaimNames.Sub))!.Value)
+                {
+                    continue;
+                }
                 <tr>
-                    <td>@book.Id</td>
-                    <td>@book.Name</td>
-                    <td>@book.AuthorName</td>
-                    <td>@book.UpdatedAt</td>
-                    <td>
-                        @if (book.IsRecommended)
-                        {
-                            <span class="text-success">
-                                @book.IsRecommended
-                            </span>
-                        }
-                        else
-                        {
-                            <span class="text-danger">
-                                @book.IsRecommended
-                            </span>
-                        }
-                    </td>
+                    <td>@user.Id</td>
+                    <td>@user.FirstName</td>
+                    <td>@user.LastName</td>
+                    <td>@user.Email</td>
+                    <td>@user.UserName</td>
                     <td>
                         <div class="row-table-action">
-                            <a asp-action="ShowChapters" asp-route-id="@book.Id" title="Chapters">
-                                <i class="fa-solid fa-book"></i>
-                            </a>
-
-                            <a asp-route-id="@book.Id" asp-action="Edit" title="Edit">
-                                <i class="fa-solid fa-pen-to-square"></i>
-                            </a>
-                            
-                            <a asp-route-id="@book.Id" asp-action="AssignGenres" title="Assign Genres">
+                            <a asp-route-id="@user.Id" asp-action="AssignRoles" title="Assign Roles">
                                 <i class="fa-solid fa-layer-group"></i>
                             </a>
                             
-                            <a asp-route-id="@book.Id" asp-action="ShowComments" title="Comments">
-                                <i class="fa-solid fa-comment"></i>
-                            </a>
-                            
-                            <form method="POST" asp-action="DeleteBook" asp-route-id="@book.Id">
+                            <form asp-action="Delete" method="POST" asp-route-id="@user.Id">
                                 <button title="Delete" type="submit" class="p-0 text-danger bg-transparent border-0">
                                     <i class="fa-solid fa-trash"></i>
                                 </button>

@@ -12,7 +12,7 @@ namespace miranaSolution.API.Controllers;
 
 [Route("api/[controller]")]
 [ApiController]
-[Authorize(Roles = RolesConstant.Administrator)]
+[Authorize]
 public class AuthorsController : ControllerBase
 {
     private readonly IAuthorService _authorService;
@@ -33,6 +33,7 @@ public class AuthorsController : ControllerBase
     }
 
     [HttpPost]
+    [Authorize(Roles = RolesConstant.Administrator)]
     public async Task<IActionResult> CreateAuthor([FromBody] ApiCreateAuthorRequest request)
     {
         var createAuthorResponse = await _authorService.CreateAuthorAsync(
@@ -42,6 +43,7 @@ public class AuthorsController : ControllerBase
     }
 
     [HttpPut("{authorId:int}")]
+    [Authorize(Roles = RolesConstant.Administrator)]
     public async Task<IActionResult> UpdateAuthor([FromRoute] int authorId, [FromBody] ApiUpdateAuthorRequest request)
     {
         try
@@ -59,6 +61,7 @@ public class AuthorsController : ControllerBase
     }
 
     [HttpDelete("{authorId:int}")]
+    [Authorize(Roles = RolesConstant.Administrator)]
     public async Task<IActionResult> DeleteAuthor([FromRoute] int authorId)
     {
         try

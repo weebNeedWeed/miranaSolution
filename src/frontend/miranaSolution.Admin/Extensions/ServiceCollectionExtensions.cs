@@ -22,15 +22,27 @@ public static class ServiceCollectionExtensions
             .ConfigureHttpClient(ConfigureDefaultClient)
             .AddHttpMessageHandler<AuthHeaderHandler>();
         
+        services.AddRefitClient<IRolesApiService>()
+            .ConfigureHttpClient(ConfigureDefaultClient)
+            .AddHttpMessageHandler<AuthHeaderHandler>();
+        
         services.AddRefitClient<IBooksApiService>()
             .ConfigureHttpClient(ConfigureDefaultClient)
-            .AddHttpMessageHandler<AuthHeaderHandler>();;
+            .AddHttpMessageHandler<AuthHeaderHandler>();
+        
+        services.AddRefitClient<ICommentApiService>()
+            .ConfigureHttpClient(ConfigureDefaultClient)
+            .AddHttpMessageHandler<AuthHeaderHandler>();
         
         services.AddRefitClient<IAuthorsApiService>()
             .ConfigureHttpClient(ConfigureDefaultClient)
             .AddHttpMessageHandler<AuthHeaderHandler>();
         
         services.AddRefitClient<IGenresApiService>()
+            .ConfigureHttpClient(ConfigureDefaultClient)
+            .AddHttpMessageHandler<AuthHeaderHandler>();
+        
+        services.AddRefitClient<ISlidesApiService>()
             .ConfigureHttpClient(ConfigureDefaultClient)
             .AddHttpMessageHandler<AuthHeaderHandler>();
         

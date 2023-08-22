@@ -19,15 +19,17 @@ public class BooksController : Controller
     private readonly IBooksApiService _booksApiService;
     private readonly IAuthorsApiService _authorsApiService;
     private readonly IGenresApiService _genresApiService;
+    private readonly ICommentApiService _commentApiService;
     private readonly IConfiguration _configuration;
 
     public BooksController(IBooksApiService booksApiService, IAuthorsApiService authorsApiService,
-        IGenresApiService genresApiService, IConfiguration configuration)
+        IGenresApiService genresApiService, IConfiguration configuration, ICommentApiService commentApiService)
     {
         _booksApiService = booksApiService;
         _authorsApiService = authorsApiService;
         _genresApiService = genresApiService;
         _configuration = configuration;
+        _commentApiService = commentApiService;
     }
 
     // GET /books
@@ -273,9 +275,6 @@ public class BooksController : Controller
     public async Task<IActionResult> AssignGenres([FromRoute] int id,[FromForm] ApiAssignGenresRequest request)
     {
         ViewData["BookId"] = id;
-
-        var result = await _booksApiService.GetBookByIdAsync(id);
-        var book = result.Data;
         
         var token = HttpContext.Session.GetString(Constants.AccessToken);
         using var client = new HttpClient();
@@ -286,7 +285,7 @@ public class BooksController : Controller
             "Bearer", token!);
         
         var _response = await client.PostAsync(
-            $"/api/books/{book.Id}/genres",request.ToFormData());
+            $"/api/books/{id}/genres",request.ToFormData());
         
         var content = await _response.Content.ReadAsStringAsync();
         var response = JsonConvert.DeserializeObject<ApiResult<dynamic>>(content);
@@ -308,7 +307,27 @@ public class BooksController : Controller
         
         return RedirectToAction("Index");
     }
-    
+
+    [HttpGet]
+    public async Task<IActionResult> ShowComments([FromRoute] int id, [FromQuery] ApiGetAllBookCommentsRequest request)
+    {
+        var book = await _booksApiService.GetBookByIdAsync(id);
+        if (book.Status is null || book.Status == "fail" || book.Status == "error") return RedirectToAction("Index");
+
+        ViewBag.Book = book.Data;
+        
+        var getCommentsResponse = await _commentApiService.GetAllCommentsByBookIdAsync(
+            id, request);
+        return View(getCommentsResponse.Data);
+    }
+
+    [HttpPost]
+    public async Task<IActionResult> DeleteComment([FromForm] int bookId, [FromForm] int commentId)
+    {
+        await _commentApiService.DeleteCommentAsync(bookId, commentId);
+        return RedirectToAction("Index");
+    }
+
     private async Task<List<CheckboxItem>> GetGenreCheckboxItemsAsync(int bookId)
     {
         var result = await _booksApiService.GetAllGenresByBookIdAsync(bookId);

@@ -1,12 +1,14 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using miranaSolution.Data.Entities;
+using miranaSolution.DTOs.Authentication.Roles;
 using miranaSolution.DTOs.Authentication.Users;
 using miranaSolution.DTOs.Common;
 using miranaSolution.Services.Exceptions;
 using miranaSolution.Services.Systems.Images;
 using miranaSolution.Services.Systems.JwtTokenGenerators;
 using miranaSolution.Services.Validations;
+using miranaSolution.Utilities.Constants;
 
 namespace miranaSolution.Services.Authentication.Users;
 
@@ -17,17 +19,19 @@ public class UserService : IUserService
     private readonly SignInManager<AppUser> _signInManager;
     private readonly UserManager<AppUser> _userManager;
     private readonly IValidatorProvider _validatorProvider;
+    private readonly RoleManager<AppRole> _roleManager;
 
     public UserService(
         UserManager<AppUser> userManager,
         SignInManager<AppUser> signInManager,
-        IJwtTokenGenerator jwtTokenGenerator, IImageSaver imageSaver, IValidatorProvider validatorProvider)
+        IJwtTokenGenerator jwtTokenGenerator, IImageSaver imageSaver, IValidatorProvider validatorProvider, RoleManager<AppRole> roleManager)
     {
         _userManager = userManager;
         _signInManager = signInManager;
         _jwtTokenGenerator = jwtTokenGenerator;
         _imageSaver = imageSaver;
         _validatorProvider = validatorProvider;
+        _roleManager = roleManager;
     }
 
     /// <exception cref="UserAlreadyExistsException">
@@ -54,6 +58,8 @@ public class UserService : IUserService
         await _userManager.CreateAsync(user, request.Password);
         user = await _userManager.FindByNameAsync(user.UserName);
 
+        await _userManager.AddToRoleAsync(user, RolesConstant.User);
+        
         var userVm = MapUserIntoUserVm(user);
 
         var response = new RegisterUserResponse(userVm);
@@ -83,7 +89,7 @@ public class UserService : IUserService
 
         var userVm = MapUserIntoUserVm(user);
 
-        var token = _jwtTokenGenerator.GenerateToken(user);
+        var token = await _jwtTokenGenerator.GenerateTokenAsync(user);
         var response = new AuthenticateUserResponse(userVm, token);
 
         return response;
@@ -231,6 +237,57 @@ public class UserService : IUserService
             pageIndex, pageSize, totalRecords);
         
         return new GetAllUsersResponse(userVms, pagerResponse);
+    }
+
+    public async Task AssignRolesAsync(AssignRolesRequest request)
+    {
+        _validatorProvider.Validate(request);
+        
+        var user = await _userManager.FindByIdAsync(request.UserId.ToString());
+        if (user is null)
+        {
+            throw new UserNotFoundException("The user with given Id does not exist.");
+        }
+
+        foreach (var item in request.RoleCheckboxItems)
+        {
+            if (!await _roleManager.RoleExistsAsync(item.Label))
+            {
+                continue;
+            }
+            
+            if (item.IsChecked)
+            {
+                if (!await _userManager.IsInRoleAsync(user, item.Label))
+                {
+                    await _userManager.AddToRoleAsync(user, item.Label);
+                } 
+            }
+            else
+            {
+                if (await _userManager.IsInRoleAsync(user, item.Label))
+                {
+                    await _userManager.RemoveFromRoleAsync(user, item.Label);
+                }
+            }
+        }
+    }
+
+    public async Task<GetRolesByUserIdResponse> GetRolesByUserIdAsync(GetRolesByUserIdRequest request)
+    {
+        var user = await _userManager.FindByIdAsync(request.UserId.ToString());
+        if (user is null)
+        {
+            throw new UserNotFoundException("The user with given Id does not exist.");
+        }
+
+        var roles = await _userManager.GetRolesAsync(user);
+        var roleVms = roles.ToList().Select(x => new RoleVm(
+            Guid.NewGuid(),
+            x,
+            "")).ToList();
+
+        return new GetRolesByUserIdResponse(roleVms);
     }
 
     private UserVm MapUserIntoUserVm(AppUser user)

@@ -1,4 +1,5 @@
-﻿using miranaSolution.DTOs.Authentication.Users;
+﻿using miranaSolution.DTOs.Authentication.Roles;
+using miranaSolution.DTOs.Authentication.Users;
 
 namespace miranaSolution.Services.Authentication.Users;
 
@@ -25,4 +26,8 @@ public interface IUserService
     Task<IncreaseReadChapterCountBy1Response> IncreaseReadChapterCountBy1Async(IncreaseReadChapterCountBy1Request request);
 
     Task<GetAllUsersResponse> GetAllUsersAsync(GetAllUsersRequest request);
+
+    Task AssignRolesAsync(AssignRolesRequest request);
+
+    Task<GetRolesByUserIdResponse> GetRolesByUserIdAsync(GetRolesByUserIdRequest request);
 }

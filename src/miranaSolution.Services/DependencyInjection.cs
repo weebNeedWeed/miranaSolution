@@ -3,6 +3,7 @@ using FluentValidation;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using miranaSolution.Services.Authentication.PasswordRecovery;
+using miranaSolution.Services.Authentication.Roles;
 using miranaSolution.Services.Authentication.Users;
 using miranaSolution.Services.Core.Authors;
 using miranaSolution.Services.Core.Bookmarks;
@@ -52,6 +53,7 @@ public static class DependencyInjection
         services.AddTransient<IMailService, SESService>();
         services.AddTransient<IPasswordRecoveryService, PasswordRecoveryService>();
         services.AddTransient<ICurrentlyReadingService, CurrentlyReadingService>();
+        services.AddTransient<IRoleService, RoleService>();
 
         // AWS mail service's configuration
         services.AddDefaultAWSOptions(configuration.GetAWSOptions());

@@ -276,7 +276,44 @@ public class UsersController : ControllerBase
 
         return Ok(new ApiSuccessResult<ApiGetAllUsersResponse>(response));
     }
-    
+
+    [HttpPost("{userId}/roles")]
+    [Authorize(Roles = RolesConstant.Administrator)]
+    public async Task<IActionResult> AssignRoles([FromRoute] string userId, [FromForm] ApiAssignRolesRequest request)
+    {
+        try
+        {
+            await _userService.AssignRolesAsync(
+                new AssignRolesRequest(
+                    new Guid(userId),
+                    request.RoleCheckboxItems));
+
+            return Ok(new ApiSuccessResult<object>());
+        }
+        catch (UserNotFoundException ex)
+        {
+            return Ok(new ApiErrorResult(ex.Message));
+        }
+    }
+
+    [HttpGet("{userId}/roles")]
+    [Authorize(Roles = RolesConstant.Administrator)]
+    public async Task<IActionResult> GetRolesByUserId([FromRoute] string userId)
+    {
+        try
+        {
+            var getRolesByUserIdResponse = await _userService.GetRolesByUserIdAsync(
+                new GetRolesByUserIdRequest(
+                    new Guid(userId)));
+            var result = new ApiGetRolesByUserIdResponse(getRolesByUserIdResponse.RoleVms);
+            
+            return Ok(new ApiSuccessResult<ApiGetRolesByUserIdResponse>(result));
+        }
+        catch (UserNotFoundException ex)
+        {
+            return Ok(new ApiErrorResult(ex.Message));
+        }
+    }
     
     private string GetUserNameFromClaims()
     {

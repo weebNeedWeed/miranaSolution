@@ -1,0 +1,55 @@
+﻿@model miranaSolution.API.ViewModels.Authentication.ApiRegisterUserRequest
+
+@{
+    ViewData["title"] = "Add New User";
+}
+
+<h1 class="mt-4">Create new user</h1>
+<div class="card mb-4">
+    <div class="card-header">
+        <a asp-action="Index" class="btn btn-danger">Back</a>
+    </div>
+    <div class="card-body">
+        <form enctype="multipart/form-data" asp-action="Create" method="POST">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+            <div class="form-group">
+                <label asp-for="FirstName">First Name</label>
+                <input class="form-control" placeholder="Enter first name" asp-for="FirstName">
+                <span asp-validation-for="FirstName" class="text-danger form-text"></span>
+            </div>
+            
+            <div class="form-group mt-4">
+                <label asp-for="LastName">Last Name</label>
+                <input class="form-control" placeholder="Enter last name" asp-for="LastName">
+                <span asp-validation-for="LastName" class="text-danger form-text"></span>
+            </div>
+            
+            <div class="form-group mt-4">
+                <label asp-for="UserName">Username</label>
+                <input class="form-control" placeholder="Enter username" asp-for="UserName">
+                <span asp-validation-for="UserName" class="text-danger form-text"></span>
+            </div>
+            
+            <div class="form-group mt-4">
+                <label asp-for="Email">Email</label>
+                <input class="form-control" placeholder="Enter email" asp-for="Email" type="email">
+                <span asp-validation-for="Email" class="text-danger form-text"></span>
+            </div>
+            
+            <div class="form-group mt-4">
+                <label asp-for="Password">Password</label>
+                <input class="form-control" placeholder="Enter password" asp-for="Password" type="password">
+                <span asp-validation-for="Password" class="text-danger form-text"></span>
+            </div>
+            
+            <div class="form-group mt-4">
+                <label asp-for="PasswordConfirmation">Password Confirmation</label>
+                <input class="form-control" placeholder="Enter password confirmation" asp-for="PasswordConfirmation" type="password">
+                <span asp-validation-for="PasswordConfirmation" class="text-danger form-text"></span>
+            </div>
+
+            <button type="submit" class="btn btn-primary mt-4">Submit</button>
+        </form>
+    </div>
+</div>

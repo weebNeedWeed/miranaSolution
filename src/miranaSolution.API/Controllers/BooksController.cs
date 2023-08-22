@@ -25,7 +25,7 @@ namespace miranaSolution.API.Controllers;
 
 [Route("api/[controller]")]
 [ApiController]
-[Authorize(Roles = RolesConstant.Administrator)]
+[Authorize]
 public class BooksController : ControllerBase
 {
     private readonly IBookmarkService _bookmarkService;
@@ -77,6 +77,7 @@ public class BooksController : ControllerBase
     // POST /api/books
     [HttpPost]
     [Consumes("multipart/form-data")]
+    [Authorize(Roles = RolesConstant.Administrator)]
     public async Task<IActionResult> CreateBook([FromForm] ApiCreateBookRequest request)
     {
         var thumbnailImageExt = Path.GetExtension(request.ThumbnailImage?.FileName);
@@ -152,6 +153,7 @@ public class BooksController : ControllerBase
 
     // POST /api/books/{bookId}/chapters
     [HttpPost("{bookId:int}/chapters")]
+    [Authorize(Roles = RolesConstant.Administrator)]
     public async Task<IActionResult> CreateBookChapter([FromRoute] int bookId,
         [FromBody] ApiCreateBookChapterRequest request)
     {
@@ -247,6 +249,7 @@ public class BooksController : ControllerBase
 
     [HttpPost("{bookId:int}")]
     [Consumes("multipart/form-data")]
+    [Authorize(Roles = RolesConstant.Administrator)]
     public async Task<IActionResult> UpdateBook([FromRoute] int bookId, [FromForm] ApiUpdateBookRequest request)
     {
         Stream? thumbnailImage = null;
@@ -290,6 +293,7 @@ public class BooksController : ControllerBase
     }
 
     [HttpPost("{bookId:int}/genres")]
+    [Authorize(Roles = RolesConstant.Administrator)]
     public async Task<IActionResult> UpdateBookGenres([FromRoute] int bookId, [FromForm] ApiAssignGenresRequest request)
     {
         try
@@ -312,6 +316,7 @@ public class BooksController : ControllerBase
     }
     
     [HttpDelete("{bookId:int}")]
+    [Authorize(Roles = RolesConstant.Administrator)]
     public async Task<IActionResult> DeleteBook([FromRoute] int bookId)
     {
         try
@@ -327,9 +332,8 @@ public class BooksController : ControllerBase
             return Ok(new ApiErrorResult(ex.Message));
         }
     }
-
+    
     [HttpPost("{bookId:int}/comments")]
-    [Authorize]
     public async Task<IActionResult> CreateBookComment([FromRoute] int bookId,
         [FromBody] ApiCreateBookCommentRequest request)
     {
@@ -357,7 +361,6 @@ public class BooksController : ControllerBase
     }
 
     [HttpDelete("{bookId:int}/comments/{commentId:int}")]
-    [Authorize]
     public async Task<IActionResult> DeleteBookComment([FromRoute] int bookId, [FromRoute] int commentId)
     {
         var userId = GetUserIdFromClaim();
@@ -384,6 +387,32 @@ public class BooksController : ControllerBase
         }
     }
 
+    [HttpDelete("{bookId:int}/comments/{commentId:int}:force")]
+    [Authorize(Roles=RolesConstant.Administrator)]
+    public async Task<IActionResult> ForceDeleteBookComment([FromRoute] int bookId, [FromRoute] int commentId)
+    {
+        try
+        {
+            // Set forceDelete = false, so the user can only delete their own comments
+            await _commentService.DeleteBookCommentAsync(
+                new DeleteBookCommentRequest(
+                    commentId,
+                    bookId,
+                    Guid.NewGuid(),
+                    true));
+    
+            return Ok(new ApiSuccessResult<object>());
+        }
+        catch (CommentNotFoundException ex)
+        {
+            return Ok(new ApiErrorResult(ex.Message));
+        }
+        catch (UserNotFoundException ex)
+        {
+            return Ok(new ApiErrorResult(ex.Message));
+        }
+    }
+    
     [HttpGet("{bookId:int}/comments")]
     [AllowAnonymous]
     public async Task<IActionResult> GetAllBookComments([FromRoute] int bookId,
@@ -414,7 +443,6 @@ public class BooksController : ControllerBase
     }
 
     [HttpPost("{bookId:int}/upvotes")]
-    [Authorize]
     public async Task<IActionResult> CreateBookUpvote([FromRoute] int bookId)
     {
         var userId = GetUserIdFromClaim();
@@ -437,7 +465,6 @@ public class BooksController : ControllerBase
     }
 
     [HttpDelete("{bookId:int}/upvotes")]
-    [Authorize]
     public async Task<IActionResult> DeleteBookUpvote([FromRoute] int bookId)
     {
         var userId = GetUserIdFromClaim();
@@ -492,7 +519,6 @@ public class BooksController : ControllerBase
     }
 
     [HttpPost("{bookId:int}/ratings")]
-    [Authorize]
     public async Task<IActionResult> CreateBookRating([FromRoute] int bookId,
         [FromBody] ApiCreateBookRatingRequest request)
     {
@@ -520,7 +546,6 @@ public class BooksController : ControllerBase
     }
 
     [HttpDelete("{bookId:int}/ratings")]
-    [Authorize]
     public async Task<IActionResult> DeleteBookRating([FromRoute] int bookId)
     {
         var userId = GetUserIdFromClaim();
@@ -541,7 +566,6 @@ public class BooksController : ControllerBase
     }
 
     [HttpPut("{bookId:int}/ratings")]
-    [Authorize]
     public async Task<IActionResult> UpdateBookRating([FromRoute] int bookId,
         [FromBody] ApiUpdateBookRatingRequest request)
     {

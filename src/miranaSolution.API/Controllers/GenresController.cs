@@ -11,7 +11,7 @@ namespace miranaSolution.API.Controllers;
 
 [Route("api/[controller]")]
 [ApiController]
-[Authorize(Roles = RolesConstant.Administrator)]
+[Authorize]
 public class GenresController : ControllerBase
 {
     private readonly IGenreService _genreService;
@@ -45,6 +45,7 @@ public class GenresController : ControllerBase
     }
 
     [HttpPost]
+    [Authorize(Roles = RolesConstant.Administrator)]
     public async Task<IActionResult> CreateGenre([FromBody] ApiCreateGenreRequest request)
     {
         var createGenreResponse = await _genreService.CreateGenreAsync(
@@ -54,6 +55,7 @@ public class GenresController : ControllerBase
     }
 
     [HttpPut("{genreId:int}")]
+    [Authorize(Roles = RolesConstant.Administrator)]
     public async Task<IActionResult> UpdateGenre([FromRoute] int genreId, [FromBody] ApiUpdateGenreRequest request)
     {
         try
@@ -72,6 +74,7 @@ public class GenresController : ControllerBase
     }
 
     [HttpDelete("{genreId:int}")]
+    [Authorize(Roles = RolesConstant.Administrator)]
     public async Task<IActionResult> DeleteGenre([FromRoute] int genreId)
     {
         try

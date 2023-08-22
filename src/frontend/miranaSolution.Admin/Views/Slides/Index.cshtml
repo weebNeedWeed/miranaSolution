@@ -1,0 +1,65 @@
+﻿@model miranaSolution.API.ViewModels.Slides.ApiGetAllSlidesResponse
+@{
+    ViewData["Title"] = "Slides";
+}
+
+@section LibResources
+{
+    <link href="https://cdn.jsdelivr.net/npm/simple-datatables@7.1.2/dist/style.min.css" rel="stylesheet"/>
+}
+
+@section Scripts
+{
+    <script src="https://cdn.jsdelivr.net/npm/simple-datatables@7.1.2/dist/umd/simple-datatables.min.js" crossorigin="anonymous"></script>
+    <script src="~/js/datatables-simple-demo.js"></script>
+}
+
+<h1 class="mt-4">Slides</h1>
+<div class="card mb-4">
+    <div class="card-header">
+        <a asp-action="Create" class="btn btn-success"><i class="fa-solid fa-plus"></i> Create new</a>
+    </div>
+    <div class="card-body">
+        <table id="datatablesSimple">
+            <thead>
+            <tr>
+                <th>Id</th>
+                <th>Name</th>
+                <th>Genres</th>
+                <th>Sort order</th>
+                <th></th>
+            </tr>
+            </thead>
+            <tbody>
+            @foreach (var slide in Model.Slides)
+            {
+                <tr>
+                    <td>@slide.Id</td>
+                    <td>@slide.Name</td>
+                    <th>@slide.Genres</th>
+                    <th>@slide.SortOrder</th>
+                    <td>
+                        <div class="row-table-action">
+                            <a asp-action="Edit" asp-route-id="@slide.Id" title="Edit">
+                                <i class="fa-solid fa-pen-to-square"></i>
+                            </a>
+                            
+                            <form method="POST" asp-action="Delete" asp-route-id="@slide.Id">
+                                <button title="Delete" type="submit" class="p-0 text-danger bg-transparent border-0">
+                                    <i class="fa-solid fa-trash"></i>
+                                </button>
+                            </form>
+                        </div>
+                    </td>
+                </tr>
+            }
+            </tbody>
+        </table>
+    </div>
+
+    <div class="card-body">
+        @* @await Component.InvokeAsync("Pager", new PagerResult( *@
+        @*            Model.PageIndex, Model.PageSize, Model.TotalPages)) *@
+    </div>
+
+</div>
