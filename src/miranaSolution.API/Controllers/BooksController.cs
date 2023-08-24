@@ -290,6 +290,10 @@ public class BooksController : ControllerBase
         {
             return Ok(new ApiErrorResult(ex.Message));
         }
+        catch (AuthorNotFoundException ex)
+        {
+            return Ok(new ApiErrorResult(ex.Message));
+        }
     }
 
     [HttpPost("{bookId:int}/genres")]
@@ -462,6 +466,10 @@ public class BooksController : ControllerBase
         {
             return Ok(new ApiErrorResult(ex.Message));
         }
+        catch (UserAlreadyUpvotesBookException ex)
+        {
+            return Ok(new ApiErrorResult(ex.Message));
+        }
     }
 
     [HttpDelete("{bookId:int}/upvotes")]
@@ -481,6 +489,10 @@ public class BooksController : ControllerBase
             return Ok(new ApiErrorResult(ex.Message));
         }
         catch (BookNotFoundException ex)
+        {
+            return Ok(new ApiErrorResult(ex.Message));
+        }
+        catch (UserNotUpvotedBookException ex)
         {
             return Ok(new ApiErrorResult(ex.Message));
         }
@@ -540,6 +552,10 @@ public class BooksController : ControllerBase
             return Ok(new ApiErrorResult(ex.Message));
         }
         catch (BookNotFoundException ex)
+        {
+            return Ok(new ApiErrorResult(ex.Message));
+        }
+        catch (BookRatingAlreadyExistsException ex)
         {
             return Ok(new ApiErrorResult(ex.Message));
         }

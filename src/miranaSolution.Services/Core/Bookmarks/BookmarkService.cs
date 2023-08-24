@@ -1,41 +1,32 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using miranaSolution.Data.Entities;
 using miranaSolution.Data.Main;
-using miranaSolution.DTOs.Authentication.Users;
 using miranaSolution.DTOs.Core.Bookmarks;
-using miranaSolution.DTOs.Core.Books;
 using miranaSolution.DTOs.Core.Chapters.Exceptions;
-using miranaSolution.Services.Authentication.Users;
-using miranaSolution.Services.Core.Books;
-using miranaSolution.Services.Core.Chapters;
 using miranaSolution.Services.Exceptions;
 
 namespace miranaSolution.Services.Core.Bookmarks;
 
 public class BookmarkService : IBookmarkService
 {
-    private readonly IBookService _bookService;
     private readonly MiranaDbContext _context;
-    private readonly IUserService _userService;
+    private readonly UserManager<AppUser> _userManager;
 
-    public BookmarkService(IBookService bookService, IUserService userService, MiranaDbContext context,
-        IChapterService chapterService)
+    public BookmarkService(MiranaDbContext context, UserManager<AppUser> userManager)
     {
-        _bookService = bookService;
-        _userService = userService;
         _context = context;
+        _userManager = userManager;
     }
 
     public async Task<CreateBookmarkResponse> CreateBookmarkAsync(CreateBookmarkRequest request)
     {
-        var getUserByIdResponse = await _userService.GetUserByIdAsync(
-            new GetUserByIdRequest(request.UserId));
-        if (getUserByIdResponse.UserVm is null)
+        var user = await _userManager.FindByIdAsync(request.UserId.ToString());
+        if (user is null)
             throw new UserNotFoundException("The user with given Id does not exist.");
 
-        var getBookByIdResponse = await _bookService.GetBookByIdAsync(
-            new GetBookByIdRequest(request.BookId));
-        if (getBookByIdResponse.BookVm is null)
+        var book = await _context.Books.FindAsync(request.BookId);
+        if (book is null)
             throw new BookNotFoundException("The book with given Id does not exist.");
 
         var existChapterWithGivenIndex = await _context.Chapters.AnyAsync(x => x.Index == request.ChapterIndex);
@@ -43,24 +34,24 @@ public class BookmarkService : IBookmarkService
             throw new ChapterNotFoundException("The chapter with given Index does not exist.");
 
         // Check if the bookmark with the request's UserId and BookId already exists, then deleting it before adding a new one
-        var bookmarkWithChapterIndexAlreadyExist = await _context.Bookmarks.AnyAsync(
-            x => x.ChapterIndex == request.ChapterIndex
-                 && x.BookId == request.BookId
+        Bookmark? bookmark = await _context.Bookmarks.FirstOrDefaultAsync(
+            x => x.BookId == request.BookId
                  && x.UserId == request.UserId);
-        if (bookmarkWithChapterIndexAlreadyExist)
-            await DeleteBookmarkAsync(
-                new DeleteBookmarkRequest(
-                    request.UserId,
-                    request.BookId));
-
-        var bookmark = new Bookmark
+        if (bookmark is not null)
         {
-            UserId = request.UserId,
-            BookId = request.BookId,
-            ChapterIndex = request.ChapterIndex
-        };
-
-        await _context.Bookmarks.AddAsync(bookmark);
+            bookmark.ChapterIndex = request.ChapterIndex;
+        }
+        else
+        {
+            bookmark = new Bookmark
+            {
+                UserId = request.UserId,
+                BookId = request.BookId,
+                ChapterIndex = request.ChapterIndex
+            };
+            await _context.Bookmarks.AddAsync(bookmark);
+        }
+        
         await _context.SaveChangesAsync();
 
         var bookmarkVm = new BookmarkVm(
@@ -75,16 +66,20 @@ public class BookmarkService : IBookmarkService
 
     public async Task DeleteBookmarkAsync(DeleteBookmarkRequest request)
     {
-        var getUserByIdResponse = await _userService.GetUserByIdAsync(
-            new GetUserByIdRequest(request.UserId));
-        if (getUserByIdResponse.UserVm is null)
+        var user = await _userManager.FindByIdAsync(request.UserId.ToString());
+        if (user is null)
             throw new UserNotFoundException("The user with given Id does not exist.");
 
-        var getBookByIdResponse = await _bookService.GetBookByIdAsync(
-            new GetBookByIdRequest(request.BookId));
-        if (getBookByIdResponse.BookVm is null)
+        var book = await _context.Books.FindAsync(request.BookId);
+        if (book is null)
             throw new BookNotFoundException("The book with given Id does not exist.");
 
+        if (!await _context.Bookmarks.AnyAsync(x => x.BookId == request.BookId
+                                                   && x.UserId.Equals(request.UserId)))
+        {
+            throw new BookmarkNotFoundException("The bookmark does not exist.");
+        }
+        
         var bookmark = new Bookmark
         {
             UserId = request.UserId,
@@ -98,22 +93,20 @@ public class BookmarkService : IBookmarkService
     public async Task<GetAllBookmarksByUserIdResponse> GetAllBookmarksByUserIdAsync(
         GetAllBookmarksByUserIdRequest request)
     {
-        var getUserByIdResponse = await _userService.GetUserByIdAsync(
-            new GetUserByIdRequest(request.UserId));
-        if (getUserByIdResponse.UserVm is null)
+        var user = await _userManager.FindByIdAsync(request.UserId.ToString());
+        if (user is null)
             throw new UserNotFoundException("The user with given Id does not exist.");
-
+        
         var query = _context.Bookmarks
             .Where(x => x.UserId == request.UserId);
 
         if (request.BookId.HasValue)
         {
-            var getBookByIdResponse = await _bookService.GetBookByIdAsync(
-                new GetBookByIdRequest(request.BookId ?? default));
-            if (getBookByIdResponse.BookVm is null)
+            var book = await _context.Books.FindAsync(request.BookId);
+            if (book is null)
                 throw new BookNotFoundException("The book with given Id does not exist.");
 
-            query = query.Where(x => x.BookId == getBookByIdResponse.BookVm.Id);
+            query = query.Where(x => x.BookId == book.Id);
         }
 
         var bookmarks = await query.ToListAsync();

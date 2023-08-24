@@ -95,6 +95,10 @@ public class BookmarksController : ControllerBase
         {
             return Ok(new ApiErrorResult(ex.Message));
         }
+        catch (BookmarkNotFoundException ex)
+        {
+            return Ok(new ApiErrorResult(ex.Message));
+        }
     }
 
     private Guid GetUserIdFromClaim()

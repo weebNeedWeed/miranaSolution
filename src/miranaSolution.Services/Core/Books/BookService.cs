@@ -91,9 +91,12 @@ public class BookService : IBookService
     public async Task<UpdateBookResponse> UpdateBookAsync(UpdateBookRequest request)
     {
         _validatorProvider.Validate(request);
-
+        
         var book = await _context.Books.FindAsync(request.BookId);
         if (book is null) throw new BookNotFoundException("The book with given Id does not exists.");
+        
+        if (!await _context.Authors.AnyAsync(x => x.Id == request.AuthorId))
+            throw new AuthorNotFoundException("The author with given Id does not exist.");
 
         // Validate the new slug must be unique
         if (await _context.Books.AnyAsync(

@@ -19,6 +19,10 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "frontend", "frontend", "{E2
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "miranaSolution.Admin", "src\frontend\miranaSolution.Admin\miranaSolution.Admin.csproj", "{FAFA15D9-1622-4929-A86A-A86D97EA4D42}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{50E2D8E1-B805-4A1C-884B-A4E8A2CCBC81}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "miranaSolution.Services.Tests", "tests\miranaSolution.Services.Tests\miranaSolution.Services.Tests.csproj", "{BCE843D9-22AE-49F4-8593-95D7A1BF42F9}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -49,6 +53,10 @@ Global
 		{FAFA15D9-1622-4929-A86A-A86D97EA4D42}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{FAFA15D9-1622-4929-A86A-A86D97EA4D42}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{FAFA15D9-1622-4929-A86A-A86D97EA4D42}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BCE843D9-22AE-49F4-8593-95D7A1BF42F9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BCE843D9-22AE-49F4-8593-95D7A1BF42F9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BCE843D9-22AE-49F4-8593-95D7A1BF42F9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BCE843D9-22AE-49F4-8593-95D7A1BF42F9}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -64,5 +72,6 @@ Global
 		{26083ADD-2BFF-4034-93FA-9A955837D901} = {24F9AE71-D403-4796-8D43-DBAE3E1A8A0B}
 		{E285A631-AF3F-4961-9364-C705377CDF93} = {24F9AE71-D403-4796-8D43-DBAE3E1A8A0B}
 		{FAFA15D9-1622-4929-A86A-A86D97EA4D42} = {E285A631-AF3F-4961-9364-C705377CDF93}
+		{BCE843D9-22AE-49F4-8593-95D7A1BF42F9} = {50E2D8E1-B805-4A1C-884B-A4E8A2CCBC81}
 	EndGlobalSection
 EndGlobal

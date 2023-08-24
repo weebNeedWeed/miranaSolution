@@ -34,6 +34,12 @@ public class BookRatingService : IBookRatingService
         if (await _context.Books.FindAsync(request.BookId) is null)
             throw new BookNotFoundException("The book with given Id does not exist.");
 
+        if (await _context.BookRatings.AnyAsync(
+                x => x.UserId.Equals(request.UserId) && x.BookId == request.BookId))
+        {
+            throw new BookRatingAlreadyExistsException("The book rating already exists.");
+        }
+        
         var bookRating = new BookRating
         {
             UserId = request.UserId,
