@@ -8,7 +8,7 @@ public interface ICommentService
 
     Task DeleteBookCommentAsync(DeleteBookCommentRequest request);
 
-    Task<GetBookCommentByIdResponse> GetBookCommentById(GetBookCommentByIdRequest request);
+    Task<GetBookCommentByIdResponse> GetBookCommentByIdAsync(GetBookCommentByIdRequest request);
 
     Task<CountCommentByUserIdResponse> CountCommentByUserIdAsync(CountCommentByUserIdRequest request);
 

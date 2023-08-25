@@ -1,9 +1,8 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using miranaSolution.Data.Entities;
 using miranaSolution.Data.Main;
-using miranaSolution.DTOs.Authentication.Users;
 using miranaSolution.DTOs.Core.CommentReactions;
-using miranaSolution.Services.Authentication.Users;
 using miranaSolution.Services.Exceptions;
 
 namespace miranaSolution.Services.Core.CommentReactions;
@@ -11,12 +10,12 @@ namespace miranaSolution.Services.Core.CommentReactions;
 public class CommentReactionService : ICommentReactionService
 {
     private readonly MiranaDbContext _context;
-    private readonly IUserService _userService;
+    private readonly UserManager<AppUser> _userManager;
 
-    public CommentReactionService(IUserService userService, MiranaDbContext context)
+    public CommentReactionService(MiranaDbContext context, UserManager<AppUser> userManager)
     {
-        _userService = userService;
         _context = context;
+        _userManager = userManager;
     }
 
     public async Task<CreateCommentReactionResponse> CreateCommentReactionAsync(CreateCommentReactionRequest request)
@@ -70,9 +69,8 @@ public class CommentReactionService : ICommentReactionService
     public async Task<CountCommentReactionByUserIdResponse> CountCommentReactionByUserIdAsync(
         CountCommentReactionByUserIdRequest request)
     {
-        var getUserByIdResponse = await _userService.GetUserByIdAsync(
-            new GetUserByIdRequest(request.UserId));
-        if (getUserByIdResponse.UserVm is null)
+        var user = await _userManager.FindByIdAsync(request.UserId.ToString());
+        if (user is null)
             throw new UserNotFoundException("The user with given Id does not exist.");
 
         var totalReactions = await _context.CommentReactions.CountAsync(x => x.UserId == request.UserId);
