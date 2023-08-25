@@ -1,4 +1,4 @@
-﻿namespace miranaSolution.DTOs.Core.Chapters.Exceptions;
+﻿namespace miranaSolution.Services.Exceptions;
 
 public class ChapterNotFoundException : Exception
 {

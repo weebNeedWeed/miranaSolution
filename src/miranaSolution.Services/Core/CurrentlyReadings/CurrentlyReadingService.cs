@@ -2,7 +2,6 @@
 using Microsoft.EntityFrameworkCore;
 using miranaSolution.Data.Entities;
 using miranaSolution.Data.Main;
-using miranaSolution.DTOs.Core.Chapters.Exceptions;
 using miranaSolution.DTOs.Core.CurrentlyReading;
 using miranaSolution.Services.Exceptions;
 

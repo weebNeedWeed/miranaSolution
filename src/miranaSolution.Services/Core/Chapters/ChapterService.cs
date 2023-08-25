@@ -12,14 +12,12 @@ namespace miranaSolution.Services.Core.Chapters;
 
 public class ChapterService : IChapterService
 {
-    private readonly IBookService _bookService;
     private readonly MiranaDbContext _context;
     private readonly IValidatorProvider _validatorProvider;
 
-    public ChapterService(MiranaDbContext context, IBookService bookService, IValidatorProvider validatorProvider)
+    public ChapterService(MiranaDbContext context, IValidatorProvider validatorProvider)
     {
         _context = context;
-        _bookService = bookService;
         _validatorProvider = validatorProvider;
     }
 
@@ -30,10 +28,9 @@ public class ChapterService : IChapterService
     {
         _validatorProvider.Validate(request);
 
-        var getBookByIdResponse = await _bookService.GetBookByIdAsync(new GetBookByIdRequest(request.BookId));
-        if (getBookByIdResponse.BookVm is null)
-            throw new BookNotFoundException(
-                "The book with given Id does not exist.");
+        var book = await _context.Books.FindAsync(request.BookId);
+        if (book is null)
+            throw new BookNotFoundException("The book with given Id does not exist.");
 
         // If there was no chapter added before, then prevIndex is 0 (the default value of int)
         var prevIndex = await _context.Chapters
@@ -187,5 +184,16 @@ public class ChapterService : IChapterService
         return response;
     }
 
+    public Task DeleteBookChapterAsync(DeleteBookChapterRequest request)
+    {
+        throw new NotImplementedException();
+    }
+
+    public Task<UpdateBookChapterResponse> UpdateBookChapterAsync(UpdateBookChapterRequest request)
+    {
+        throw new NotImplementedException();
+    }
+
     // TODO: Add the method for updating the chapter here
+    
 }

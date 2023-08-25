@@ -3,7 +3,6 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using miranaSolution.API.ViewModels.Common;
 using miranaSolution.API.ViewModels.CurrentlyReadings;
-using miranaSolution.DTOs.Core.Chapters.Exceptions;
 using miranaSolution.DTOs.Core.CurrentlyReading;
 using miranaSolution.Services.Core.CurrentlyReadings;
 using miranaSolution.Services.Exceptions;

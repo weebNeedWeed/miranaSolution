@@ -3,7 +3,6 @@ using Microsoft.EntityFrameworkCore;
 using miranaSolution.Data.Entities;
 using miranaSolution.Data.Main;
 using miranaSolution.DTOs.Core.Bookmarks;
-using miranaSolution.DTOs.Core.Chapters.Exceptions;
 using miranaSolution.Services.Exceptions;
 
 namespace miranaSolution.Services.Core.Bookmarks;

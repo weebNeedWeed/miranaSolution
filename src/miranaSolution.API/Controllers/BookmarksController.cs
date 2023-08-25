@@ -4,7 +4,6 @@ using Microsoft.IdentityModel.JsonWebTokens;
 using miranaSolution.API.ViewModels.Bookmarks;
 using miranaSolution.API.ViewModels.Common;
 using miranaSolution.DTOs.Core.Bookmarks;
-using miranaSolution.DTOs.Core.Chapters.Exceptions;
 using miranaSolution.Services.Core.Bookmarks;
 using miranaSolution.Services.Exceptions;
 

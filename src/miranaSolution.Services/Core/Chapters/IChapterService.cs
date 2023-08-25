@@ -13,4 +13,8 @@ public interface IChapterService
     Task<GetTotalBookChaptersResponse> GetTotalBookChaptersAsync(GetTotalBookChaptersRequest request);
 
     Task<GetLatestCreatedChaptersResponse> GetLatestCreatedChaptersAsync(GetLatestCreatedChaptersRequest request);
+
+    Task DeleteBookChapterAsync(DeleteBookChapterRequest request);
+
+    Task<UpdateBookChapterResponse> UpdateBookChapterAsync(UpdateBookChapterRequest request);
 }
