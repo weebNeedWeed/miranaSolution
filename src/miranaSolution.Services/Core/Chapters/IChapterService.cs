@@ -17,4 +17,8 @@ public interface IChapterService
     Task DeleteBookChapterAsync(DeleteBookChapterRequest request);
 
     Task<UpdateBookChapterResponse> UpdateBookChapterAsync(UpdateBookChapterRequest request);
+
+    Task UpdateNextChapterIndexAsync(UpdateNextChapterIndexRequest request);
+    
+    Task UpdatePreviousChapterIndexAsync(UpdatePreviousChapterIndexRequest request);
 }

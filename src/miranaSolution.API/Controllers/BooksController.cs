@@ -164,7 +164,8 @@ public class BooksController : ControllerBase
                     bookId,
                     request.Name,
                     request.WordCount,
-                    request.Content));
+                    request.Content,
+                    request.Index));
 
             return Ok(new ApiSuccessResult<ChapterVm>(createBookChapterResponse.ChapterVm));
         }
@@ -172,7 +173,103 @@ public class BooksController : ControllerBase
         {
             return Ok(new ApiErrorResult(ex.Message));
         }
-        catch (InvalidImageExtensionException ex)
+        catch (ChapterAlreadyExistsException ex)
+        {
+            return Ok(new ApiErrorResult(ex.Message));
+        }
+    }
+
+    [HttpPut("{bookId:int}/chapters/{index:int}/next/{nextIndex:int}")]
+    [Authorize(Roles = RolesConstant.Administrator)]
+    public async Task<IActionResult> UpdateNextChapter([FromRoute] int bookId, [FromRoute] int index, [FromRoute] int nextIndex)
+    {
+        try
+        {
+            var request = new UpdateNextChapterIndexRequest(
+                bookId, index, nextIndex);
+            await _chapterService.UpdateNextChapterIndexAsync(request);
+
+            return Ok(new ApiSuccessResult<object>());
+        }
+        catch (BookNotFoundException ex)
+        {
+            return Ok(new ApiErrorResult(ex.Message));
+        }
+        catch (ChapterNotFoundException ex)
+        {
+            return Ok(new ApiErrorResult(ex.Message));
+        }
+        catch (ArgumentException ex)
+        {
+            return Ok(new ApiErrorResult(ex.Message));
+        }
+    }
+    
+    [HttpPut("{bookId:int}/chapters/{index:int}/previous/{previousIndex:int}")]
+    [Authorize(Roles = RolesConstant.Administrator)]
+    public async Task<IActionResult> UpdatePreviousChapter([FromRoute] int bookId, [FromRoute] int index, [FromRoute] int previousIndex)
+    {
+        try
+        {
+            var request = new UpdatePreviousChapterIndexRequest(
+                bookId, index, previousIndex);
+            await _chapterService.UpdatePreviousChapterIndexAsync(request);
+
+            return Ok(new ApiSuccessResult<object>());
+        }
+        catch (BookNotFoundException ex)
+        {
+            return Ok(new ApiErrorResult(ex.Message));
+        }
+        catch (ChapterNotFoundException ex)
+        {
+            return Ok(new ApiErrorResult(ex.Message));
+        }
+        catch (ArgumentException ex)
+        {
+            return Ok(new ApiErrorResult(ex.Message));
+        }
+    }
+
+    [HttpDelete("{bookId:int}/chapters/{index:int}/next")]
+    [Authorize(Roles = RolesConstant.Administrator)]
+    public async Task<IActionResult> RemoveNextChapterIndex([FromRoute] int bookId, [FromRoute] int index)
+    {
+        try
+        {
+            var request = new UpdateNextChapterIndexRequest(
+                bookId, index, null);
+            await _chapterService.UpdateNextChapterIndexAsync(request);
+
+            return Ok(new ApiSuccessResult<object>());
+        }
+        catch (BookNotFoundException ex)
+        {
+            return Ok(new ApiErrorResult(ex.Message));
+        }
+        catch (ChapterNotFoundException ex)
+        {
+            return Ok(new ApiErrorResult(ex.Message));
+        }
+    }
+    
+    [HttpDelete("{bookId:int}/chapters/{index:int}/previous")]
+    [Authorize(Roles = RolesConstant.Administrator)]
+    public async Task<IActionResult> RemovePreviousChapterIndex([FromRoute] int bookId, [FromRoute] int index)
+    {
+        try
+        {
+            var request = new UpdatePreviousChapterIndexRequest(
+                bookId, index, null);
+            await _chapterService.UpdatePreviousChapterIndexAsync(request);
+
+            return Ok(new ApiSuccessResult<object>());
+        }
+        catch (BookNotFoundException ex)
+        {
+            return Ok(new ApiErrorResult(ex.Message));
+        }
+        catch (ChapterNotFoundException ex)
         {
             return Ok(new ApiErrorResult(ex.Message));
         }
@@ -184,23 +281,30 @@ public class BooksController : ControllerBase
     public async Task<IActionResult> GetAllBookChapters([FromRoute] int bookId,
         [FromQuery] ApiGetAllBookChaptersRequest request)
     {
-        var pagerRequest = new PagerRequest(
-            request.PageIndex,
-            request.PageSize);
+        try
+        {
+            var pagerRequest = new PagerRequest(
+                request.PageIndex,
+                request.PageSize);
 
-        var getAllBookChaptersResponse = await _chapterService.GetAllBookChaptersAsync(
-            new GetAllBookChaptersRequest(
-                bookId,
-                pagerRequest));
+            var getAllBookChaptersResponse = await _chapterService.GetAllBookChaptersAsync(
+                new GetAllBookChaptersRequest(
+                    bookId,
+                    pagerRequest));
 
-        var response = new ApiGetAllBookChaptersResponse(
-            getAllBookChaptersResponse.ChapterVms,
-            request.PageIndex,
-            request.PageSize,
-            getAllBookChaptersResponse.PagerResponse.TotalPages,
-            getAllBookChaptersResponse.PagerResponse.TotalRecords);
+            var response = new ApiGetAllBookChaptersResponse(
+                getAllBookChaptersResponse.ChapterVms,
+                request.PageIndex,
+                request.PageSize,
+                getAllBookChaptersResponse.PagerResponse.TotalPages,
+                getAllBookChaptersResponse.PagerResponse.TotalRecords);
 
-        return Ok(new ApiSuccessResult<ApiGetAllBookChaptersResponse>(response));
+            return Ok(new ApiSuccessResult<ApiGetAllBookChaptersResponse>(response));
+        }
+        catch (BookNotFoundException ex)
+        {
+            return Ok(new ApiErrorResult(ex.Message));
+        }
     }
 
     // GET /api/books/{bookId}/chapters/{index}

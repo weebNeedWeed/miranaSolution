@@ -9,6 +9,6 @@ public record ChapterVm(
     int ReadCount,
     int WordCount,
     string Content,
-    bool HasNextChapter,
-    bool HasPreviousChapter,
+    int? NextIndex,
+    int? PreviousIndex,
     int BookId);

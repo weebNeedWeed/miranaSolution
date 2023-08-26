@@ -9,6 +9,8 @@ import {useBaseUrl} from "../../helpers/hooks/useBaseUrl";
 import {currentlyReadingApiHelper} from "../../helpers/apis/CurrentlyReadingApiHelper";
 import {ToastVariant} from "../../components/Toast";
 import {bookmarkApiHelper} from "../../helpers/apis/BookmarkApiHelper";
+import {Helmet} from "react-helmet";
+import React from "react";
 
 type BookmarkBlockProps = {
     bookmark: Bookmark;
@@ -86,6 +88,10 @@ const UserBookmarks = (): JSX.Element => {
     }
 
     return <div className="flex w-full flex-row flex-wrap gap-2 md:gap-4">
+        <Helmet>
+            <title>Bookmarks | Mirana Readers</title>
+        </Helmet>
+
         {data.map((elm, index) =>
             <BookmarkBlock refetch={refetch} bookmark={elm} key={index}/>)}
     </div>

@@ -3,4 +3,5 @@
 public record ApiCreateBookChapterRequest(
     string Name,
     int WordCount,
-    string Content);
+    string Content,
+    int Index);

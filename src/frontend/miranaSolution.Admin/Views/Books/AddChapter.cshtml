@@ -27,8 +27,14 @@
 
             <div class="form-group mt-4">
                 <label asp-for="WordCount">Word count</label>
-                <input class="form-control" placeholder="Enter name" asp-for="WordCount">
+                <input class="form-control" placeholder="Enter word count" asp-for="WordCount">
                 <span asp-validation-for="WordCount" class="text-danger form-text"></span>
+            </div>
+            
+            <div class="form-group mt-4">
+                <label asp-for="Index">Chapter Index</label>
+                <input class="form-control" placeholder="Enter index" asp-for="Index">
+                <span asp-validation-for="Index" class="text-danger form-text"></span>
             </div>
 
             <button type="submit" class="btn btn-primary mt-4">Submit</button>

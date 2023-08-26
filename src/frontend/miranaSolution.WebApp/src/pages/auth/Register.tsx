@@ -6,6 +6,7 @@ import {ToastVariant} from "../../components/Toast";
 import {RegisterUserRequest} from "../../helpers/models/catalog/user/RegisterUserRequest";
 import {authApiHelper} from "../../helpers/apis/AuthApiHelper";
 import {IoIosArrowBack} from "react-icons/io";
+import {Helmet} from "react-helmet";
 
 const Register = (): JSX.Element => {
     const navigate = useNavigate();
@@ -189,6 +190,10 @@ const Register = (): JSX.Element => {
     return (
         <form method="POST" onSubmit={handleSubmit}
               className="relative bg-white w-full p-8 sm:p-12 rounded-md shadow-md shadow-slate-500">
+            <Helmet>
+                <title>Register | Mirana Readers</title>
+            </Helmet>
+
             <Link to={"/"}
                   className="flex flex-row items-center gap-x-1 absolute top-3 left-3 text-sm font-normal text-slate-600">
                 <IoIosArrowBack/>

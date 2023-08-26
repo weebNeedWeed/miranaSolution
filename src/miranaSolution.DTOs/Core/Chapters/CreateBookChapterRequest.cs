@@ -4,4 +4,5 @@ public record CreateBookChapterRequest(
     int BookId,
     string Name,
     int WordCount,
-    string Content);
+    string Content,
+    int Index);

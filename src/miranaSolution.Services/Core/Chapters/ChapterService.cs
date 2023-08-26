@@ -2,9 +2,7 @@
 using miranaSolution.Data.Entities;
 using miranaSolution.Data.Main;
 using miranaSolution.DTOs.Common;
-using miranaSolution.DTOs.Core.Books;
 using miranaSolution.DTOs.Core.Chapters;
-using miranaSolution.Services.Core.Books;
 using miranaSolution.Services.Exceptions;
 using miranaSolution.Services.Validations;
 
@@ -32,50 +30,39 @@ public class ChapterService : IChapterService
         if (book is null)
             throw new BookNotFoundException("The book with given Id does not exist.");
 
-        // If there was no chapter added before, then prevIndex is 0 (the default value of int)
-        var prevIndex = await _context.Chapters
-            .Where(x => x.BookId == request.BookId)
-            .OrderByDescending(x => x.Index)
-            .Select(x => x.Index)
-            .FirstOrDefaultAsync();
+        if (await _context.Chapters.AnyAsync(
+                x => x.BookId == request.BookId && x.Index == request.Index))
+        {
+            throw new ChapterAlreadyExistsException("The book's chapter with given index already exists.");
+        }
 
         var chapter = new Chapter
         {
             Name = request.Name,
             WordCount = request.WordCount,
             Content = request.Content,
-            Index = prevIndex + 1,
+            Index = request.Index,
             ReadCount = 0,
             BookId = request.BookId
         };
 
         await _context.Chapters.AddAsync(chapter);
         await _context.SaveChangesAsync();
-
-        var getTotalChaptersResponse = await GetTotalBookChaptersAsync(new GetTotalBookChaptersRequest(request.BookId));
-
+        
         var response = new CreateBookChapterResponse(
-            new ChapterVm(
-                chapter.Id,
-                chapter.Index,
-                chapter.Name,
-                chapter.CreatedAt,
-                chapter.UpdatedAt,
-                chapter.ReadCount,
-                chapter.WordCount,
-                chapter.Content,
-                chapter.Index < getTotalChaptersResponse.TotalChapters,
-                chapter.Index > 1,
-                chapter.BookId
-            ));
+            MapChapterToChapterVm(chapter));
 
         return response;
     }
 
     public async Task<GetAllBookChaptersResponse> GetAllBookChaptersAsync(GetAllBookChaptersRequest request)
     {
-        var query = _context.Chapters.Where(x => x.BookId == request.BookId);
-        query = query
+        var book = await _context.Books.FindAsync(request.BookId);
+        if (book is null)
+            throw new BookNotFoundException("The book with given Id does not exist.");
+        
+        var query = _context.Chapters
+            .Where(x => x.BookId == request.BookId)
             .Skip((request.PagerRequest.PageIndex - 1) * request.PagerRequest.PageSize)
             .Take(request.PagerRequest.PageSize)
             .OrderBy(x => x.Index);
@@ -83,28 +70,22 @@ public class ChapterService : IChapterService
         var getTotalChaptersResponse = await GetTotalBookChaptersAsync(new GetTotalBookChaptersRequest(request.BookId));
         var totalChapters = getTotalChaptersResponse.TotalChapters;
 
-        var chapterVms = await query
-            .Select(x => new ChapterVm(
-                x.Id,
-                x.Index,
-                x.Name,
-                x.CreatedAt,
-                x.UpdatedAt,
-                x.ReadCount,
-                x.WordCount,
-                x.Content,
-                x.Index < totalChapters,
-                x.Index > 1,
-                x.BookId
-            ))
+        var chapters = await query
             .ToListAsync();
+        var chapterVms = new List<ChapterVm>();
 
+        foreach (var chapter in chapters)
+        {
+            var chapterVm = await MapTotallyChapterToChapterVmAsync(chapter);
+            chapterVms.Add(chapterVm);
+        }
+        
         var response = new GetAllBookChaptersResponse(
             new PagerResponse(
                 request.PagerRequest.PageIndex,
                 request.PagerRequest.PageSize,
                 totalChapters),
-            chapterVms);
+            chapterVms.ToList());
 
         return response;
     }
@@ -126,22 +107,8 @@ public class ChapterService : IChapterService
         book.ViewCount++;
         await _context.SaveChangesAsync();
         
-        var getTotalChaptersResponse = await GetTotalBookChaptersAsync(new GetTotalBookChaptersRequest(request.BookId));
-
-        var chapterVm = new ChapterVm(
-            chapter.Id,
-            chapter.Index,
-            chapter.Name,
-            chapter.CreatedAt,
-            chapter.UpdatedAt,
-            chapter.ReadCount,
-            chapter.WordCount,
-            chapter.Content,
-            chapter.Index < getTotalChaptersResponse.TotalChapters,
-            chapter.Index > 1,
-            chapter.BookId);
-
-        var response = new GetBookChapterByIndexResponse(chapterVm);
+        var response = new GetBookChapterByIndexResponse(
+            await MapTotallyChapterToChapterVmAsync(chapter));
 
         return response;
     }
@@ -164,23 +131,11 @@ public class ChapterService : IChapterService
             .OrderByDescending(x => x.CreatedAt)
             .Take(request.NumberOfChapters);
 
-        var chapterVms = await query
-            .Select(x => new ChapterVm(
-                x.Id,
-                x.Index,
-                x.Name,
-                x.CreatedAt,
-                x.UpdatedAt,
-                x.ReadCount,
-                x.WordCount,
-                x.Content,
-                false,
-                false,
-                x.BookId
-            ))
+        var chapters = await query
             .ToListAsync();
+        var chapterVms = chapters.Select(MapChapterToChapterVm).ToList();
 
-        var response = new GetLatestCreatedChaptersResponse(chapterVms);
+        var response = new GetLatestCreatedChaptersResponse(chapterVms.ToList());
         return response;
     }
 
@@ -194,6 +149,173 @@ public class ChapterService : IChapterService
         throw new NotImplementedException();
     }
 
-    // TODO: Add the method for updating the chapter here
-    
+    public async Task UpdateNextChapterIndexAsync(UpdateNextChapterIndexRequest request)
+    {
+        var book = await _context.Books.FindAsync(request.BookId);
+        if (book is null)
+        {
+            throw new BookNotFoundException("The book with given Id does not exist.");
+        }
+
+        var currentChapter = await _context.Chapters
+            .FirstOrDefaultAsync(x => x.BookId == request.BookId && x.Index == request.CurrentIndex);
+        if (currentChapter is null)
+        {
+            throw new ChapterNotFoundException("The book's chapter with given index does not exist.");
+        }
+        
+        var rel = await _context.ChapterRelationships
+            .FirstOrDefaultAsync(x => x.FromId == currentChapter.Id);
+
+        if (request.NextIndex is not null)
+        {
+            if (request.CurrentIndex == request.NextIndex)
+            {
+                throw new ArgumentException("CurrentIndex must not be equal to NextIndex.");
+            }
+            
+            var nextChapter = await _context.Chapters
+                .FirstOrDefaultAsync(x => x.BookId == request.BookId && x.Index == request.NextIndex);
+            if (nextChapter is null)
+            {
+                throw new ChapterNotFoundException("The book's chapter with given index does not exist.");
+            }
+            
+            if (rel is not null)
+            {
+                _context.ChapterRelationships.Remove(rel);
+            }
+            
+            rel = new ChapterRelationship
+            {
+                FromId = currentChapter.Id,
+                ToId = nextChapter.Id
+            };
+
+            await _context.ChapterRelationships.AddAsync(rel);
+
+            await _context.SaveChangesAsync();
+            return;
+        }
+        
+        // If no specifying next chapter, then deleting the current rel
+        if (rel is not null)
+        {
+            _context.ChapterRelationships.Remove(rel);
+            await _context.SaveChangesAsync();
+        }
+    }
+
+    public async Task UpdatePreviousChapterIndexAsync(UpdatePreviousChapterIndexRequest request)
+    {
+        var book = await _context.Books.FindAsync(request.BookId);
+        if (book is null)
+        {
+            throw new BookNotFoundException("The book with given Id does not exist.");
+        }
+
+        var currentChapter = await _context.Chapters
+            .FirstOrDefaultAsync(x => x.BookId == request.BookId && x.Index == request.CurrentIndex);
+        if (currentChapter is null)
+        {
+            throw new ChapterNotFoundException("The book's chapter with given index does not exist.");
+        }
+        
+        var rel = await _context.ChapterRelationships
+            .FirstOrDefaultAsync(x => x.ToId == currentChapter.Id);
+
+        if (request.PreviousIndex is not null)
+        {
+            if (request.CurrentIndex == request.PreviousIndex)
+            {
+                throw new ArgumentException("CurrentIndex must not be equal to PreviousIndex.");
+            }
+            
+            var previousChapter = await _context.Chapters
+                .FirstOrDefaultAsync(x => x.BookId == request.BookId && x.Index == request.PreviousIndex);
+            if (previousChapter is null)
+            {
+                throw new ChapterNotFoundException("The book's chapter with given index does not exist.");
+            }
+            
+            if (rel is not null)
+            {
+                rel.FromId = previousChapter.Id;
+            }
+            
+            rel = new ChapterRelationship
+            {
+                FromId = previousChapter.Id,
+                ToId = currentChapter.Id
+            };
+
+            await _context.ChapterRelationships.AddAsync(rel);
+
+            await _context.SaveChangesAsync();
+            return;
+        }
+        
+        // If no specifying next chapter, then deleting the current rel
+        if (rel is not null)
+        {
+            _context.ChapterRelationships.Remove(rel);
+            await _context.SaveChangesAsync();
+        }
+    }
+
+    private async Task<ChapterVm> MapTotallyChapterToChapterVmAsync(Chapter chapter)
+    {
+        var nextRel = await _context.ChapterRelationships
+            .FirstOrDefaultAsync(x => x.FromId == chapter.Id);
+        int? nextIndex = null;
+        if (nextRel is not null)
+        {
+            var nextChapter = await _context.Chapters.FirstAsync(x => x.Id == nextRel.ToId);
+            nextIndex = nextChapter.Index;
+        }
+        
+        var prevRel = await _context.ChapterRelationships
+            .FirstOrDefaultAsync(x => x.ToId == chapter.Id);
+        int? prevIndex = null;
+        if (prevRel is not null)
+        {
+            var prevChapter = await _context.Chapters.FirstAsync(x => x.Id == prevRel.FromId);
+            prevIndex = prevChapter.Index;
+        }
+        
+        var chapterVm = new ChapterVm(
+            chapter.Id,
+            chapter.Index,
+            chapter.Name,
+            chapter.CreatedAt,
+            chapter.UpdatedAt,
+            chapter.ReadCount,
+            chapter.WordCount,
+            chapter.Content,
+            nextIndex,
+            prevIndex,
+            chapter.BookId
+        );
+
+        return chapterVm;
+    }
+
+    private ChapterVm MapChapterToChapterVm(Chapter chapter)
+    {
+        var chapterVm = new ChapterVm(
+            chapter.Id,
+            chapter.Index,
+            chapter.Name,
+            chapter.CreatedAt,
+            chapter.UpdatedAt,
+            chapter.ReadCount,
+            chapter.WordCount,
+            chapter.Content,
+            null,
+            null,
+            chapter.BookId
+        );
+
+        return chapterVm;
+    }
 }

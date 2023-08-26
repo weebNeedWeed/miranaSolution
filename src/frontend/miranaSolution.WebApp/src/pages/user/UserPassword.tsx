@@ -9,6 +9,7 @@ import {ToastVariant} from "../../components/Toast";
 import {useAccessToken} from "../../helpers/hooks/useAccessToken";
 import {useSystemContext} from "../../contexts/SystemContext";
 import {useNavigate} from "react-router-dom";
+import {Helmet} from "react-helmet";
 
 const PasswordChangingForm = (): JSX.Element => {
     const [ableToSubmit, setAbleToSubmit] = useState<boolean>(false)
@@ -142,6 +143,10 @@ const UserPassword = (): JSX.Element => {
     };
 
     return <div className="flex flex-col items-start justify-start mx-auto md:w-[400px] max-w-full">
+        <Helmet>
+            <title>User Password | Mirana Readers</title>
+        </Helmet>
+
         <ul className="self-start text-base sm:text-lg">
             <li className="flex flex-row gap-x-2 items-center">
                 <span className="w-4 h-4 bg-oldRose block shrink-0 self-start mt-1"></span>

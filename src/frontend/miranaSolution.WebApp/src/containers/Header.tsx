@@ -25,6 +25,10 @@ const Header = (): JSX.Element => {
 
     const slides = data.slides;
 
+    if (slides.length === 0) {
+        return <></>
+    }
+
     const currentSlide = slides![slideIndex];
 
     const genres = currentSlide.genres.split(",").map((elm) => elm.trim());

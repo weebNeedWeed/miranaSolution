@@ -24,5 +24,11 @@ public class CreateBookChapterRequestValidator : AbstractValidator<CreateBookCha
             .WithMessage("Content không được để trống.")
             .Length(8, 8192)
             .WithMessage("Content phải có độ dài từ 8 tới 8192 ký tự.");
+        
+        RuleFor(x => x.Index)
+            .NotNull()
+            .WithMessage("Index không được để trống.")
+            .GreaterThan(0)
+            .WithMessage("Index phải lớn hơn 0.");
     }
 }

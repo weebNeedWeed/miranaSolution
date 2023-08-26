@@ -7,12 +7,13 @@ import {genreApiHelper} from "../../helpers/apis/GenreApiHelper";
 import {useLocation, useNavigate, useSearchParams} from "react-router-dom";
 import clsx from "clsx";
 import {bookApiHelper} from "../../helpers/apis/BookApiHelper";
-import {useEffect, useMemo, useState} from "react";
+import React, {useEffect, useMemo, useState} from "react";
 import {Genre} from "../../helpers/models/catalog/books/Genre";
 import {useMediaQuery} from "../../helpers/hooks/useMediaQuery";
 import {GetAllBooksRequest} from "../../helpers/models/catalog/books/GetAllBooksRequest";
 import {authorApiHelper} from "../../helpers/apis/AuthorApiHelper";
 import {Author} from "../../helpers/models/catalog/author/Author";
+import {Helmet} from "react-helmet";
 
 type FilterButtonProps = {
     title: string;
@@ -528,6 +529,10 @@ const BookCardList = (props: BookCardListProps): JSX.Element => {
 
 const BooksIndex = (): JSX.Element => {
     return <Section className="text-deepKoamaru pt-0 md:pt-8">
+        <Helmet>
+            <title>Books | Mirana Readers</title>
+        </Helmet>
+
         <div className="flex flex-col md:flex-row items-stretch shadow-sm shadow-slate-500 rounded-md">
             <FilterSection/>
 

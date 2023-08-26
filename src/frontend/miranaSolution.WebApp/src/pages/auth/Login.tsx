@@ -1,4 +1,4 @@
-import {useId, useState} from "react";
+import React, {useId, useState} from "react";
 import {AiOutlineLock, AiOutlineUser} from "react-icons/ai";
 import {Link, useNavigate} from "react-router-dom";
 import {useSystemContext} from "../../contexts/SystemContext";
@@ -7,6 +7,7 @@ import {ToastVariant} from "../../components/Toast";
 import {AuthenticateUserResponse} from "../../helpers/models/auth/AuthenticateUserResponse";
 import {authApiHelper} from "../../helpers/apis/AuthApiHelper";
 import {IoIosArrowBack} from "react-icons/io";
+import {Helmet} from "react-helmet";
 
 const Login = (): JSX.Element => {
     const userNameId = useId();
@@ -99,6 +100,10 @@ const Login = (): JSX.Element => {
             onSubmit={handleSubmit}
             className="relative bg-white w-full p-8 sm:p-12 rounded-md shadow-md shadow-slate-500"
         >
+            <Helmet>
+                <title>Login | Mirana Readers</title>
+            </Helmet>
+
             <Link to={"/"}
                   className="flex flex-row items-center gap-x-1 absolute top-3 left-3 text-sm font-normal text-slate-600">
                 <IoIosArrowBack/>

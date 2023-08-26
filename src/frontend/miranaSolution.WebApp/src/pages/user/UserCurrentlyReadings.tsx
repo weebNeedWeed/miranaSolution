@@ -8,6 +8,8 @@ import {useAccessToken} from "../../helpers/hooks/useAccessToken";
 import {useBaseUrl} from "../../helpers/hooks/useBaseUrl";
 import {useSystemContext} from "../../contexts/SystemContext";
 import {ToastVariant} from "../../components/Toast";
+import {Helmet} from "react-helmet";
+import React from "react";
 
 type CurrentlyReadingBlockProps = {
     currentlyReading: CurrentlyReading;
@@ -84,6 +86,10 @@ const UserCurrentlyReadings = (): JSX.Element => {
     }
 
     return <div className="w-full">
+        <Helmet>
+            <title>Currently Readings | Mirana Readers</title>
+        </Helmet>
+
         <div className="w-full flex flex-row flex-wrap gap-2 md:gap-4">
             {data.currentlyReadings.map((elm, index) =>
                 <CurrentlyReadingBlock refetch={refetch} currentlyReading={elm} key={index}/>)}

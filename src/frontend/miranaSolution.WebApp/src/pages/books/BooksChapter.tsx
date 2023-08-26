@@ -7,7 +7,7 @@ import {AiFillEye} from "react-icons/ai";
 import {MdOutlineUpdate} from "react-icons/md";
 import {BiText} from "react-icons/bi";
 import {bookApiHelper} from "../../helpers/apis/BookApiHelper";
-import {useEffect, useState} from "react";
+import React, {useEffect, useState} from "react";
 import {CommentsSection} from "../../containers";
 import {RiMenuLine} from "react-icons/ri";
 import {FaBookmark, FaHome} from "react-icons/fa";
@@ -26,6 +26,7 @@ import {useLocalStorage} from "../../helpers/hooks/useLocalStorage";
 import {userApiHelper} from "../../helpers/apis/UserApiHelper";
 import {currentlyReadingApiHelper} from "../../helpers/apis/CurrentlyReadingApiHelper";
 import {CurrentlyReading} from "../../helpers/models/catalog/currentlyReading/CurrentlyReading";
+import {Helmet} from "react-helmet";
 
 type ChapterHeaderProps = {
     book: Book;
@@ -74,7 +75,7 @@ const PagerSection = ({chapter, book}: PagerSectionProps): JSX.Element => {
 
     return <div className="w-full flex flex-row items-center font-semibold text-base sm:text-xl
         bg-[rgba(255,255,255,0.8)] border-[1px] border-solid border-slate-400 px-2 py-2 sm:px-8 sm:py-4 justify-evenly relative">
-        {chapter.hasPreviousChapter ?
+        {chapter.previousIndex ?
             <Link className={"flex flex-row items-center grow"}
                   to={strTemplate.replace("[[chapter]]", (chapter.index - 1).toString())}>
                 <IoIosArrowBack/> {"Chương trước"}
@@ -89,7 +90,7 @@ const PagerSection = ({chapter, book}: PagerSectionProps): JSX.Element => {
             <VscBook className="text-2xl"/>
         </Link>
 
-        {chapter.hasNextChapter ?
+        {chapter.nextIndex ?
             <Link className={"flex flex-row items-center grow justify-end"}
                   to={strTemplate.replace("[[chapter]]", (chapter.index + 1).toString())}>
                 {"Chương kế"} <IoIosArrowForward/>
@@ -323,6 +324,13 @@ const BooksChapter = (): JSX.Element => {
 
     return <div
         className="mx-auto w-100% md:w-[768px] lg:w-[980px] max-w-full px-8 md:px-0 text-deepKoamaru mb-16">
+
+        <Helmet>
+            <title>
+                {`${book.name} #${chapter.index}`} | Mirana Readers
+            </title>
+        </Helmet>
+
         <ChapterHeader book={book} chapter={chapter}/>
 
         <div className="my-2">

@@ -11,6 +11,7 @@ import {useSystemContext} from "../../contexts/SystemContext";
 import {ToastVariant} from "../../components/Toast";
 import {useNavigate} from "react-router-dom";
 import {useQuery} from "react-query";
+import {Helmet} from "react-helmet";
 
 const InfoChangingForm = (): JSX.Element => {
     const [firstName, setFirstName] = useState<string>("");
@@ -195,6 +196,10 @@ const UserProfile = (): JSX.Element => {
     };
 
     return <div className="flex flex-col items-center justify-start mx-auto md:w-[400px] max-w-full">
+        <Helmet>
+            <title>User Profile | Mirana Readers</title>
+        </Helmet>
+
         <span className="w-full flex flex-col justify-start mt-4 items-center">
             {state.user.avatar !== "" ?
                 <Avatar imageUrl={baseUrl + state.user.avatar} className="w-28 h-28 sm:w-40 sm:h-40"/> :

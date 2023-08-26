@@ -7,7 +7,7 @@ export interface Chapter {
     readCount: number;
     wordCount: number;
     content: string;
-    hasNextChapter: boolean;
-    hasPreviousChapter: boolean;
+    nextIndex: number;
+    previousIndex: number;
     bookId: number;
 }

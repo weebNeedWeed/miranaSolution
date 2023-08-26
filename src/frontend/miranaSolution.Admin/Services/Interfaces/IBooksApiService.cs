@@ -1,8 +1,7 @@
 using miranaSolution.API.ViewModels.Books;
 using miranaSolution.API.ViewModels.Common;
-using miranaSolution.DTOs.Common;
 using miranaSolution.DTOs.Core.Books;
-using Newtonsoft.Json;
+using miranaSolution.DTOs.Core.Chapters;
 using Refit;
 
 namespace miranaSolution.Admin.Services.Interfaces;
@@ -27,7 +26,36 @@ public interface IBooksApiService
     Task<ApiResult<BookVm>> GetBookByIdAsync([AliasAs("id")] int id);
 
     [Get("/api/books/{id}/chapters")]
-    Task<ApiResult<ApiGetAllBookChaptersResponse>> GetAllBookChaptersAsync([AliasAs("id")] int id, ApiGetAllBookChaptersRequest request);
+    Task<ApiResult<ApiGetAllBookChaptersResponse>> GetAllBookChaptersAsync(
+        [AliasAs("id")] int id, 
+        ApiGetAllBookChaptersRequest request);
+    
+    [Get("/api/books/{id}/chapters/{index}")]
+    Task<ApiResult<ChapterVm>> GetBookChapterByIndexAsync(
+        [AliasAs("id")] int id, 
+        [AliasAs("index")] int index);
+    
+    [Put("/api/books/{id}/chapters/{index}/next/{nextIndex}")]
+    Task<ApiResult<ChapterVm>> UpdateNextChapterIndex(
+        [AliasAs("id")] int id, 
+        [AliasAs("index")] int index,
+        [AliasAs("nextIndex")] int nextIndex);
+    
+    [Put("/api/books/{id}/chapters/{index}/previous/{previousIndex}")]
+    Task<ApiResult<ChapterVm>> UpdatePreviousChapterIndex(
+        [AliasAs("id")] int id, 
+        [AliasAs("index")] int index,
+        [AliasAs("previousIndex")] int previousIndex);
+    
+    [Delete("/api/books/{id}/chapters/{index}/next")]
+    Task<ApiResult<ChapterVm>> RemoveNextChapterIndex(
+        [AliasAs("id")] int id, 
+        [AliasAs("index")] int index);
+    
+    [Delete("/api/books/{id}/chapters/{index}/previous")]
+    Task<ApiResult<ChapterVm>> RemovePreviousChapterIndex(
+        [AliasAs("id")] int id, 
+        [AliasAs("index")] int index);
 
     [Post("/api/books/{id}/chapters")]
     Task<ApiResult<dynamic>> CreateBookChapterAsync(

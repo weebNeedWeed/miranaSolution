@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using miranaSolution.Admin.Extensions;
 using miranaSolution.Admin.Services.Interfaces;
+using miranaSolution.Admin.ViewModels.Books;
 using miranaSolution.API.ViewModels.Books;
 using miranaSolution.API.ViewModels.Common;
 using miranaSolution.DTOs.Common;
@@ -81,6 +82,98 @@ public class BooksController : Controller
         });
 
         return View(chapters.Data);
+    }
+
+    [HttpGet("[controller]/{id:int}/chapters/{index:int}/next")]
+    public async Task<IActionResult> UpdateChapterNextIndex([FromRoute] int id, [FromRoute] int index)
+    {
+        var result = await _booksApiService.GetBookChapterByIndexAsync(id, index);
+        ViewBag.Chapter = result.Data;
+        var viewModel = new UpdateChapterNextIndexViewModel(result.Data.NextIndex);
+        
+        return View(viewModel);
+    }
+    
+    [HttpPost("[controller]/{id:int}/chapters/{index:int}/next")]
+    public async Task<IActionResult> UpdateChapterNextIndex(
+        [FromRoute] int id, 
+        [FromRoute] int index, 
+        [FromForm] UpdateChapterNextIndexViewModel viewModel)
+    {
+        var result = await _booksApiService.GetBookChapterByIndexAsync(id, index);
+        ViewBag.Chapter = result.Data;
+        
+        if (!viewModel.NextIndex.HasValue)
+        {
+            return View(viewModel);
+        }
+        
+        var response = await _booksApiService.UpdateNextChapterIndex(
+            id, index, viewModel.NextIndex.Value);
+
+        if (response.Status == "error")
+        {
+            ViewData[Constants.Error] = response.Message;
+            return View(viewModel);
+        }
+
+        return RedirectToAction("ShowChapters", new { id = result.Data.BookId });
+    }
+    
+    [HttpPost("[controller]/{id:int}/chapters/{index:int}/next:remove")]
+    public async Task<IActionResult> RemoveChapterNextIndex(
+        [FromRoute] int id, 
+        [FromRoute] int index)
+    {
+        var response = await _booksApiService.RemoveNextChapterIndex(id, index);
+
+        return RedirectToAction("UpdateChapterNextIndex", new { id,index});
+    }
+    
+    [HttpGet("[controller]/{id:int}/chapters/{index:int}/previous")]
+    public async Task<IActionResult> UpdateChapterPreviousIndex([FromRoute] int id, [FromRoute] int index)
+    {
+        var result = await _booksApiService.GetBookChapterByIndexAsync(id, index);
+        ViewBag.Chapter = result.Data;
+        var viewModel = new UpdateChapterPreviousIndexViewModel(result.Data.PreviousIndex);
+        
+        return View(viewModel);
+    }
+    
+    [HttpPost("[controller]/{id:int}/chapters/{index:int}/previous:remove")]
+    public async Task<IActionResult> RemoveChapterPreviousIndex(
+        [FromRoute] int id, 
+        [FromRoute] int index)
+    {
+        var response = await _booksApiService.RemovePreviousChapterIndex(id, index);
+
+        return RedirectToAction("UpdateChapterPreviousIndex", new { id,index});
+    }
+    
+    [HttpPost("[controller]/{id:int}/chapters/{index:int}/previous")]
+    public async Task<IActionResult> UpdateChapterPreviousIndex(
+        [FromRoute] int id, 
+        [FromRoute] int index, 
+        [FromForm] UpdateChapterPreviousIndexViewModel viewModel)
+    {
+        var result = await _booksApiService.GetBookChapterByIndexAsync(id, index);
+        ViewBag.Chapter = result.Data;
+        
+        if (!viewModel.PreviousIndex.HasValue)
+        {
+            return View(viewModel);
+        }
+        
+        var response = await _booksApiService.UpdatePreviousChapterIndex(
+            id, index, viewModel.PreviousIndex.Value);
+
+        if (response.Status == "error")
+        {
+            ViewData[Constants.Error] = response.Message;
+            return View(viewModel);
+        }
+
+        return RedirectToAction("ShowChapters", new { id = result.Data.BookId });
     }
 
     // POST /books/create

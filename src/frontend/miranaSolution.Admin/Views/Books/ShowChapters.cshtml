@@ -39,23 +39,47 @@
                 <th>Id</th>
                 <th>Name</th>
                 <th>Index</th>
-                <th>Updated At</th>
                 <th>Read Count</th>
                 <th>Word Count</th>
+                <th>Previous Index</th>
+                <th>Next Index</th>
                 <th></th>
             </tr>
             </thead>
             <tbody>
-            @foreach (var book in Model.Chapters)
+            @foreach (var chapter in Model.Chapters)
             {
                 <tr>
-                    <td>@book.Id</td>
-                    <td>@book.Name</td>
-                    <td>@book.Index</td>
-                    <td>@book.UpdatedAt</td>
-                    <td>@book.ReadCount</td>
-                    <td>@book.WordCount</td>
+                    <td>@chapter.Id</td>
+                    <td>@chapter.Name</td>
+                    <td>@chapter.Index</td>
+                    <td>@chapter.ReadCount</td>
+                    <td>@chapter.WordCount</td>
+                    <th>@chapter.PreviousIndex</th>
+                    <th>@chapter.NextIndex</th>
                     <td>
+                        <div class="row-table-action">
+                            <a asp-action="UpdateChapterPreviousIndex" 
+                               asp-route-id="@chapter.BookId" 
+                               asp-route-index="@chapter.Index" 
+                               title="Update previous chapter">
+                                <i class="fa-solid fa-arrow-left"></i>
+                            </a>
+                            
+                            <a asp-action="UpdateChapterNextIndex"
+                               asp-route-id="@chapter.BookId" 
+                               asp-route-index="@chapter.Index" 
+                               title="Update next chapter">
+                                <i class="fa-solid fa-arrow-right"></i>
+                            </a>
+                            
+                            @* <form method="POST" asp-action="DeleteBook" asp-route-id="@book.Id"> *@
+                            @*     <button title="Delete" type="submit" class="p-0 text-danger bg-transparent border-0"> *@
+                            @*         <i class="fa-solid fa-trash"></i> *@
+                            @*     </button> *@
+                            @* </form> *@
+                        </div>
+                        
                     </td>
                 </tr>
             }

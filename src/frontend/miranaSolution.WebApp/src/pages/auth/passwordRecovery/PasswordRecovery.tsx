@@ -6,6 +6,7 @@ import {useSystemContext} from "../../../contexts/SystemContext";
 import {ToastVariant} from "../../../components/Toast";
 import {authApiHelper} from "../../../helpers/apis/AuthApiHelper";
 import clsx from "clsx";
+import {Helmet} from "react-helmet";
 
 const PasswordRecovery = (): JSX.Element => {
     const emailId = useId();
@@ -93,6 +94,9 @@ const PasswordRecovery = (): JSX.Element => {
         onSubmit={handleSubmit}
         className="relative bg-white w-full p-8 sm:p-12 rounded-md shadow-md shadow-slate-500"
     >
+        <Helmet>
+            <title>Recovery | Mirana Readers</title>
+        </Helmet>
         <Link to={"/"}
               className="flex flex-row items-center gap-x-1 absolute top-3 left-3 text-sm font-normal text-slate-600">
             <IoIosArrowBack/>

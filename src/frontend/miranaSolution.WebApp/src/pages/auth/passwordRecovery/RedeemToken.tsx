@@ -5,6 +5,7 @@ import {AiOutlineLock} from "react-icons/ai";
 import {authApiHelper} from "../../../helpers/apis/AuthApiHelper";
 import {ToastVariant} from "../../../components/Toast";
 import {useSystemContext} from "../../../contexts/SystemContext";
+import {Helmet} from "react-helmet";
 
 const RedeemToken = (): JSX.Element => {
     const [searchParams] = useSearchParams();
@@ -112,6 +113,10 @@ const RedeemToken = (): JSX.Element => {
         onSubmit={handleSubmit}
         className="relative bg-white w-full p-8 sm:p-12 rounded-md shadow-md shadow-slate-500"
     >
+        <Helmet>
+            <title>Redeem Token | Mirana Readers</title>
+        </Helmet>
+
         <Link to={"/"}
               className="flex flex-row items-center gap-x-1 absolute top-3 left-3 text-sm font-normal text-slate-600">
             <IoIosArrowBack/>

@@ -1,0 +1,34 @@
+﻿@model miranaSolution.Admin.ViewModels.Books.UpdateChapterNextIndexViewModel
+
+@{
+    ViewData["title"] = "Update next of chapter #" + ViewBag.Chapter.Index;
+}
+
+<h1 class="mt-4">Update next of chapter #@ViewBag.Chapter.Index</h1>
+<div class="card mb-4">
+    <div class="card-header">
+        <a asp-action="Index" class="btn btn-danger">Back</a>
+    </div>
+    <div class="card-body">
+        <form id="remove-form" asp-action="RemoveChapterNextIndex" asp-route-id="@ViewBag.Chapter.BookId" asp-route-index="@ViewBag.Chapter.Index" method="POST">
+        </form>
+        
+        <form asp-route-id="@ViewBag.Chapter.BookId" asp-route-index="@ViewBag.Chapter.Index" enctype="multipart/form-data" asp-action="UpdateChapterNextIndex" method="POST">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            
+            <div class="form-group flex-grow-1">
+                <label asp-for="NextIndex">Next Index</label>
+                <div class="d-flex flex-row gap-2">
+                    <input class="form-control flex-grow-1" placeholder="Enter next index" asp-for="NextIndex" min="1">
+                    <button type="submit" class="btn btn-danger" form="remove-form">
+                        <i class="fa-solid fa-x"></i>
+                    </button>
+                </div>
+                <span asp-validation-for="NextIndex" class="text-danger form-text"></span>
+            </div>
+
+            <button type="submit" class="btn btn-primary mt-4">Submit</button>
+        </form>
+
+    </div>
+</div>

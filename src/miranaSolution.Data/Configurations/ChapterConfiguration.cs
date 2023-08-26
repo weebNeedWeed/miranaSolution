@@ -16,7 +16,7 @@ public class ChapterConfiguration : IEntityTypeConfiguration<Chapter>
 
         builder.Property(x => x.CreatedAt)
             .IsRequired().HasDefaultValueSql("getdate()");
-        ;
+        
         builder.Property(x => x.UpdatedAt)
             .IsRequired().HasDefaultValueSql("getdate()");
 

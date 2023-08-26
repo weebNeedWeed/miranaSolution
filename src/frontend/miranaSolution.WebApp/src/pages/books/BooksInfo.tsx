@@ -25,6 +25,10 @@ import {bookUpvoteApiHelper} from "../../helpers/apis/BookUpvoteApiHelper";
 import {IoIosArrowForward} from "react-icons/io";
 import {MobileChapterList} from "../../containers/MobileChapterList";
 import {currentlyReadingApiHelper} from "../../helpers/apis/CurrentlyReadingApiHelper";
+import {useLocalStorage} from "../../helpers/hooks/useLocalStorage";
+import {CurrentlyReading} from "../../helpers/models/catalog/currentlyReading/CurrentlyReading";
+import {useBaseUrl} from "../../helpers/hooks/useBaseUrl";
+import {Helmet} from "react-helmet";
 
 type MobileTabsSectionProps = {
     getChaptersResponse: GetAllChaptersResponse;
@@ -274,10 +278,14 @@ const BooksInfo = (): JSX.Element => {
     const [upvote, setUpvote] = useState<BookUpvote>();
     const [startChapter, setStartChapter] = useState(1);
 
+    const [offlineReadingBooks, setOfflineReadingBooks] = useLocalStorage<CurrentlyReading[]>("readings", []);
+
     const [openRatingDialog, setOpenRatingDialog] = useState(false);
 
     const pageIndex = parseInt(searchParams.get("pageIndex") ?? "1", 10);
     const pageSize = parseInt(searchParams.get("pageSize") ?? "30", 10);
+
+    const baseUrl = useBaseUrl();
 
     useEffect(() => {
         (async () => {
@@ -294,7 +302,15 @@ const BooksInfo = (): JSX.Element => {
                     pageSize
                 });
 
+                const fetchAllToGetFirstChapter = await bookApiHelper.getAllChapters({
+                    bookId: result.book.id,
+                    pageIndex: 1,
+                    pageSize: 1
+                });
+
                 setResponse(chaptersResult);
+                let start = fetchAllToGetFirstChapter.chapters.length > 0 ?
+                    fetchAllToGetFirstChapter.chapters[0].index : 1;
 
                 if (authContext.state.isLoggedIn) {
                     const bookmarks = await bookmarkApiHelper.getAllBookmark(accessToken, result.book.id);
@@ -306,9 +322,16 @@ const BooksInfo = (): JSX.Element => {
                     const getCurrReadingBooks = await currentlyReadingApiHelper
                         .getCurrentlyReadingBooks(accessToken, result.book.id);
                     if (getCurrReadingBooks.currentlyReadings.length > 0) {
-                        setStartChapter(getCurrReadingBooks.currentlyReadings[0].chapterIndex);
+                        start = getCurrReadingBooks.currentlyReadings[0].chapterIndex;
+                    }
+                } else {
+                    const currentChapter = offlineReadingBooks.find((elm) => elm.bookId === result.book.id);
+                    if (currentChapter) {
+                        start = currentChapter.chapterIndex;
                     }
                 }
+
+                setStartChapter(start);
             } catch (error: any) {
                 // TODO: Navigate the user to not found page
                 navigate("/404");
@@ -425,12 +448,16 @@ const BooksInfo = (): JSX.Element => {
     }
 
     return <Section className="text-deepKoamaru pt-0 md:pt-8">
+        <Helmet>
+            <title>{book.name} | Mirana Readers</title>
+        </Helmet>
+
         <div
             className="w-full bg-[rgba(255,255,255,0.8)] rounded-md shadow-sm shadow-slate-500 flex flex-col">
             <div className="w-full flex flex-row items-stretch px-6 pt-6 pb-0 md:pb-6">
                 <span
                     className="w-24 h-auto md:w-40 aspect-[3/4] shrink-0 block rounded-md bg-cover bg-center bg-no-repeat drop-shadow-md"
-                    style={{backgroundImage: `url('${book.thumbnailImage}')`}}>
+                    style={{backgroundImage: `url('${baseUrl}/${book.thumbnailImage}')`}}>
                 </span>
 
                 <div className="ml-2 md:ml-4 grow w-full flex flex-col">
