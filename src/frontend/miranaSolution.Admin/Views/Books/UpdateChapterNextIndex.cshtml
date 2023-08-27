@@ -7,7 +7,12 @@
 <h1 class="mt-4">Update next of chapter #@ViewBag.Chapter.Index</h1>
 <div class="card mb-4">
     <div class="card-header">
-        <a asp-action="Index" class="btn btn-danger">Back</a>
+        <a
+            asp-action="ShowChapters"
+            asp-route-id="@ViewBag.Chapter.BookId"
+            class="btn btn-danger">
+            Back
+        </a>
     </div>
     <div class="card-body">
         <form id="remove-form" asp-action="RemoveChapterNextIndex" asp-route-id="@ViewBag.Chapter.BookId" asp-route-index="@ViewBag.Chapter.Index" method="POST">

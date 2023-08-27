@@ -17,7 +17,7 @@ public class ApiExceptionFilter : IExceptionFilter
 
     public void OnException(ExceptionContext context)
     {
-        // Automatic catching the validation error, then return the api fail result to clients
+        // Automatic catching the validation error, then returning the api failure results to the client
         if (context.Exception is ValidationException exception)
         {
             context.Result = new JsonResult(exception.Errors.ToApiFailResult());

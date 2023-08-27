@@ -61,6 +61,17 @@ public interface IBooksApiService
     Task<ApiResult<dynamic>> CreateBookChapterAsync(
         [AliasAs("id")] int id, 
         [Body] ApiCreateBookChapterRequest request);
+    
+    [Delete("/api/books/{id}/chapters/{index}")]
+    Task<ApiResult<dynamic>> DeleteBookChapterAsync(
+        [AliasAs("id")] int id, 
+        [AliasAs("index")] int index);
+    
+    [Put("/api/books/{id}/chapters/{index}")]
+    Task<ApiResult<dynamic>> UpdateBookChapterAsync(
+        [AliasAs("id")] int id, 
+        [AliasAs("index")] int index, 
+        [Body] ApiUpdateBookChapterRequest request);
 
     [Delete("/api/books/{id}")]
     Task<ApiResult<dynamic>> DeleteBookAsync(

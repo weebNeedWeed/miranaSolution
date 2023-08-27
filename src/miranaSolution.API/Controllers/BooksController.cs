@@ -328,6 +328,57 @@ public class BooksController : ControllerBase
         }
     }
 
+    [HttpPut("{bookId:int}/chapters/{index:int}")]
+    [Authorize(Roles = RolesConstant.Administrator)]
+    public async Task<IActionResult> UpdateBookChapter([FromRoute] int bookId, 
+        [FromRoute] int index, [FromBody] ApiUpdateBookChapterRequest request)
+    {
+        try
+        {
+            var updateResult = await _chapterService.UpdateBookChapterAsync(
+                new UpdateBookChapterRequest(
+                    bookId,
+                    index,
+                    request.Name,
+                    request.WordCount,
+                    request.Content,
+                    request.NewIndex));
+            
+            return Ok(new ApiSuccessResult<ChapterVm>(updateResult.ChapterVm));
+        }
+        catch (ChapterNotFoundException ex)
+        {
+            return Ok(new ApiErrorResult(ex.Message));
+        }
+        catch (ChapterAlreadyExistsException ex)
+        {
+            return Ok(new ApiErrorResult(ex.Message));
+        }
+    }
+    
+    [HttpDelete("{bookId:int}/chapters/{index:int}")]
+    [Authorize(Roles = RolesConstant.Administrator)]
+    public async Task<IActionResult> DeleteBookChapter([FromRoute] int bookId, [FromRoute] int index)
+    {
+        try
+        {
+             await _chapterService.DeleteBookChapterAsync(
+                new DeleteBookChapterRequest(
+                    bookId,
+                    index));
+            
+            return Ok(new ApiSuccessResult<object>());
+        }
+        catch (ChapterNotFoundException ex)
+        {
+            return Ok(new ApiErrorResult(ex.Message));
+        }
+        catch (Exception ex)
+        {
+            return Ok(new ApiErrorResult(ex.Message));
+        }
+    }
+    
     // GET /api/books/{slug}
     [HttpGet("{slug}")]
     [AllowAnonymous]

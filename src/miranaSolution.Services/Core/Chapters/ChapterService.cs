@@ -139,14 +139,54 @@ public class ChapterService : IChapterService
         return response;
     }
 
-    public Task DeleteBookChapterAsync(DeleteBookChapterRequest request)
+    public async Task DeleteBookChapterAsync(DeleteBookChapterRequest request)
     {
-        throw new NotImplementedException();
+        var chapter = await _context.Chapters.FirstOrDefaultAsync(
+            x => x.BookId == request.BookId && x.Index == request.Index);
+        if (chapter is null)
+        {
+            throw new ChapterNotFoundException("The chapter with given index does not exist.");
+        }
+
+        if (await _context.ChapterRelationships.AnyAsync(
+                x => x.FromId == chapter.Id
+                     || x.ToId == chapter.Id))
+        {
+            throw new Exception("There is a need to remove the relationship to the next or previous chapter.");
+        }
+
+        _context.Chapters.Remove(chapter);
+        await _context.SaveChangesAsync();
     }
 
-    public Task<UpdateBookChapterResponse> UpdateBookChapterAsync(UpdateBookChapterRequest request)
+    public async Task<UpdateBookChapterResponse> UpdateBookChapterAsync(UpdateBookChapterRequest request)
     {
-        throw new NotImplementedException();
+        _validatorProvider.Validate(request);
+        
+        var chapter = await _context.Chapters.FirstOrDefaultAsync(
+            x => x.BookId == request.BookId && x.Index == request.CurrentIndex);
+        if (chapter is null)
+        {
+            throw new ChapterNotFoundException("The chapter with given index does not exist.");
+        }
+
+        if (await _context.Chapters.AnyAsync(
+                x => x.BookId == request.BookId
+                     && x.Index != request.CurrentIndex
+                     && x.Index == request.NewIndex))
+        {
+            throw new ChapterAlreadyExistsException("The chapter with given index already exists");
+        }
+
+        chapter.Index = request.NewIndex;
+        chapter.Content = request.Content;
+        chapter.WordCount = request.WordCount;
+        chapter.Name = request.Name;
+
+        await _context.SaveChangesAsync();
+
+        return new UpdateBookChapterResponse(
+            await MapTotallyChapterToChapterVmAsync(chapter));
     }
 
     public async Task UpdateNextChapterIndexAsync(UpdateNextChapterIndexRequest request)

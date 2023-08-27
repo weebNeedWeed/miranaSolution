@@ -1,3 +1,4 @@
 ﻿namespace miranaSolution.DTOs.Core.Chapters;
 
-public record UpdateBookChapterResponse();
+public record UpdateBookChapterResponse(
+    ChapterVm ChapterVm);

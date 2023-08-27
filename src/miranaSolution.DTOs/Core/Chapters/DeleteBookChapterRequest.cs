@@ -1,3 +1,5 @@
 ﻿namespace miranaSolution.DTOs.Core.Chapters;
 
-public record DeleteBookChapterRequest();
+public record DeleteBookChapterRequest(
+    int BookId,
+    int Index);

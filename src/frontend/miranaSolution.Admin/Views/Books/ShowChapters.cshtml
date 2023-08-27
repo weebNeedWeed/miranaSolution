@@ -73,11 +73,16 @@
                                 <i class="fa-solid fa-arrow-right"></i>
                             </a>
                             
-                            @* <form method="POST" asp-action="DeleteBook" asp-route-id="@book.Id"> *@
-                            @*     <button title="Delete" type="submit" class="p-0 text-danger bg-transparent border-0"> *@
-                            @*         <i class="fa-solid fa-trash"></i> *@
-                            @*     </button> *@
-                            @* </form> *@
+                            <a asp-route-id="@chapter.BookId" asp-route-index="@chapter.Index" asp-action="UpdateChapter" title="Edit">
+                                <i class="fa-solid fa-pen-to-square"></i>
+                            </a>
+                            
+                            <form method="POST" asp-action="DeleteChapter" asp-route-id="@chapter.BookId">
+                                <input type="hidden" value="@chapter.Index" name="index"/>
+                                <button title="Delete" type="submit" class="p-0 text-danger bg-transparent border-0">
+                                    <i class="fa-solid fa-trash"></i>
+                                </button>
+                            </form>
                         </div>
                         
                     </td>
