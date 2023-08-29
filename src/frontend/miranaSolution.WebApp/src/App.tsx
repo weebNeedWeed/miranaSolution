@@ -3,7 +3,7 @@ import {router} from "./helpers/https/routing";
 import {QueryClient, QueryClientProvider} from "react-query";
 import {SystemContextProvider} from "./contexts/SystemContext";
 import {AuthenticationContextProvider} from "./contexts/AuthenticationContext";
-import React from "react";
+import React, {useEffect} from "react";
 import {Helmet} from "react-helmet";
 import logo from "./assets/favicon.svg";
 
