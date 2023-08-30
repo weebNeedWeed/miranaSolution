@@ -4,6 +4,7 @@ import {BsBoxArrowInRight} from "react-icons/bs";
 import {AnimatePresence, motion} from "framer-motion";
 import {useQuery} from "react-query";
 import {slideApiHelper} from "../helpers/apis/SlideApiHelper";
+import {Link} from "react-router-dom";
 
 const motionVariants = {
     initial: {opacity: 0, y: 50},
@@ -61,13 +62,14 @@ const Header = (): JSX.Element => {
                         <p className="text-base text-deepKoamaru mb-4">
                             {currentSlide.shortDescription}
                         </p>
-                        <button
+                        <Link
+                            to={currentSlide.url}
                             className="group flex flex-row justify-center items-center outline-none rounded-md border-2 border-solid border-deepKoamaru px-3 py-1 text-lg font-semibold font-sansPro text-deepKoamaru bg-[rgba(var(--color-old-rose),0.6)] transition-all hover:bg-[rgba(var(--color-old-rose),0.4)]">
                             <p className="mr-1 group-hover:mr-2 transition-all">Đọc ngay</p>
                             <span>
-                <BsBoxArrowInRight/>
-              </span>
-                        </button>
+                                <BsBoxArrowInRight/>
+                            </span>
+                        </Link>
                     </motion.div>
                 </AnimatePresence>
 

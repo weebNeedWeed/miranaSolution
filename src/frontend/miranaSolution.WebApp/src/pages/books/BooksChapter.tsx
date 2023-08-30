@@ -175,7 +175,7 @@ const ChapterContent = (props: { book: Book; chapter: Chapter }): JSX.Element =>
 
             setOfflineReadingBooks([...offlineReadingBooks]);
         }
-    }, []);
+    }, [props.book.id, props.chapter.index]);
 
     const variants = {
         initial: {bottom: "-120%"},
@@ -311,12 +311,16 @@ const BooksChapter = (): JSX.Element => {
                 setChapter(_chapter);
 
                 if (authContext.state.isLoggedIn) {
+                    const getCurrentlyReadingBooksResponse = await currentlyReadingApiHelper.getCurrentlyReadingBooks(accessToken, bookId);
+                    if (getCurrentlyReadingBooksResponse.currentlyReadings.length === 1) {
+                        await currentlyReadingApiHelper.removeBook(accessToken, bookId);
+                    }
                     await currentlyReadingApiHelper.addBook(accessToken, {bookId, chapterIndex: _chapter.index});
                 }
             } catch (error: any) {
             }
         })();
-    }, [slug, index]);
+    }, [index]);
 
     if (!book || !chapter) {
         return <div></div>;

@@ -41,6 +41,6 @@ public class MiranaDbContext : IdentityDbContext<AppUser, AppRole, Guid>
         builder.Entity<IdentityUserRole<Guid>>().ToTable("AppUserRoles");
         builder.Entity<IdentityUserToken<Guid>>().ToTable("AppUserTokens");
 
-        builder.Seed();
+        // builder.Seed();
     }
 }

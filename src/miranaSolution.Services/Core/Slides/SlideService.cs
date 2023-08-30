@@ -31,6 +31,7 @@ public class SlideService : ISlideService
             Genres = request.Genres,
             ShortDescription = request.ShortDescription,
             SortOrder = request.SortOrder,
+            Url = request.Url,
             ThumbnailImage = await _imageSaver.SaveImageAsync(
                 request.ThumbnailImage, request.ThumbnailImageExtension)
         };
@@ -55,6 +56,7 @@ public class SlideService : ISlideService
         slide.ShortDescription = request.ShortDescription;
         slide.SortOrder = request.SortOrder;
         slide.Genres = request.Genres;
+        slide.Url = request.Url;
 
         if (request.ThumbnailImage is not null)
         {
@@ -108,6 +110,7 @@ public class SlideService : ISlideService
             slide.ShortDescription,
             slide.ThumbnailImage,
             slide.Genres,
-            slide.SortOrder);
+            slide.SortOrder,
+            slide.Url);
     }
 }

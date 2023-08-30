@@ -17,6 +17,7 @@ public interface ISlidesApiService
         [AliasAs("shortDescription")]string shortDescription,
         [AliasAs("genres")]string genres,
         [AliasAs("sortOrder")]int sortOrder,
+        [AliasAs("url")]string url,
         [AliasAs("thumbnailImage")] StreamPart thumbnailImage);
 
     [Get("/api/slides/{id}")]
@@ -35,5 +36,6 @@ public interface ISlidesApiService
         [AliasAs("shortDescription")] string shortDescription,
         [AliasAs("genres")] string genres,
         [AliasAs("sortOrder")] int sortOrder,
+        [AliasAs("url")]string url,
         [AliasAs("thumbnailImage")] StreamPart? thumbnailImage);
 }

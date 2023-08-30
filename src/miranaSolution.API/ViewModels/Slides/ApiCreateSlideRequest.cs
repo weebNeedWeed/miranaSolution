@@ -5,4 +5,5 @@ public record ApiCreateSlideRequest(
     string ShortDescription,
     string Genres,
     int SortOrder,
+    string Url,
     IFormFile ThumbnailImage);

@@ -6,4 +6,5 @@ public record SlideVm(
     string ShortDescription,
     string ThumbnailImage,
     string Genres,
-    int SortOrder);
+    int SortOrder,
+    string Url);

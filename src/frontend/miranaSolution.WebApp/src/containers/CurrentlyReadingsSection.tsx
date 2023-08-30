@@ -99,10 +99,10 @@ const CurrentlyReadingsSection = (): JSX.Element => {
             <h2 className="text-xl gradient-text font-bold mb-4">Đang đọc</h2>
 
             <div className="flex flex-col justify-start items-center">
-                {data && data.currentlyReadings.map((elm, index) =>
+                {data && data.currentlyReadings.slice(0, 5).map((elm, index) =>
                     <ReadingCard refetch={refetch} currentlyReading={elm} key={index}/>)}
 
-                {!data && offlineReadingBooks.slice(0, 6).map((elm, index) =>
+                {!data && offlineReadingBooks.slice(0, 5).map((elm, index) =>
                     <ReadingCard offline={true} refetch={() => {
                     }} currentlyReading={elm} key={index}/>)}
             </div>

@@ -6,5 +6,6 @@ public record UpdateSlideRequest(
     string ShortDescription,
     string Genres,
     int SortOrder,
+    string Url,
     Stream? ThumbnailImage,
     string? ThumbnailImageExtension);

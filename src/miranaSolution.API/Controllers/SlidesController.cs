@@ -60,6 +60,7 @@ public class SlidesController : ControllerBase
                     request.ShortDescription,
                     request.Genres,
                     request.SortOrder,
+                    request.Url,
                     stream,
                     ext));
 
@@ -111,6 +112,7 @@ public class SlidesController : ControllerBase
                         request.ShortDescription,
                         request.Genres,
                         request.SortOrder,
+                        request.Url,
                         stream,
                         ext));
 

@@ -37,6 +37,12 @@
                 <span asp-validation-for="SortOrder" class="text-danger form-text"></span>
             </div>
             
+            <div class="form-group mt-4">
+                <label asp-for="Url">Url</label>
+                <input class="form-control" placeholder="Enter url" asp-for="Url">
+                <span asp-validation-for="Url" class="text-danger form-text"></span>
+            </div>
+            
             <div class="input-group mt-4 d-flex flex-column">
                 <input type="file" asp-for="ThumbnailImage">
                 <span asp-validation-for="ThumbnailImage" class="text-danger form-text"></span>

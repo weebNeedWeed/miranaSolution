@@ -44,7 +44,7 @@ const GenresBox = (props: GenresBoxProps): JSX.Element => {
         </div>;
     });
 
-    return <div className="flex flex-col w-full p-3">
+    return <div className="flex flex-col w-full p-3 gap-y-2">
         {mappedGenreTupleList}
     </div>;
 };
@@ -71,7 +71,7 @@ const Menu = ({className, handleOpenGenresBox}: MenuProps): JSX.Element => {
                 <button onClick={handleOpenGenresBox}>Thể loại</button>
 
                 <div
-                    className="shadow-md shadow-oldRose md:group-hover:block left-[50%] absolute hidden bg-oldRose top-full opacity-80 w-56 h-auto translate-x-[-50%] rounded-sm">
+                    className="shadow-md shadow-oldRose md:group-hover:block left-[50%] absolute hidden bg-oldRose top-full w-56 h-auto translate-x-[-50%] rounded-sm">
                     <GenresBox/>
                 </div>
             </div>

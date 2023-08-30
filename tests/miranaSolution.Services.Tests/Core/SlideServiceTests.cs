@@ -52,6 +52,7 @@ public class SlideServiceTests
                 des,
                 "",
                 sortOrder,
+                "",
                 Stream.Null,
                 ""));
 
@@ -75,6 +76,7 @@ public class SlideServiceTests
                     "",
                     "",
                     1,
+                    "",
                     Stream.Null,
                     "")));
     }
@@ -107,6 +109,7 @@ public class SlideServiceTests
                 des,
                 "",
                 sortOrder,
+                "",
                 Stream.Null,
                 ""));
 
@@ -128,6 +131,7 @@ public class SlideServiceTests
                     "",
                     "",
                     1,
+                    "",
                     Stream.Null,
                     "")));
     }
@@ -146,6 +150,7 @@ public class SlideServiceTests
                     "",
                     "",
                     1,
+                    "",
                     Stream.Null,
                     "")));
     }

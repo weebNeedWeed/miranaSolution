@@ -6,7 +6,7 @@ import {GetAllSlidesResponse} from "../models/catalog/sildes/GetAllSlidesRespons
 class SlideApiHelper extends BaseApiHelper {
     async getAllSlides(): Promise<GetAllSlidesResponse> {
         const response = await this.init().get<ApiResult<GetAllSlidesResponse>>("/slides");
-        console.log(response);
+        
         if (response.data.status === "error") {
             throw new Error(response.data.message);
         }

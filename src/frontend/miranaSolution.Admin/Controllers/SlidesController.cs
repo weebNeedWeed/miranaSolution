@@ -43,6 +43,7 @@ public class SlidesController : Controller
             request.ShortDescription,
             request.Genres,
             request.SortOrder,
+            request.Url,
             streamPart);
         
         if (response.Status == "error")
@@ -81,6 +82,7 @@ public class SlidesController : Controller
             getSlideResult.Data.ShortDescription,
             getSlideResult.Data.Genres,
             getSlideResult.Data.SortOrder,
+            getSlideResult.Data.Url,
             null);
 
         return View(viewModel);
@@ -105,6 +107,7 @@ public class SlidesController : Controller
             request.ShortDescription,
             request.Genres,
             request.SortOrder,
+            request.Url,
             streamPart);
         
         if (response.Status == "error")

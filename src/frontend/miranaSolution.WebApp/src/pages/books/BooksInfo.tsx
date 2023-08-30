@@ -484,7 +484,7 @@ const BooksInfo = (): JSX.Element => {
                     <div className="md:flex hidden flex-row justify-start items-center mt-2 gap-x-8">
                         <div className="flex flex-col items-start">
                             <span className="font-semibold text-xl">
-                                {getAllChaptersResponse?.totalPages}
+                                {getAllChaptersResponse?.totalChapters}
                             </span>
 
                             <span className="font-normal text-base">
@@ -577,7 +577,7 @@ const BooksInfo = (): JSX.Element => {
                 <div className="md:hidden flex flex-row justify-around items-center">
                     <div className="flex flex-col items-start">
                             <span className="font-semibold text-lg">
-                                {getAllChaptersResponse?.totalPages}
+                                {getAllChaptersResponse?.totalChapters}
                             </span>
 
                         <span className="font-normal text-sm">

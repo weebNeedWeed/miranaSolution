@@ -1,8 +1,12 @@
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Options;
 using miranaSolution.API.Extensions;
 using miranaSolution.API.Filters;
 using miranaSolution.API.HealthChecks;
 using miranaSolution.Data;
+using miranaSolution.Data.Entities;
+using miranaSolution.Data.Main;
 using miranaSolution.Services;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -18,7 +22,8 @@ builder.Services.Configure<ApiBehaviorOptions>(x => { x.SuppressModelStateInvali
 // Add project's logical layers
 builder.Services
     .AddDataLayer()
-    .AddBusinessLayer();
+    .AddBusinessLayer()
+    .Configure<SeedingOptions>(builder.Configuration.GetSection(SeedingOptions.SectionName));
 
 builder.Services
     .AddAuth()
@@ -39,6 +44,19 @@ builder.Services.AddHealthChecks()
     .AddCheck<DatabaseHealthCheck>("Database");
 
 var app = builder.Build();
+
+// Seeding data
+using (var serviceScope = app.Services.CreateScope())
+{
+    var serviceProvider = serviceScope.ServiceProvider;
+    var dbContext = serviceProvider.GetRequiredService<MiranaDbContext>();
+    var userManager = serviceProvider.GetRequiredService<UserManager<AppUser>>();
+    var roleManager = serviceProvider.GetRequiredService<RoleManager<AppRole>>();
+    var seedingOptions = serviceProvider.GetRequiredService<IOptions<SeedingOptions>>();
+
+    var seeder = new SampleDataSeeder(dbContext,userManager,roleManager,seedingOptions);
+    await seeder.SeedAllAsync();
+}
 
 if (app.Environment.IsDevelopment())
 {

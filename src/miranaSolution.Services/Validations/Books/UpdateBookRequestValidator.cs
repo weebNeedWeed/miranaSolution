@@ -21,14 +21,14 @@ public class UpdateBookRequestValidator : AbstractValidator<UpdateBookRequest>
         RuleFor(x => x.ShortDescription)
             .NotNull()
             .WithMessage("ShortDescription không được để trống.")
-            .Length(0, 256)
-            .WithMessage("ShortDescription phải có độ dài từ 0 tới 256 ký tự.");
+            .Length(0, 512)
+            .WithMessage("ShortDescription phải có độ dài từ 0 tới 512 ký tự.");
 
         RuleFor(x => x.LongDescription)
             .NotNull()
             .WithMessage("LongDescription không được để trống.")
-            .Length(0, 512)
-            .WithMessage("LongDescription phải có độ dài từ 0 tới 512 ký tự.");
+            .Length(0, 2048)
+            .WithMessage("LongDescription phải có độ dài từ 0 tới 2048 ký tự.");
 
         RuleFor(x => x.IsDone)
             .NotNull()

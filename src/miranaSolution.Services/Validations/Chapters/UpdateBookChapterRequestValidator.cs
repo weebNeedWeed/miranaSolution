@@ -10,8 +10,8 @@ public class UpdateBookChapterRequestValidator : AbstractValidator<UpdateBookCha
         RuleFor(x => x.Name)
             .NotEmpty()
             .WithMessage("Name không được để trống.")
-            .Length(8, 32)
-            .WithMessage("Name phải có độ dài từ 8 tới 32 ký tự.");
+            .Length(2, 256)
+            .WithMessage("Name phải có độ dài từ 2 tới 256 ký tự.");
 
         RuleFor(x => x.WordCount)
             .NotNull()
@@ -22,8 +22,8 @@ public class UpdateBookChapterRequestValidator : AbstractValidator<UpdateBookCha
         RuleFor(x => x.Content)
             .NotEmpty()
             .WithMessage("Content không được để trống.")
-            .Length(8, 8192)
-            .WithMessage("Content phải có độ dài từ 8 tới 8192 ký tự.");
+            .Length(8, 32768)
+            .WithMessage("Content phải có độ dài từ 8 tới 32768 ký tự.");
         
         RuleFor(x => x.NewIndex)
             .NotNull()
