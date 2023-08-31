@@ -5,5 +5,7 @@ export interface Comment {
     createdAt: Date,
     updatedAt: Date,
     userId: string,
+    username: string,
+    userAvatar: string,
     bookId: number
 }

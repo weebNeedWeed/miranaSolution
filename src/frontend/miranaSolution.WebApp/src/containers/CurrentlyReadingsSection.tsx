@@ -18,25 +18,17 @@ type ReadingCardProps = {
 }
 
 const ReadingCard = ({currentlyReading, refetch, offline}: ReadingCardProps): JSX.Element => {
-    const {data: book} = useQuery(
-        ["book", currentlyReading.bookId],
-        () => bookApiHelper.getBookById(currentlyReading.bookId));
-
     const _offline = offline ?? false;
 
     const [accessToken,] = useAccessToken();
     const systemContext = useSystemContext();
     const baseUrl = useBaseUrl();
 
-    if (!book) {
-        return <></>
-    }
-
     const handleDelete = async (event: React.MouseEvent<HTMLButtonElement>) => {
         event.preventDefault();
 
         try {
-            await currentlyReadingApiHelper.removeBook(accessToken, book.id);
+            await currentlyReadingApiHelper.removeBook(accessToken, currentlyReading.bookId);
 
             systemContext.dispatch({
                 type: "addToast",
@@ -60,14 +52,14 @@ const ReadingCard = ({currentlyReading, refetch, offline}: ReadingCardProps): JS
 
     return (
         <Link
-            to={`/books/${book.slug}/chapters/${currentlyReading.chapterIndex}`}
+            to={`/books/${currentlyReading.bookSlug}/chapters/${currentlyReading.chapterIndex}`}
             className="relative group w-full bg-whiteChocolate p-2 flex cursor-pointer rounded shadow-sm shadow-darkVanilla border-2 border-solid hover:border-darkVanilla transition-all mb-3"
         >
             <div className="flex flex-row w-full items-center">
-                <img src={`${baseUrl}${book.thumbnailImage}`} alt="" className="aspect-[2/3] w-10"/>
+                <img src={`${baseUrl}${currentlyReading.thumbnailImage}`} alt="" className="aspect-[2/3] w-10"/>
                 <div className="flex flex-col h-full justify-start items-start ml-2">
                     <h4 className="text-sm font-semibold text-oldRose line-clamp-1 mt-1">
-                        {book.name}
+                        {currentlyReading.bookName}
                     </h4>
 
                     <span className="text-sm text-deepKoamaru mt-1">Số chương: {currentlyReading.chapterIndex}</span>

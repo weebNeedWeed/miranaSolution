@@ -28,13 +28,13 @@ public class CurrentlyReadingsController : ControllerBase
 
         try
         {
-            var addBookResponse = await _currentlyReadingService.AddBookAsync(
+            await _currentlyReadingService.AddBookAsync(
                 new AddBookRequest(
                     request.BookId,
                     userId,
                     request.ChapterIndex));
 
-            return Ok(new ApiSuccessResult<CurrentlyReadingVm>(addBookResponse.CurrentlyReadingVm));
+            return Ok(new ApiSuccessResult<object>());
         }
         catch (BookNotFoundException ex)
         {

@@ -27,7 +27,21 @@ public class BookService : IBookService
         var book = await _context.Books.FindAsync(request.BookId);
         if (book is null) return new GetBookByIdResponse(null);
 
-        var bookVm = MapBookIntoBookVm(book);
+        var bookVm = new BookVm(
+            book.Id,
+            book.Name,
+            book.ShortDescription,
+            book.LongDescription,
+            book.CreatedAt,
+            book.UpdatedAt,
+            book.ThumbnailImage,
+            book.IsRecommended,
+            book.Slug,
+            "",
+            new List<string>(),
+            book.IsDone,
+            book.AuthorId,
+            book.ViewCount);
 
         var response = new GetBookByIdResponse(bookVm);
 
@@ -143,10 +157,25 @@ public class BookService : IBookService
     public async Task<GetRecommendedBooksResponse> GetRecommendedBooksAsync()
     {
         var books = await _context.Books
+            .Include(x => x.Author)
             .Where(x => x.IsRecommended)
             .ToListAsync();
 
-        var bookVms = books.Select(MapBookIntoBookVm).ToList();
+        var bookVms = books.Select(x => new BookVm(
+            x.Id,
+            x.Name,
+            x.ShortDescription,
+            x.LongDescription,
+            x.CreatedAt,
+            x.UpdatedAt,
+            x.ThumbnailImage,
+            x.IsRecommended,
+            x.Slug,
+            x.Author!.Name,
+            new List<string>(),
+            x.IsDone,
+            x.AuthorId,
+            x.ViewCount)).ToList();
 
         return new GetRecommendedBooksResponse(bookVms);
     }
@@ -211,8 +240,21 @@ public class BookService : IBookService
             .Take(request.NumberOfBooks)
             .ToListAsync();
 
-        var bookVms = books.Select(MapBookIntoBookVm)
-            .ToList();
+        var bookVms = books.Select(x => new BookVm(
+            x.Id,
+            x.Name,
+            x.ShortDescription,
+            x.LongDescription,
+            x.CreatedAt,
+            x.UpdatedAt,
+            x.ThumbnailImage,
+            x.IsRecommended,
+            x.Slug,
+            "",
+            new List<string>(),
+            x.IsDone,
+            x.AuthorId,
+            x.ViewCount)).ToList();
 
         return new GetMostReadingBooksResponse(bookVms);
     }

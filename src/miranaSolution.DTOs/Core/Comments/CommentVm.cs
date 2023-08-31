@@ -7,4 +7,6 @@ public record CommentVm(
     DateTime CreatedAt,
     DateTime UpdatedAt,
     Guid? UserId,
+    string Username,
+    string UserAvatar,
     int BookId);

@@ -21,8 +21,6 @@ public class Book
 
     public List<BookGenre> BookGenres { get; set; } = new();
 
-    public List<Rating> Ratings { get; set; } = new();
-
     public List<Comment> Comments { get; set; } = new();
 
     public List<BookUpvote> BookUpvotes { get; set; } = new();

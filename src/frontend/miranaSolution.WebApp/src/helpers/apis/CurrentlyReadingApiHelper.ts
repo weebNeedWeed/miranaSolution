@@ -8,7 +8,7 @@ import {CreateCommentRequest} from "../models/catalog/books/CreateCommentRequest
 import {GetCurrentlyReadingBooksResponse} from "../models/catalog/currentlyReading/getCurrentlyReadingBooksResponse";
 
 class CurrentlyReadingApiHelper extends BaseApiHelper {
-    async addBook(accessToken: string, request: AddBookRequest): Promise<CurrentlyReading> {
+    async addBook(accessToken: string, request: AddBookRequest): Promise<void> {
         const headers = {
             Authorization: `Bearer ${accessToken}`,
         }
@@ -18,9 +18,6 @@ class CurrentlyReadingApiHelper extends BaseApiHelper {
         if (response.data.status === "error") {
             throw new Error(response.data.message);
         }
-
-
-        return response.data.data;
     }
 
     async removeBook(accessToken: string, bookId: number): Promise<void> {

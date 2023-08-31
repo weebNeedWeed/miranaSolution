@@ -12,7 +12,7 @@ public static class DependencyInjection
     {
         services.ConfigureOptions<DatabaseOptionsSetup>();
 
-        services.AddDbContext<MiranaDbContext>((serviceProvider, options) =>
+        services.AddDbContextPool<MiranaDbContext>((serviceProvider, options) =>
         {
             var databaseOptions = serviceProvider.GetService<IOptions<DatabaseOptions>>()!.Value;
             var hostingEnvironment = serviceProvider.GetService<IHostingEnvironment>();
@@ -31,8 +31,6 @@ public static class DependencyInjection
             options.EnableDetailedErrors(databaseOptions.EnableDetailedErrors);
             options.EnableSensitiveDataLogging(databaseOptions.EnableSensitiveDataLogging);
         });
-
-        services.AddScoped<DbContext, MiranaDbContext>();
 
         return services;
     }

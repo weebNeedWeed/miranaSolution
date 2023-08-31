@@ -165,6 +165,7 @@ const RatingDialog = (props: RatingDialogProps): JSX.Element => {
 
             <div className="flex flex-row justify-between items-end w-full mt-4">
                 <button
+                    disabled={star == 0}
                     type="submit"
                     className={clsx(star == 0 && "bg-[rgba(48,54,89,0.5)]", "rounded bg-deepKoamaru py-1.5 px-3 text-white flex justify-center items-center gap-x-2 text-sm md:text-base self-start")}>
                     {typeof userRating === "undefined" ? "Tạo đánh giá" : "Cập nhật"}

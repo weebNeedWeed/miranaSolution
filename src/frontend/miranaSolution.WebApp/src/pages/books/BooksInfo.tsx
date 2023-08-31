@@ -29,19 +29,16 @@ import {useLocalStorage} from "../../helpers/hooks/useLocalStorage";
 import {CurrentlyReading} from "../../helpers/models/catalog/currentlyReading/CurrentlyReading";
 import {useBaseUrl} from "../../helpers/hooks/useBaseUrl";
 import {Helmet} from "react-helmet";
+import {GetRatingsOverviewResponse} from "../../helpers/models/catalog/books/GetRatingsOverviewResponse";
 
 type MobileTabsSectionProps = {
     getChaptersResponse: GetAllChaptersResponse;
-    book: Book,
+    book: Book;
+    ratingOverview?: GetRatingsOverviewResponse;
 }
 const MobileTabSection = (props: MobileTabsSectionProps) => {
-    const {getChaptersResponse, book} = props;
+    const {getChaptersResponse, book, ratingOverview} = props;
     const [open, setOpen] = useState(false);
-
-    const {data: ratingsOverview} = useQuery(
-        ["ratingsOverview", book.id],
-        () => bookApiHelper.getRatingsOverview(props.book.id)
-    );
 
     return <>
         <button onClick={() => setOpen(!open)}
@@ -78,14 +75,14 @@ const MobileTabSection = (props: MobileTabsSectionProps) => {
             </h4>
 
             <div className="pl-14 pb-2 pt-1">
-                {ratingsOverview && <div className="flex flex-col mt-1 w-full">
+                {ratingOverview && <div className="flex flex-col mt-1 w-full">
                     {Array.from(new Array(5)).map((_, index) => <div
                         key={index}
                         className="flex flex-row gap-x-2 items-center text-base font-normal">
                         <Rating value={5 - index} width={16} spacing={2}/>
 
                         <span className="text-sm">
-                            {ratingsOverview.ratingsByStar[5 - index]} đánh giá
+                            {ratingOverview.ratingsByStar[5 - index]} đánh giá
                         </span>
                     </div>)}
                 </div>}
@@ -207,9 +204,10 @@ const ChapterList = (props: ChapterListProps): JSX.Element => {
 
 type TabsSectionProps = {
     getChaptersResponse: GetAllChaptersResponse;
-    book: Book,
+    book: Book;
+    ratingOverview?: GetRatingsOverviewResponse;
 };
-const TabsSection = ({getChaptersResponse, book}: TabsSectionProps): JSX.Element => {
+const TabsSection = ({getChaptersResponse, book, ratingOverview}: TabsSectionProps): JSX.Element => {
     const [tabIndex, setTabIndex] = useState<1 | 2 | 3>(1);
 
     const isTabIndexActive = (index: number) => {
@@ -258,7 +256,7 @@ const TabsSection = ({getChaptersResponse, book}: TabsSectionProps): JSX.Element
             </div>
 
             <div className={clsx(isTabIndexActive(3) ? "block" : "hidden", "w-full")}>
-                <RatingsSection book={book}/>
+                <RatingsSection book={book} ratingOverview={ratingOverview}/>
             </div>
         </div>
     </div>;
@@ -274,7 +272,7 @@ const BooksInfo = (): JSX.Element => {
     const [accessToken, setAccessToken] = useAccessToken();
     const systemContext = useSystemContext();
     const authContext = useAuthenticationContext();
-    const [ratings, setRatings] = useState<BookRating[]>();
+    const [ratingOverview, setRatingOverview] = useState<GetRatingsOverviewResponse>();
     const [upvote, setUpvote] = useState<BookUpvote>();
     const [startChapter, setStartChapter] = useState(1);
 
@@ -293,8 +291,9 @@ const BooksInfo = (): JSX.Element => {
                 const result = await bookApiHelper.getBookBySlug(slug!);
                 setBookResponse(result);
 
-                let response = await bookApiHelper.getAllRatings(result.book.id);
-                setRatings(response.bookRatings);
+                const getOverviewResponse = await bookApiHelper.getRatingsOverview(
+                    result.book.id);
+                setRatingOverview(getOverviewResponse);
 
                 const chaptersResult = await bookApiHelper.getAllChapters({
                     bookId: result.book.id,
@@ -302,15 +301,8 @@ const BooksInfo = (): JSX.Element => {
                     pageSize
                 });
 
-                const fetchAllToGetFirstChapter = await bookApiHelper.getAllChapters({
-                    bookId: result.book.id,
-                    pageIndex: 1,
-                    pageSize: 1
-                });
-
                 setResponse(chaptersResult);
-                let start = fetchAllToGetFirstChapter.chapters.length > 0 ?
-                    fetchAllToGetFirstChapter.chapters[0].index : 1;
+                let start = 1;
 
                 if (authContext.state.isLoggedIn) {
                     const bookmarks = await bookmarkApiHelper.getAllBookmark(accessToken, result.book.id);
@@ -338,19 +330,6 @@ const BooksInfo = (): JSX.Element => {
             }
         })();
     }, [pageIndex, pageSize, authContext.state.isLoggedIn, slug]);
-
-    let avgStar = useMemo(() => {
-        let _ = 0;
-        ratings?.forEach(x => {
-            _ += x.star;
-        });
-
-        if ((ratings?.length ?? 0) === 0) {
-            return 0;
-        }
-
-        return Math.round(_ / ratings!.length);
-    }, [ratings]);
 
     if (!getBookResponse) {
         return <></>;
@@ -524,10 +503,11 @@ const BooksInfo = (): JSX.Element => {
                     </div>
 
                     <div className="mt-1 md:mt-2 w-full flex flex-row gap-x-1">
-                        <Rating value={avgStar}/>
+                        <Rating value={ratingOverview?.avg ?? 0}/>
                         <span className="text-base text-deepKoamaru">
-                            <span className="font-semibold">{avgStar}</span>
-                            <span className="md:inline-block hidden">/5 ({ratings?.length ?? 0} đánh giá)</span>
+                            <span className="font-semibold">{ratingOverview?.avg ?? 0}</span>
+                            <span
+                                className="md:inline-block hidden">/5 ({ratingOverview?.totalRatings ?? 0} đánh giá)</span>
                         </span>
                     </div>
 
@@ -662,11 +642,13 @@ const BooksInfo = (): JSX.Element => {
             </div>
 
             <div className="w-full mt-6 hidden flex-col md:flex">
-                {getAllChaptersResponse && <TabsSection book={book} getChaptersResponse={getAllChaptersResponse}/>}
+                {getAllChaptersResponse && <TabsSection ratingOverview={ratingOverview} book={book}
+                                                        getChaptersResponse={getAllChaptersResponse}/>}
             </div>
 
             <div className="w-full mt-6 flex flex-col md:hidden">
-                {getAllChaptersResponse && <MobileTabSection book={book} getChaptersResponse={getAllChaptersResponse}/>}
+                {getAllChaptersResponse && <MobileTabSection ratingOverview={ratingOverview} book={book}
+                                                             getChaptersResponse={getAllChaptersResponse}/>}
             </div>
 
             <div className="p-6">

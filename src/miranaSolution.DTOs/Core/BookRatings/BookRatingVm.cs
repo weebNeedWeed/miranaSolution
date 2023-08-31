@@ -2,6 +2,8 @@
 
 public record BookRatingVm(
     Guid UserId,
+    string Username,
+    string UserAvatar,
     int BookId,
     string Content,
     int Star,

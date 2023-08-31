@@ -409,6 +409,8 @@ public class BookRatingServiceTests
             new GetOverviewRequest(book.Id));
 
         Assert.NotNull(actual.RatingsByStar);
+        Assert.Equal(2, actual.TotalRatings);
+        Assert.Equal(2, actual.Avg);
         Assert.Collection(actual.RatingsByStar, 
             x => Assert.Equal(1, x.Value),
             x => Assert.Equal(1, x.Value),

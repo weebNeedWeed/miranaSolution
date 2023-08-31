@@ -18,7 +18,7 @@ public class CurrentlyReadingService : ICurrentlyReadingService
         _userManager = userManager;
     }
 
-    public async Task<AddBookResponse> AddBookAsync(AddBookRequest request)
+    public async Task AddBookAsync(AddBookRequest request)
     {
         if (await _userManager.FindByIdAsync(request.UserId.ToString()) is null)
             throw new UserNotFoundException("The user with given Id does not exist.");
@@ -30,35 +30,25 @@ public class CurrentlyReadingService : ICurrentlyReadingService
         if (!existChapterWithGivenIndex)
             throw new ChapterNotFoundException("The chapter with given Index does not exist.");
 
-        var isBookAddedToCurrentlyReadings = await _context.CurrentlyReadings
-            .AnyAsync(
-                x => x.ChapterIndex == request.ChapterIndex &&
-                     x.UserId.Equals(request.UserId) &&
-                     x.BookId == request.BookId);
-        if (isBookAddedToCurrentlyReadings)
+        var curr = await _context.CurrentlyReadings
+            .FirstOrDefaultAsync(x => x.UserId.Equals(request.UserId) &&
+                                      x.BookId == request.BookId);
+        if (curr is not null)
         {
-            await RemoveBookAsync(
-                new RemoveBookRequest(
-                    request.UserId, request.BookId));
+            curr.ChapterIndex = request.ChapterIndex;
         }
-
-        var currentlyReadingBook = new CurrentlyReading
+        else
         {
-            ChapterIndex = request.ChapterIndex,
-            UserId = request.UserId,
-            BookId = request.BookId
-        };
-
-        await _context.CurrentlyReadings.AddAsync(currentlyReadingBook);
+            curr = new CurrentlyReading
+            {
+                ChapterIndex = request.ChapterIndex,
+                UserId = request.UserId,
+                BookId = request.BookId
+            };
+            await _context.CurrentlyReadings.AddAsync(curr);
+        }
+        
         await _context.SaveChangesAsync();
-
-        var currentlyReadingVm = new CurrentlyReadingVm(
-            currentlyReadingBook.BookId,
-            currentlyReadingBook.UserId,
-            currentlyReadingBook.ChapterIndex,
-            currentlyReadingBook.CreatedAt);
-
-        return new AddBookResponse(currentlyReadingVm);
     }
 
     public async Task RemoveBookAsync(RemoveBookRequest request)
@@ -95,14 +85,25 @@ public class CurrentlyReadingService : ICurrentlyReadingService
             query = query.Where(x => x.BookId == request.BookId);
         }
 
-        var currReadings = await query.OrderByDescending(x => x.CreatedAt)
-            .ToListAsync();
+        var newQuery = from curr in query
+            join book in _context.Books on curr.BookId equals book.Id
+            orderby curr.CreatedAt descending 
+            select new
+            {
+                curr,
+                book,
+            };
 
-        var currReadingVms = currReadings.Select(x => new CurrentlyReadingVm(
-            x.BookId,
-            x.UserId,
-            x.ChapterIndex,
-            x.CreatedAt)).ToList();
+        var items = await newQuery.ToListAsync();
+
+        var currReadingVms = items.Select(x => new CurrentlyReadingVm(
+            x.book.Id,
+            x.book.Name,
+            x.book.ThumbnailImage,
+            x.book.Slug,
+            x.curr.UserId,
+            x.curr.ChapterIndex,
+            x.curr.CreatedAt)).ToList();
 
         return new GetCurrentlyReadingBooksResponse(currReadingVms);
     }

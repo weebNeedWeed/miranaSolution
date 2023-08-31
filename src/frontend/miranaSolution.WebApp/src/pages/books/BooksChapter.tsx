@@ -27,6 +27,7 @@ import {userApiHelper} from "../../helpers/apis/UserApiHelper";
 import {currentlyReadingApiHelper} from "../../helpers/apis/CurrentlyReadingApiHelper";
 import {CurrentlyReading} from "../../helpers/models/catalog/currentlyReading/CurrentlyReading";
 import {Helmet} from "react-helmet";
+import {Loading} from "../../components";
 
 type ChapterHeaderProps = {
     book: Book;
@@ -157,7 +158,10 @@ const ChapterContent = (props: { book: Book; chapter: Chapter }): JSX.Element =>
                 bookId: props.book.id,
                 chapterIndex: props.chapter.index,
                 userId: "guest",
-                createdAt: new Date(Date.now())
+                createdAt: new Date(Date.now()),
+                bookName: props.book.name,
+                thumbnailImage: props.book.thumbnailImage,
+                bookSlug: props.book.slug,
             };
 
             const clone = [...offlineReadingBooks];
@@ -311,19 +315,17 @@ const BooksChapter = (): JSX.Element => {
                 setChapter(_chapter);
 
                 if (authContext.state.isLoggedIn) {
-                    const getCurrentlyReadingBooksResponse = await currentlyReadingApiHelper.getCurrentlyReadingBooks(accessToken, bookId);
-                    if (getCurrentlyReadingBooksResponse.currentlyReadings.length === 1) {
-                        await currentlyReadingApiHelper.removeBook(accessToken, bookId);
-                    }
                     await currentlyReadingApiHelper.addBook(accessToken, {bookId, chapterIndex: _chapter.index});
                 }
             } catch (error: any) {
             }
         })();
-    }, [index]);
+    }, [slug, index]);
 
     if (!book || !chapter) {
-        return <div></div>;
+        return <div className="min-h-[700px]">
+            <Loading show={true}/>
+        </div>
     }
 
     return <div

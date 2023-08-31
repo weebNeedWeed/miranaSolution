@@ -9,12 +9,12 @@ type BookCardProps = {
 const BookCard = ({book}: BookCardProps): JSX.Element => {
     const baseUrl = useBaseUrl();
     return (
-        <div className="md:w-[calc(calc(100%/2)-0.75rem)] md:mr-3 mb-3">
+        <div className="w-full md:w-[calc(calc(100%/2)-0.75rem)] md:mr-3 mb-3">
             <Link
                 to={`/books/${book.slug}`}
                 className="w-full bg-whiteChocolate p-2 flex cursor-pointer rounded shadow-sm shadow-darkVanilla border-2 border-solid hover:border-darkVanilla transition-all"
             >
-                <div className="flex flex-row justify-center items-center">
+                <div className="flex flex-row justify-start items-center w-full">
                     <img
                         src={`${baseUrl}${book.thumbnailImage}`}
                         alt=""

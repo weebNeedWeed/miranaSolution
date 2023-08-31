@@ -146,7 +146,7 @@ public class BooksController : ControllerBase
         var getLatestCreatedChaptersResponse = await _chapterService.GetLatestCreatedChaptersAsync(
             new GetLatestCreatedChaptersRequest(numberOfChapters));
         var response = new ApiGetLatestCreatedChaptersResponse(
-            getLatestCreatedChaptersResponse.ChapterVms);
+            getLatestCreatedChaptersResponse.LatestChapterVms);
 
         return Ok(new ApiSuccessResult<ApiGetLatestCreatedChaptersResponse>(response));
     }
@@ -290,6 +290,7 @@ public class BooksController : ControllerBase
             var getAllBookChaptersResponse = await _chapterService.GetAllBookChaptersAsync(
                 new GetAllBookChaptersRequest(
                     bookId,
+                    request.Detailed,
                     pagerRequest));
 
             var response = new ApiGetAllBookChaptersResponse(
@@ -799,7 +800,10 @@ public class BooksController : ControllerBase
                 new GetOverviewRequest(
                     bookId));
 
-            var response = new ApiGetBookRatingsOverviewResponse(getOverviewResponse.RatingsByStar);
+            var response = new ApiGetBookRatingsOverviewResponse(
+                getOverviewResponse.TotalRatings,
+                getOverviewResponse.Avg,
+                getOverviewResponse.RatingsByStar);
 
             return Ok(new ApiSuccessResult<ApiGetBookRatingsOverviewResponse>(response));
         }

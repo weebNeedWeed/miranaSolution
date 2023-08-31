@@ -17,7 +17,6 @@ public class MiranaDbContext : IdentityDbContext<AppUser, AppRole, Guid>
     public DbSet<Genre> Genres { get; set; }
     public DbSet<BookGenre> BookGenres { get; set; }
     public DbSet<Chapter> Chapters { get; set; }
-    public DbSet<Rating> Ratings { get; set; }
     public DbSet<Slide> Slides { get; set; }
     public DbSet<Comment> Comments { get; set; }
     public DbSet<Bookmark> Bookmarks { get; set; }

@@ -25,16 +25,16 @@ type DeleteButtonProps = {
     comment: Comment;
     onlyIcon?: boolean;
     refetch: () => void;
-    user: User;
+    userId: string;
 }
 const DeleteButton = React.memo((props: DeleteButtonProps): JSX.Element => {
-    const {refetch, user, comment} = props;
+    const {refetch, userId, comment} = props;
     const onlyIcon = props.onlyIcon ?? false;
     const authContext = useAuthenticationContext();
     const systemContext = useSystemContext();
     const [accessToken,] = useAccessToken();
 
-    if (!authContext.state.isLoggedIn || authContext.state.user.id !== user.id) {
+    if (!authContext.state.isLoggedIn || authContext.state.user.id !== userId) {
         return <></>
     }
 
@@ -218,22 +218,14 @@ type ReplyProps = {
     parentRefetch: () => void
 }
 const Reply = ({reply, parentRefetch}: ReplyProps): JSX.Element => {
-    const {data: userData} = useQuery(
-        ["replyUser", reply.userId],
-        () => userApiHelper.getUserProfileById(reply.userId), {
-            staleTime: Infinity
-        });
     const baseUrl = useBaseUrl();
-    if (!userData) {
-        return <div></div>
-    }
 
     return <div className="w-full flex flex-row gap-x-2 border-t-[2px] pt-2 mt-2">
-        {userData.avatar !== "" ?
-            <Avatar imageUrl={baseUrl + userData.avatar} className="w-9 h-9 md:w-12 md:h-12 shrink-0"/> :
+        {reply.userAvatar !== "" ?
+            <Avatar imageUrl={baseUrl + reply.userAvatar} className="w-9 h-9 md:w-12 md:h-12 shrink-0"/> :
             <Avatar className="w-9 h-9 md:w-12 md:h-12 shrink-0"/>}
         <div className="flex flex-col w-full">
-            <span className="font-semibold text-base max-w-2xl line-clamp-1">{userData.userName}</span>
+            <span className="font-semibold text-base max-w-2xl line-clamp-1">{reply.username}</span>
             <span className="md:mt-0.5">
                 {reply.content}
             </span>
@@ -249,7 +241,7 @@ const Reply = ({reply, parentRefetch}: ReplyProps): JSX.Element => {
                     </span>
                 </div>
 
-                <DeleteButton onlyIcon={true} comment={reply} refetch={parentRefetch} user={userData}/>
+                <DeleteButton onlyIcon={true} comment={reply} refetch={parentRefetch} userId={reply.userId}/>
             </div>
         </div>
     </div>
@@ -269,12 +261,6 @@ const MainComment = ({comment, parentRefetch}: MainCommentProps): JSX.Element =>
 
     const [retry, setRetry] = useState<boolean>(false);
     const [loadMore, setLoadMore] = useState(false)
-
-    const {data: userData} = useQuery(
-        ["user", comment.userId],
-        () => userApiHelper.getUserProfileById(comment.userId), {
-            staleTime: Infinity
-        });
 
     const replyPerLoad = 5;
 
@@ -308,10 +294,6 @@ const MainComment = ({comment, parentRefetch}: MainCommentProps): JSX.Element =>
     }, [index, retry]);
 
     const baseUrl = useBaseUrl();
-
-    if (!userData) {
-        return <div></div>
-    }
 
     const handleLoadReply = () => {
         setLoadReply(true);
@@ -352,12 +334,12 @@ const MainComment = ({comment, parentRefetch}: MainCommentProps): JSX.Element =>
     }
 
     return <div className="w-full flex flex-row gap-x-2 border-t-[2px] py-2">
-        {userData.avatar !== "" ?
-            <Avatar imageUrl={baseUrl + userData.avatar} className="w-9 h-9 md:w-12 md:h-12 shrink-0"/> :
+        {comment.userAvatar !== "" ?
+            <Avatar imageUrl={baseUrl + comment.userAvatar} className="w-9 h-9 md:w-12 md:h-12 shrink-0"/> :
             <Avatar className="w-9 h-9 md:w-12 md:h-12 shrink-0"/>}
 
         <div className="flex flex-col w-full">
-            <span className="font-semibold text-base max-w-2xl line-clamp-1">{userData.userName}</span>
+            <span className="font-semibold text-base max-w-2xl line-clamp-1">{comment.username}</span>
             <span className="flex flex-row items-center gap-x-1 font-normal text-xs">
                 <BiTime/>
                 {timeSince(comment.createdAt)}
@@ -390,7 +372,7 @@ const MainComment = ({comment, parentRefetch}: MainCommentProps): JSX.Element =>
                     </button>
 
                     <DeleteButton
-                        comment={comment} user={userData} refetch={parentRefetch}/>
+                        comment={comment} userId={comment.userId} refetch={parentRefetch}/>
                 </div>
             </span>
 

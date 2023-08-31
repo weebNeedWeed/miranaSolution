@@ -76,7 +76,16 @@ public class ChapterService : IChapterService
 
         foreach (var chapter in chapters)
         {
-            var chapterVm = await MapTotallyChapterToChapterVmAsync(chapter);
+            ChapterVm chapterVm;
+            if (request.Detailed)
+            {
+                chapterVm = await MapTotallyChapterToChapterVmAsync(chapter);
+            }
+            else
+            {
+                chapterVm = MapChapterToChapterVm(chapter);
+            }
+            
             chapterVms.Add(chapterVm);
         }
         
@@ -127,16 +136,45 @@ public class ChapterService : IChapterService
     public async Task<GetLatestCreatedChaptersResponse> GetLatestCreatedChaptersAsync(
         GetLatestCreatedChaptersRequest request)
     {
-        var query = _context.Chapters
-            .OrderByDescending(x => x.CreatedAt)
+        var chapters = _context.Chapters
+            .OrderByDescending(x => x.UpdatedAt)
             .Take(request.NumberOfChapters);
 
-        var chapters = await query
-            .ToListAsync();
-        var chapterVms = chapters.Select(MapChapterToChapterVm).ToList();
+        var query = from chapter in chapters
+            join book in _context.Books on chapter.BookId equals book.Id
+            join author in _context.Authors on book.AuthorId equals author.Id
+            select new
+            {
+                chapter,
+                book,
+                author
+            };
 
-        var response = new GetLatestCreatedChaptersResponse(chapterVms.ToList());
-        return response;
+        var queryData = await query.ToListAsync();
+        var latestChapters = new List<LatestChapterVm>();
+
+        foreach (var item in queryData)
+        {
+            var genres = await _context.BookGenres
+                .Include(x => x.Genre)
+                .Where(x => x.BookId == item.book.Id)
+                .ToListAsync();
+
+            var latestChapter = new LatestChapterVm(
+                item.chapter.Id,
+                item.book.Name,
+                item.book.Slug,
+                genres[0].Genre?.Name ?? "",
+                item.chapter.Index,
+                item.chapter.Name,
+                item.chapter.UpdatedAt,
+                item.author.Name
+            );
+            
+            latestChapters.Add(latestChapter);
+        }
+
+        return new GetLatestCreatedChaptersResponse(latestChapters);
     }
 
     public async Task DeleteBookChapterAsync(DeleteBookChapterRequest request)

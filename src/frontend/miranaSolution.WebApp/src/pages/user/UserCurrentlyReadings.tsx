@@ -16,21 +16,13 @@ type CurrentlyReadingBlockProps = {
     refetch: () => void
 };
 const CurrentlyReadingBlock = ({currentlyReading, refetch}: CurrentlyReadingBlockProps): JSX.Element => {
-    const {data: book} = useQuery(
-        ["book", currentlyReading.bookId],
-        () => bookApiHelper.getBookById(currentlyReading.bookId));
-
     const [accessToken,] = useAccessToken();
     const systemContext = useSystemContext();
     const baseUrl = useBaseUrl();
 
-    if (!book) {
-        return <></>
-    }
-
     const handleDelete = async () => {
         try {
-            await currentlyReadingApiHelper.removeBook(accessToken, book.id);
+            await currentlyReadingApiHelper.removeBook(accessToken, currentlyReading.bookId);
 
             systemContext.dispatch({
                 type: "addToast",
@@ -54,12 +46,12 @@ const CurrentlyReadingBlock = ({currentlyReading, refetch}: CurrentlyReadingBloc
 
     return <div className="flex flex-row w-full md:w-[calc(50%-0.5rem)] gap-x-2.5 shadow-md rounded flex-wrap shrink-0">
         <div className="aspect-[3/4] w-12 h-auto"
-             style={{backgroundImage: `url("${baseUrl}${book.thumbnailImage}")`}}>
+             style={{backgroundImage: `url("${baseUrl}${currentlyReading.thumbnailImage}")`}}>
         </div>
         <div className="flex flex-col grow">
-            <Link to={`/books/${book.slug}/chapters/${currentlyReading.chapterIndex}`}
+            <Link to={`/books/${currentlyReading.bookSlug}/chapters/${currentlyReading.chapterIndex}`}
                   className="w-full line-clamp-1 text-oldRose font-semibold">
-                {book.name}
+                {currentlyReading.bookName}
             </Link>
             <span className="text-sm">
                 Số chương: {currentlyReading.chapterIndex}

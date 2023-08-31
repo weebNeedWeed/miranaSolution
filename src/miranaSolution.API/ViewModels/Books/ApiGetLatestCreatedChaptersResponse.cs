@@ -2,4 +2,4 @@
 
 namespace miranaSolution.API.ViewModels.Books;
 
-public record ApiGetLatestCreatedChaptersResponse(List<ChapterVm> Chapters);
+public record ApiGetLatestCreatedChaptersResponse(List<LatestChapterVm> LatestChapters);

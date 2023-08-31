@@ -22,7 +22,7 @@ public class BookRatingConfiguration : IEntityTypeConfiguration<BookRating>
             .HasForeignKey(x => x.UserId)
             .OnDelete(DeleteBehavior.Cascade);
 
-        builder.Property(x => x.CreatedAt)
+        builder.Property(x => x.UpdatedAt)
             .IsRequired()
             .HasDefaultValueSql("getdate()");
 

@@ -106,6 +106,7 @@ public class CommentService : ICommentService
             throw new BookNotFoundException("The book with given Id does not exist.");
 
         var query = _context.Comments
+            .Include(x => x.AppUser)
             .Where(x => x.BookId == request.BookId && x.ParentId == request.ParentId);
 
         if (request.Asc ?? false)
@@ -122,7 +123,16 @@ public class CommentService : ICommentService
             .Take(pageSize);
 
         var comments = await query.ToListAsync();
-        var commentVms = comments.Select(MapCommentIntoCommentVm).ToList();
+        var commentVms = comments.Select(x => new CommentVm(
+            x.Id,
+            x.Content,
+            x.ParentId,
+            x.CreatedAt,
+            x.UpdatedAt,
+            x.UserId,
+            x.AppUser?.UserName ?? "",
+            x.AppUser?.Avatar ?? "",
+            x.BookId)).ToList();
 
         var response = new GetAllBookCommentsResponse(
             commentVms,
@@ -140,6 +150,8 @@ public class CommentService : ICommentService
             comment.CreatedAt,
             comment.UpdatedAt,
             comment.UserId,
+            "",
+            "",
             comment.BookId);
 
         return commentVm;

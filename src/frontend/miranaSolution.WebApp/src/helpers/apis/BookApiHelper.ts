@@ -23,6 +23,7 @@ import {UpdateRatingRequest} from "../models/catalog/books/UpdateRatingRequest";
 import {BookUpvote} from "../models/catalog/books/BookUpvote";
 import {GetAllUpvotesResponse} from "../models/catalog/books/GetAllUpvotesResponse";
 import {GetRatingsOverviewResponse} from "../models/catalog/books/GetRatingsOverviewResponse";
+import {LatestChapter} from "../models/catalog/books/LatestChapter";
 
 class BookApiHelper extends BaseApiHelper {
     async getAllBooks(request: GetAllBooksRequest): Promise<GetAllBooksResponse> {
@@ -89,7 +90,7 @@ class BookApiHelper extends BaseApiHelper {
         return response.data.data;
     }
 
-    async getLatestChapters(numberOfChapters: number = 10): Promise<Chapter[]> {
+    async getLatestChapters(numberOfChapters: number = 10): Promise<LatestChapter[]> {
         const url = `/books/chapters/latest?numberOfChapters=${numberOfChapters}`;
 
         const response = await this.init().get<ApiResult<GetLatestChaptersResponse>>(url);
@@ -97,7 +98,7 @@ class BookApiHelper extends BaseApiHelper {
             throw new Error(response.data.message);
         }
 
-        return response.data.data.chapters;
+        return response.data.data.latestChapters;
     }
 
     async getBookById(bookId: number): Promise<Book> {

@@ -9,6 +9,7 @@ import {BookRating} from "../helpers/models/catalog/books/BookRating";
 import {userApiHelper} from "../helpers/apis/UserApiHelper";
 import {useBaseUrl} from "../helpers/hooks/useBaseUrl";
 import {Book} from "../helpers/models/catalog/books/Book";
+import {GetRatingsOverviewResponse} from "../helpers/models/catalog/books/GetRatingsOverviewResponse";
 
 type RatingBlockProps = {
     rating: BookRating
@@ -16,23 +17,14 @@ type RatingBlockProps = {
 const RatingBlock = (props: RatingBlockProps): JSX.Element => {
     const {rating} = props;
     const baseUrl = useBaseUrl();
-    const {data: userData} = useQuery(
-        ["user", rating.userId],
-        () => userApiHelper.getUserProfileById(rating.userId), {
-            staleTime: Infinity
-        });
-
-    if (!userData) {
-        return <div></div>
-    }
 
     return <div className="flex flex-row gap-x-2 border-b-[2px] py-2">
-        {userData.avatar !== "" ?
-            <Avatar imageUrl={baseUrl + userData.avatar} className="w-12 h-12 shrink-0"/> :
+        {rating.userAvatar !== "" ?
+            <Avatar imageUrl={baseUrl + rating.userAvatar} className="w-12 h-12 shrink-0"/> :
             <Avatar className="w-12 h-12 shrink-0"/>}
 
         <div className="flex flex-col grow">
-            <span className="font-semibold text-base max-w-2xl line-clamp-1">{userData.userName}</span>
+            <span className="font-semibold text-base max-w-2xl line-clamp-1">{rating.username}</span>
             <div className="flex flex-row items-center gap-x-4">
                 <span className="flex flex-row items-center gap-x-1">
                     <Rating value={rating.star}/>
@@ -54,10 +46,11 @@ const RatingBlock = (props: RatingBlockProps): JSX.Element => {
 }
 
 type RatingsSectionProps = {
-    book: Book
+    ratingOverview?: GetRatingsOverviewResponse;
+    book: Book;
 }
 
-const RatingsSection = ({book}: RatingsSectionProps): JSX.Element => {
+const RatingsSection = ({book, ratingOverview}: RatingsSectionProps): JSX.Element => {
     const pageIndexKey = "ratingIndex";
     const pageSizeKey = "ratingSize";
 
@@ -69,11 +62,6 @@ const RatingsSection = ({book}: RatingsSectionProps): JSX.Element => {
     const {data: response} = useQuery(
         ["ratings", pageIndex, pageSize],
         () => bookApiHelper.getAllRatings(book.id, undefined, pageIndex, pageSize)
-    );
-
-    const {data: ratingsOverview} = useQuery(
-        ["ratingsOverview", book.id],
-        () => bookApiHelper.getRatingsOverview(book.id)
     );
 
     if (!response) {
@@ -99,14 +87,14 @@ const RatingsSection = ({book}: RatingsSectionProps): JSX.Element => {
                 Tổng quan
             </h4>
 
-            {ratingsOverview && <div className="flex flex-col mt-1 pl-2">
+            {ratingOverview && <div className="flex flex-col mt-1 pl-2">
                 {Array.from(new Array(5)).map((_, index) => <div
                     key={index}
                     className="flex flex-row gap-x-2 items-center text-base font-normal">
                     <Rating value={5 - index} width={17} spacing={2}/>
 
                     <span>
-                        {ratingsOverview.ratingsByStar[5 - index]} đánh giá
+                        {ratingOverview.ratingsByStar[5 - index]} đánh giá
                     </span>
                 </div>)}
             </div>}

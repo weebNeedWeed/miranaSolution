@@ -115,9 +115,11 @@ public class BookRatingService : IBookRatingService
         var pageSize = request.PagerRequest.PageSize;
 
         var query = _context.BookRatings
+            .Include(x => x.User)
             .Where(x => x.BookId == request.BookId);
 
-        if (request.UserId.HasValue) query = query.Where(x => x.UserId.Equals(request.UserId));
+        if (request.UserId.HasValue) 
+            query = query.Where(x => x.UserId.Equals(request.UserId));
 
         var totalRatings = await query.CountAsync();
 
@@ -127,7 +129,16 @@ public class BookRatingService : IBookRatingService
 
         var ratings = await query.ToListAsync();
 
-        var ratingVms = ratings.Select(MapBookRatingIntoBookRatingVm).ToList();
+        var ratingVms = ratings
+            .Select(x => new BookRatingVm(
+                x.UserId,
+                x.User!.UserName,
+                x.User!.Avatar,
+                x.BookId,
+                x.Content,
+                x.Star,
+                x.CreatedAt,
+                x.UpdatedAt)).ToList();
 
         var response = new GetAllBookRatingsByBookIdResponse(
             ratingVms,
@@ -162,9 +173,23 @@ public class BookRatingService : IBookRatingService
             .Where(x => x.BookId == request.BookId)
             .ToListAsync();
 
-        foreach (var rating in ratings) ratingsByStar[rating.Star]++;
+        var totalRatings = ratings.Count;
+        var sum = 0;
+        foreach (var rating in ratings)
+        {
+            sum += rating.Star;
+            ratingsByStar[rating.Star]++;
+        }
 
-        var response = new GetOverviewResponse(ratingsByStar);
+        var avg = 0;
+        if (totalRatings > 0) 
+            avg = (int)Math.Round((float)sum / totalRatings);
+
+        var response = new GetOverviewResponse(
+            totalRatings,
+            avg,
+            ratingsByStar);
+        
         return response;
     }
 
@@ -172,6 +197,8 @@ public class BookRatingService : IBookRatingService
     {
         var ratingVm = new BookRatingVm(
             bookRating.UserId,
+            "",
+            "",
             bookRating.BookId,
             bookRating.Content,
             bookRating.Star,

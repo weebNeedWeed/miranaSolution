@@ -77,6 +77,7 @@ public class BooksController : Controller
 
         var chapters = await _booksApiService.GetAllBookChaptersAsync(id, new ApiGetAllBookChaptersRequest()
         {
+            Detailed = true,
             PageSize = pageSize,
             PageIndex = pageIndex
         });

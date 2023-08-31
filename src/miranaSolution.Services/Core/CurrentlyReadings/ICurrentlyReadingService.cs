@@ -4,7 +4,7 @@ namespace miranaSolution.Services.Core.CurrentlyReadings;
 
 public interface ICurrentlyReadingService
 {
-    Task<AddBookResponse> AddBookAsync(AddBookRequest request);
+    Task AddBookAsync(AddBookRequest request);
 
     Task RemoveBookAsync(RemoveBookRequest request);
 

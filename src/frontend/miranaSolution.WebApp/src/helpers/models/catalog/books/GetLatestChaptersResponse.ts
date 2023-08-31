@@ -1,5 +1,5 @@
-import {Chapter} from "./Chapter";
+import {LatestChapter} from "./LatestChapter";
 
 export interface GetLatestChaptersResponse {
-    chapters: Chapter[]
+    latestChapters: LatestChapter[]
 }
