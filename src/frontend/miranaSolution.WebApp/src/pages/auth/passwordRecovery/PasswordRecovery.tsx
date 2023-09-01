@@ -50,9 +50,11 @@ const PasswordRecovery = (): JSX.Element => {
 
         const currentHost = `${window.location.protocol}//${window.location.hostname}`;
         try {
+            // const callback = `${currentHost}:${window.location.port}${window.location.pathname}/redeem-token`;
+            const callback = `${currentHost}${window.location.pathname}/redeem-token`;
             await authApiHelper.sendRecoveryEmail({
                 email: email,
-                callback: `${currentHost}:${window.location.port}${window.location.pathname}/redeem-token`
+                callback
             });
 
             systemContext.dispatch({
