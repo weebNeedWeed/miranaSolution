@@ -1,4 +1,4 @@
-import {Link, useParams} from "react-router-dom";
+import {Link, useNavigate, useParams} from "react-router-dom";
 import {Book} from "../../helpers/models/catalog/books/Book";
 import {Chapter} from "../../helpers/models/catalog/books/Chapter";
 import {IoIosArrowBack, IoIosArrowForward} from "react-icons/io";
@@ -54,13 +54,11 @@ const ChapterHeader = ({book, chapter}: ChapterHeaderProps): JSX.Element => {
         <div
             className="bg-[rgba(255,255,255,0.8)] border-[1px] border-solid border-slate-400 px-2 py-2 sm:px-8 sm:py-4 mt-4">
             <h2 className="font-semibold text-1xl sm:text-2xl">Chương {chapter.index}: {chapter.name}</h2>
-            <ul className="list-disc ml-6 text-sm font-normal">
-                <li><span className="flex flex-row items-center gap-1"><BiText/> {chapter.wordCount.toString()}</span>
-                </li>
-                <li><span
-                    className="flex flex-row items-center gap-1"><AiFillEye/> {chapter.readCount.toString()}</span>
-                </li>
-            </ul>
+            <div className="ml-3 text-sm font-normal">
+                <span className="flex flex-row items-center gap-1"><BiText/> {chapter.wordCount.toString()}</span>
+                <span className="flex flex-row items-center gap-1"><AiFillEye/> {chapter.readCount.toString()}</span>
+            </div>
+
         </div>
     </div>;
 };
@@ -68,8 +66,9 @@ const ChapterHeader = ({book, chapter}: ChapterHeaderProps): JSX.Element => {
 type PagerSectionProps = {
     chapter: Chapter;
     book: Book;
+    setOpenDialog: (status: boolean) => void
 }
-const PagerSection = ({chapter, book}: PagerSectionProps): JSX.Element => {
+const PagerSection = ({chapter, book, setOpenDialog}: PagerSectionProps): JSX.Element => {
     const strTemplate = `/books/${book.slug}/chapters/[[chapter]]`;
     const disabledBtnOnClick = (event: any) => {
     };
@@ -87,9 +86,10 @@ const PagerSection = ({chapter, book}: PagerSectionProps): JSX.Element => {
                 <IoIosArrowBack/> {"Chương trước"}
             </Link>}
 
-        <Link to="/" className="border-x-[1px] border-deepKoamaru border-solid px-2 sm:px-6 absolute">
+        <button onClick={() => setOpenDialog(true)}
+                className="border-x-[1px] border-deepKoamaru border-solid px-2 sm:px-6 absolute">
             <VscBook className="text-2xl"/>
-        </Link>
+        </button>
 
         {chapter.nextIndex ?
             <Link className={"flex flex-row items-center grow justify-end"}
@@ -104,9 +104,12 @@ const PagerSection = ({chapter, book}: PagerSectionProps): JSX.Element => {
     </div>;
 };
 
-const ChapterContent = (props: { book: Book; chapter: Chapter }): JSX.Element => {
+const ChapterContent = (props: {
+    book: Book;
+    chapter: Chapter,
+    setOpenDialog: (status: boolean) => void
+}): JSX.Element => {
     const [openBottom, setOpenBottom] = useState(false);
-    const [openDialog, setOpenDialog] = useState(false);
     const authContext = useAuthenticationContext();
     const systemContext = useSystemContext();
     const [accessToken,] = useAccessToken();
@@ -238,7 +241,7 @@ const ChapterContent = (props: { book: Book; chapter: Chapter }): JSX.Element =>
                     </Link>
 
                     <button
-                        onClick={() => setOpenDialog(true)}
+                        onClick={() => props.setOpenDialog(true)}
                         className="flex flex-row w-14 h-14 justify-center items-center text-2xl border-b-[1px] border-deepKoamaru">
                         <RiMenuLine/>
                     </button>
@@ -265,34 +268,32 @@ const ChapterContent = (props: { book: Book; chapter: Chapter }): JSX.Element =>
                 animate="visible"
                 exit="exit"
                 className="md:hidden fixed bottom-0 left-0 w-full bg-oldRose z-30">
-                <div className="flex flex-row justify-center items-center py-3 text-deepKoamaru">
+                <div className="flex flex-row justify-center items-center text-deepKoamaru">
                     <Link
                         to={`/books/${props.book.slug}`}
-                        className="h-full w-full flex flex-row justify-center items-center text-2xl border-r-[1px] border-deepKoamaru">
+                        className="py-4 h-full w-full flex flex-row justify-center items-center text-2xl border-r-[1px] border-deepKoamaru">
                         <FaHome/>
                     </Link>
 
                     <button
-                        onClick={() => setOpenDialog(true)}
-                        className="h-full w-full flex flex-row justify-center items-center text-2xl border-r-[1px] border-deepKoamaru">
+                        onClick={() => props.setOpenDialog(true)}
+                        className="py-4 h-full w-full flex flex-row justify-center items-center text-2xl border-r-[1px] border-deepKoamaru">
                         <RiMenuLine/>
                     </button>
 
                     <button
                         onClick={handleCreateBookmark}
-                        className="h-full w-full flex flex-row justify-center items-center text-2xl border-r-[1px] border-deepKoamaru">
+                        className="py-4 h-full w-full flex flex-row justify-center items-center text-2xl border-r-[1px] border-deepKoamaru">
                         <FaBookmark/>
                     </button>
 
                     <button onClick={scrollToTop}
-                            className="h-full w-full flex flex-row justify-center items-center text-2xl">
+                            className="py-4 h-full w-full flex flex-row justify-center items-center text-2xl">
                         <AiOutlineArrowUp/>
                     </button>
                 </div>
             </motion.div>}
         </AnimatePresence>
-
-        <MobileChapterList open={openDialog} handleClose={() => setOpenDialog(false)} book={props.book}/>
     </>;
 };
 
@@ -302,6 +303,8 @@ const BooksChapter = (): JSX.Element => {
     const [book, setBook] = useState<Book>();
     const authContext = useAuthenticationContext();
     const [accessToken,] = useAccessToken();
+    const navigate = useNavigate();
+    const [openDialog, setOpenDialog] = useState(false);
 
     useEffect(() => {
         (async () => {
@@ -318,13 +321,13 @@ const BooksChapter = (): JSX.Element => {
                     await currentlyReadingApiHelper.addBook(accessToken, {bookId, chapterIndex: _chapter.index});
                 }
             } catch (error: any) {
+                navigate("/404");
             }
         })();
     }, [slug, index]);
 
     if (!book || !chapter) {
         return <div className="min-h-[700px]">
-            <Loading show={true}/>
         </div>
     }
 
@@ -340,19 +343,21 @@ const BooksChapter = (): JSX.Element => {
         <ChapterHeader book={book} chapter={chapter}/>
 
         <div className="my-2">
-            <PagerSection chapter={chapter} book={book}/>
+            <PagerSection chapter={chapter} book={book} setOpenDialog={setOpenDialog}/>
         </div>
 
-        <ChapterContent book={book} chapter={chapter}/>
+        <ChapterContent setOpenDialog={setOpenDialog} book={book} chapter={chapter}/>
 
         <div className="my-2">
-            <PagerSection chapter={chapter} book={book}/>
+            <PagerSection chapter={chapter} book={book} setOpenDialog={setOpenDialog}/>
         </div>
 
         <div
             className="my-2 bg-[rgba(255,255,255,0.8)] border-[1px] border-solid border-slate-400 px-2 py-2 sm:px-8 sm:py-4">
             <CommentsSection size={5} bookId={book.id}/>
         </div>
+
+        <MobileChapterList open={openDialog} handleClose={() => setOpenDialog(false)} book={book}/>
     </div>;
 };
 

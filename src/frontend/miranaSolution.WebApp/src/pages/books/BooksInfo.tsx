@@ -325,7 +325,6 @@ const BooksInfo = (): JSX.Element => {
 
                 setStartChapter(start);
             } catch (error: any) {
-                // TODO: Navigate the user to not found page
                 navigate("/404");
             }
         })();
