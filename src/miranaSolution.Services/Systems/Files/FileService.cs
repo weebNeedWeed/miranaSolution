@@ -9,9 +9,9 @@ public class FileService : IFileService
     private readonly string _folder = "uploads";
     private readonly string _root;
 
-    public FileService(IHostingEnvironment webHostEnvironment)
+    public FileService(IWebHostEnvironment webHostEnvironment)
     {
-        _root = Path.Combine(webHostEnvironment.WebRootPath, _folder);
+        _root = Path.Combine(webHostEnvironment.ContentRootPath, _folder);
         if (!File.Exists(_root)) Directory.CreateDirectory(_root);
     }
 
