@@ -11,7 +11,7 @@ public class FileService : IFileService
 
     public FileService(IWebHostEnvironment webHostEnvironment)
     {
-        _root = Path.Combine(webHostEnvironment.ContentRootPath, _folder);
+        _root = Path.Combine(webHostEnvironment.WebRootPath, _folder);
         if (!File.Exists(_root)) Directory.CreateDirectory(_root);
     }
 
