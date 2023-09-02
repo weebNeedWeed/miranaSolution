@@ -2,7 +2,6 @@
 
 ![GitHub last commit (by committer)](https://img.shields.io/badge/1.0.0-8A2BE2)
 ![GitHub last commit (by committer)](https://img.shields.io/github/last-commit/weebNeedWeed/miranaSolution)
-![GitHub](https://img.shields.io/github/license/weebNeedWeed/miranaSolution)
 ![GitHub code size in bytes](https://img.shields.io/github/languages/code-size/weebNeedWeed/miranaSolution)
 
 
@@ -55,3 +54,5 @@ A mini Chinese novels reader which was built based on traditional Three-tier arc
    ```console
     npm run build
    ```
+
+## Some screenshots
