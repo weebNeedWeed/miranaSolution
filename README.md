@@ -54,6 +54,13 @@ A mini Chinese novels reader which was built based on traditional Three-tier arc
     npm run build
    ```
 
+## How to test
+
+Just simply go to the root/tests/miranaSolution.Services.Tests and run the command:
+```console
+dotnet test
+```
+
 ## Some screenshots
 ![Header](https://github.com/weebNeedWeed/miranaSolution/blob/master/screenshots/header.png?raw=true)
 
