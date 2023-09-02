@@ -3,7 +3,7 @@ import {Outlet, useLocation, useNavigate} from "react-router-dom";
 import {LoadingScreen, ToastContainer} from "../containers";
 import {useAccessToken} from "../helpers/hooks/useAccessToken";
 import {getUserByAccessToken} from "../helpers/utilityFns/validateAccessToken";
-import {useEffect} from "react";
+import {useEffect, useLayoutEffect} from "react";
 import {useSystemContext} from "../contexts/SystemContext";
 import {ToastMessage, ToastVariant} from "../components/Toast";
 import {useAuthenticationContext} from "../contexts/AuthenticationContext";
@@ -22,9 +22,9 @@ const DefaultLayout = (): JSX.Element => {
         window.scrollTo({top: 0, left: 0, behavior: "auto"});
     }, [location]);
 
-    useEffect(() => {
+    useLayoutEffect(() => {
         (async () => {
-            if (accessToken && accessToken !== "") {
+            if (accessToken.trim()) {
                 const result = await getUserByAccessToken(accessToken);
 
                 if (result === null) {
@@ -53,7 +53,7 @@ const DefaultLayout = (): JSX.Element => {
             }
         })();
 
-    }, [accessToken]);
+    }, []);
 
     return (
         <div>

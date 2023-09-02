@@ -1,6 +1,6 @@
 import {Outlet, useNavigate} from "react-router-dom";
 import {LoadingScreen, ToastContainer} from "../containers";
-import {useEffect} from "react";
+import {useEffect, useLayoutEffect} from "react";
 import {useAccessToken} from "../helpers/hooks/useAccessToken";
 import {getUserByAccessToken} from "../helpers/utilityFns/validateAccessToken";
 
@@ -8,9 +8,9 @@ const AuthLayout = (): JSX.Element => {
     const [accessToken, setAccessToken] = useAccessToken();
     const navigate = useNavigate();
 
-    useEffect(() => {
+    useLayoutEffect(() => {
         (async () => {
-            if (accessToken && accessToken !== "") {
+            if (accessToken.trim()) {
                 const result = await getUserByAccessToken(accessToken);
                 if (result === null) {
                     setAccessToken("");
@@ -20,7 +20,7 @@ const AuthLayout = (): JSX.Element => {
                 navigate("/");
             }
         })();
-    }, [accessToken]);
+    }, []);
 
     return (
         <div className="flex w-full justify-center min-h-[100vh]">

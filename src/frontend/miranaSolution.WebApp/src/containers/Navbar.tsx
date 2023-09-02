@@ -1,5 +1,5 @@
-import React, {MouseEvent, useEffect, useState} from "react";
-import {Link, NavLink, useNavigate} from "react-router-dom";
+import React, {MouseEvent, useEffect, useLayoutEffect, useState} from "react";
+import {Link, NavLink, useLocation, useNavigate} from "react-router-dom";
 import logo from "../assets/logo.svg";
 import {CgClose, CgMenuRight} from "react-icons/cg";
 import {clsx} from "clsx";
@@ -100,6 +100,7 @@ const Navbar = (): JSX.Element => {
     const [openUserMenu, setOpenUserMenu] = useState<boolean>(false);
     const [accessToken, setAccessToken] = useAccessToken();
     const navigate = useNavigate();
+    const location = useLocation();
     const [openGenresBox, setOpenGenresBox] = useState<boolean>(false);
     const matches = useMediaQuery("(max-width: 768px)");
 
@@ -108,6 +109,9 @@ const Navbar = (): JSX.Element => {
     const {isLoading, data: genresData, error} = useQuery("genres",
         () => genreApiHelper.getAllGenres());
 
+    useLayoutEffect(() => {
+        setToggleMenu(false);
+    }, [location]);
 
     useEffect(() => {
         if (toggleMenu) {
