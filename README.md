@@ -5,7 +5,7 @@
 ![GitHub code size in bytes](https://img.shields.io/github/languages/code-size/weebNeedWeed/miranaSolution)
 
 
-A mini Chinese novels reader which was built based on traditional Three-tier architecture with ASP.NET Core and Dependency Injection for loose coupling.
+A mini Chinese novels reader which was built based on traditional Three-layer architecture with ASP.NET Core and Dependency Injection for loose coupling.
 
 #### Technologies and libraries used in this project:
 1. For front-end side:
@@ -13,7 +13,7 @@ A mini Chinese novels reader which was built based on traditional Three-tier arc
     - Also using axios to facilitate the API callings.
 2. For back-end side:
     - Using ASP.NET Core for exposing API to clients.
-    - Based on Three-tier architecture with three main layers: Data (DAL), Services (BLL) and WebApp (UI).
+    - Based on Three-layer architecture with three main layers: Data (DAL), Services (BLL) and WebApp (UI).
     - Using SQL Server for persistence.
 3. Cloud Services: 
     - AWS EC2: for deploying.
