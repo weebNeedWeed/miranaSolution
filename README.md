@@ -8,23 +8,17 @@
 A mini Chinese novels reader which was built based on traditional Three-tier architecture with ASP.NET Core and Dependency Injection for loose coupling.
 
 #### Technologies and libraries used in this project:
-
-- For front-end side:
-    1. Using React for smooth UI and also some related libraries. i.e: Framer-motion for animation and Tailwindcss for all styling stuffs in the project.
-   
-    2. Also using axios to facilitate the API callings.
-- For back-end side:
-    1. Using ASP.NET Core for exposing API to clients.
-   
-    2. Based on Three-tier architecture with three main layers: Data (DAL), Services (BLL) and WebApp (UI).
-
-    3. Using SQL Server for persistence.
-- Cloud Services: 
-    1. AWS EC2: for deploying.
-
-    2. AWS RDS: A storage solution in Production environment.
-
-    3. AWS SES: Delivering recovery email to the users.
+1. For front-end side:
+    - Using React for smooth UI and also some related libraries. i.e: Framer-motion for animation and Tailwindcss for all styling stuffs in the project.
+    - Also using axios to facilitate the API callings.
+2. For back-end side:
+    - Using ASP.NET Core for exposing API to clients.
+    - Based on Three-tier architecture with three main layers: Data (DAL), Services (BLL) and WebApp (UI).
+    - Using SQL Server for persistence.
+3. Cloud Services: 
+    - AWS EC2: for deploying.
+    - AWS RDS: A storage solution in Production environment.
+    - AWS SES: Delivering recovery email to the users.
 
 ## How to install
 
