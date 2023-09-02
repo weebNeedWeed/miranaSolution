@@ -56,3 +56,8 @@ A mini Chinese novels reader which was built based on traditional Three-tier arc
    ```
 
 ## Some screenshots
+![Header](https://github.com/weebNeedWeed/miranaSolution/blob/master/screenshots/header.png?raw=true)
+
+![Home](https://github.com/weebNeedWeed/miranaSolution/blob/master/screenshots/home.png?raw=true)
+
+![Login](https://github.com/weebNeedWeed/miranaSolution/blob/master/screenshots/login.png?raw=true)
