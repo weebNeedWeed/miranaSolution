@@ -16,7 +16,7 @@ A mini Chinese novels reader which was built based on traditional Three-layer ar
     - Based on Three-layer architecture with three main layers: Data (DAL), Services (BLL) and WebApp (UI).
     - Using SQL Server for persistence.
 3. Cloud Services: 
-    - AWS EC2: for deploying.
+    - AWS EC2: for deployment.
     - AWS RDS: A storage solution in Production environment.
     - AWS SES: Delivering recovery email to the users.
 
