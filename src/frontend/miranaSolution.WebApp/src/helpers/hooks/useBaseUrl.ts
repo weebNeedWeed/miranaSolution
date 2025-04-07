@@ -1,7 +1,7 @@
 const useBaseUrl = () => {
-    const baseUrl = import.meta.env.VITE_BASE_ADDRESS;
+  const baseUrl = import.meta.env.VITE_BASE_ADDRESS;
 
-    return baseUrl;
-}
+  return baseUrl;
+};
 
-export {useBaseUrl};
+export { useBaseUrl };
