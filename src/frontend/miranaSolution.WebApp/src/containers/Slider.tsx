@@ -22,7 +22,7 @@ const SwiperSlideChild = ({ image }: SwiperChildSlideProps): JSX.Element => {
       className={`w-[150px] h-[224px] sm:w-[215px] sm:h-[322px] bg-cover bg-center`}
       style={{
         boxShadow: "rgba(0, 0, 0, 0.35) 0px 5px 15px",
-        backgroundImage: `url('@/${baseUrl}/${image}')`,
+        backgroundImage: `url('${baseUrl}${image}')`,
       }}
     ></div>
   );
