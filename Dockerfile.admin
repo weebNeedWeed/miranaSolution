@@ -1,0 +1,24 @@
+FROM mcr.microsoft.com/dotnet/sdk:6.0 AS build
+
+ENV ASPNETCORE_ENVIRONMENT=Production
+
+WORKDIR /app
+
+COPY . .
+
+RUN dotnet restore ./src/frontend/miranaSolution.Admin
+
+RUN dotnet publish ./src/frontend/miranaSolution.Admin -o ./output
+
+###
+FROM mcr.microsoft.com/dotnet/aspnet:6.0.36
+
+WORKDIR /app
+ENV ASPNETCORE_URLS=http://+:5000
+
+COPY --from=build /app/output/ ./
+
+EXPOSE 5000
+EXPOSE 5001
+
+CMD ["dotnet", "miranaSolution.Admin.dll"]

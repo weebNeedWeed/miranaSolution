@@ -477,7 +477,6 @@ $RECYCLE.BIN/
 *.lnk
 
 appsettings.development.json
-Migrations
 .idea
 
 wwwroot/uploads
