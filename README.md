@@ -7,6 +7,8 @@
 
 A mini Chinese novels reader which was built based on traditional Three-layer architecture with ASP.NET Core and Dependency Injection for loose coupling.
 
+![Architectural Diagram](https://github.com/weebNeedWeed/miranaSolution/blob/master/screenshots/mirana.drawio.png?raw=true)
+
 #### Technologies and libraries used in this project:
 1. For front-end side:
     - Using React for smooth UI and also some related libraries. i.e: Framer-motion for animation and Tailwindcss for all styling stuffs in the project.
@@ -15,10 +17,8 @@ A mini Chinese novels reader which was built based on traditional Three-layer ar
     - Using ASP.NET Core for exposing API to clients.
     - Based on Three-layer architecture with three main layers: Data (DAL), Services (BLL) and WebApp (UI).
     - Using SQL Server for persistence.
-3. Cloud Services: 
-    - AWS EC2: for deployment.
-    - AWS RDS: A storage solution in Production environment.
-    - AWS SES: Delivering recovery email to the users.
+3. Deployment: 
+    - AWS Elastic Container Service
 
 ## How to install
 
